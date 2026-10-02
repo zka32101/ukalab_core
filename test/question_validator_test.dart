@@ -129,6 +129,68 @@ void main() {
     expect(codes(validateQuestions([q(contentVer: '')])), {'no-content-ver'});
   });
 
+  group('仕訳(journal)の検証', () {
+    Question journalQ({
+      List<JournalLine> lines = const [
+        JournalLine(side: JournalSide.debit, account: 'cash', amount: 1000),
+        JournalLine(side: JournalSide.credit, account: 'sales', amount: 1000),
+      ],
+    }) =>
+        Question(
+          qid: 'j1',
+          examId: 'sample',
+          subjectId: 'math',
+          topicId: 't',
+          prompt: '仕訳せよ',
+          type: QuestionType.journal,
+          journalAnswer: JournalAnswer(lines: lines),
+          explanation: '解説',
+          source: QuestionSource.original,
+          sourceRef: '自作',
+          contentVer: '1',
+        );
+
+    test('正しい仕訳は指摘なし', () {
+      expect(validateQuestions([journalQ()]), isEmpty);
+    });
+
+    test('借方合計と貸方合計が不一致', () {
+      expect(
+        codes(validateQuestions([
+          journalQ(lines: const [
+            JournalLine(side: JournalSide.debit, account: 'cash', amount: 1000),
+            JournalLine(side: JournalSide.credit, account: 'sales', amount: 900),
+          ])
+        ])),
+        contains('journal-unbalanced'),
+      );
+    });
+
+    test('行が空', () {
+      expect(codes(validateQuestions([journalQ(lines: const [])])), contains('journal-empty'));
+    });
+
+    test('金額が0以下', () {
+      expect(
+        codes(validateQuestions([
+          journalQ(lines: const [
+            JournalLine(side: JournalSide.debit, account: 'cash', amount: 0),
+            JournalLine(side: JournalSide.credit, account: 'sales', amount: 0),
+          ])
+        ])),
+        contains('journal-amount'),
+      );
+    });
+
+    test('toJson → fromJson で往復できる', () {
+      final original = journalQ();
+      final again = Question.fromJson(
+        jsonDecode(jsonEncode(original.toJson())) as Map<String, dynamic>,
+      );
+      expect(again.toJson(), original.toJson());
+    });
+  });
+
   test('試験定義との整合', () {
     expect(codes(validateQuestions([q(examId: 'other')], exam: exam)), {'exam-mismatch'});
     expect(codes(validateQuestions([q(subjectId: 'zzz')], exam: exam)), {'unknown-subject'});

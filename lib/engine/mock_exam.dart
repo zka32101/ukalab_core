@@ -1,5 +1,6 @@
 import '../config/exam_config.dart';
 import '../question/question.dart';
+import 'journal_judge.dart';
 
 /// 得点と満点。
 class ScoreLine {
@@ -39,13 +40,25 @@ class MockExamResult {
 /// 必要得点（得点率 pct を満たす最小の整数点）。
 int requiredScore(double pct, int max) => (pct * max / 100 - 1e-9).ceil();
 
+bool _isCorrect(Question q, Object? answer) {
+  switch (q.type) {
+    case QuestionType.choice:
+      return answer is int && answer == q.answerIndex;
+    case QuestionType.journal:
+      final expected = q.journalAnswer;
+      if (expected == null || answer is! List<JournalLine>) return false;
+      return judgeJournal(expected, answer).isCorrect;
+  }
+}
+
 /// 模擬試験を採点して合否を判定する。
 ///
-/// [answers] は qid → 選んだ選択肢の番号。未回答は null または欠落（不正解扱い）。
-/// 科目別の最低得点率は、出題が1問以上ある科目にだけ適用する。
+/// [answers] は qid → 回答。choice型は選んだ選択肢の番号（int）、journal型は
+/// 入力した仕訳の行（`List<JournalLine>`）。未回答は null・型違い・欠落のいずれも
+/// 不正解扱い。科目別の最低得点率は、出題が1問以上ある科目にだけ適用する。
 MockExamResult scoreMockExam({
   required List<Question> questions,
-  required Map<String, int?> answers,
+  required Map<String, Object?> answers,
   required PassRule rule,
 }) {
   final subjectScore = <String, int>{};
@@ -56,7 +69,7 @@ MockExamResult scoreMockExam({
   for (final q in questions) {
     max += q.points;
     subjectMax[q.subjectId] = (subjectMax[q.subjectId] ?? 0) + q.points;
-    final correct = answers[q.qid] == q.answerIndex;
+    final correct = _isCorrect(q, answers[q.qid]);
     final got = correct ? q.points : 0;
     score += got;
     subjectScore[q.subjectId] = (subjectScore[q.subjectId] ?? 0) + got;
