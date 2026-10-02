@@ -6,4 +6,6 @@ export 'content/question_validator.dart';
 export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';
+export 'policy/free_tier.dart';
+export 'policy/usage_quota.dart';
 export 'question/question.dart';

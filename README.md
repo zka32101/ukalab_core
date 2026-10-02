@@ -75,6 +75,17 @@ items[record.qid] = Srs.review(items[record.qid], qid: record.qid, correct: reco
 
 保存（端末内・Firestore）はこのパッケージの範囲外。型は JSON に往復できる。
 
+### 無料枠とプレミアムの線引き
+
+```dart
+const limits = FreeTierLimits.standard; // 暫定。値は変更できる
+final quota = limits.mockExamQuota(isPremium: hasPremium, store: myStore);
+if (quota.canUse && await quota.tryConsume()) { /* 模擬試験を開始 */ }
+final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全分野
+```
+
+`KeyValueStore` はアプリ側で SharedPreferences などを使って実装する。premium だけが対象で、noads のみの人は無料と同じ扱い。
+
 ## まだ入っていないもの
 
 テーマ（分野色・資格別テーマ色）、推し・コイン、共通UI部品、学習体験の「型」9部品、Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
