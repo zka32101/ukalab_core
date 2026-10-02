@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../config/exam_config.dart';
 import '../question/question.dart';
 import 'journal_judge.dart';
@@ -39,6 +41,34 @@ class MockExamResult {
 
 /// 必要得点（得点率 pct を満たす最小の整数点）。
 int requiredScore(double pct, int max) => (pct * max / 100 - 1e-9).ceil();
+
+/// 模擬試験の出題を選ぶ。無効（disabled）の問題は除く。
+///
+/// [level.subjectQuestionCounts] があれば科目ごとにその数だけ抽出する
+/// （出題順は指定した科目の順。各科目の問題が足りない分はそのまま不足する）。
+/// 無ければ全体から [level.questionCount] 問を抽出する。
+List<Question> pickMockExamQuestions({
+  required Iterable<Question> pool,
+  required LevelConfig level,
+  int seed = 0,
+}) {
+  final active = pool.where((q) => !q.disabled).toList();
+  final counts = level.subjectQuestionCounts;
+  if (counts == null) {
+    return (List<Question>.from(active)..shuffle(Random(seed)))
+        .take(level.questionCount)
+        .toList();
+  }
+  final result = <Question>[];
+  var salt = 0;
+  for (final entry in counts.entries) {
+    final subjectPool = active.where((q) => q.subjectId == entry.key).toList()
+      ..shuffle(Random(seed + salt));
+    result.addAll(subjectPool.take(entry.value));
+    salt++;
+  }
+  return result;
+}
 
 bool _isCorrect(Question q, Object? answer) {
   switch (q.type) {

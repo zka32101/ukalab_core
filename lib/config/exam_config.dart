@@ -60,6 +60,7 @@ class LevelConfig {
     required this.questionCount,
     required this.passRule,
     this.timeLimitSec,
+    this.subjectQuestionCounts,
   });
 
   final String levelId;
@@ -72,6 +73,11 @@ class LevelConfig {
   /// 制限時間（秒）。null なら無制限。
   final int? timeLimitSec;
 
+  /// 科目別の出題数配分（subjectId → 問数）。null なら科目を区別せず
+  /// 全体から [questionCount] 問を抽出する。指定する場合、値の合計は
+  /// [questionCount] と一致する必要がある。
+  final Map<String, int>? subjectQuestionCounts;
+
   factory LevelConfig.fromJson(Map<String, dynamic> j) {
     const where = 'level';
     final count = reqInt(j, 'questionCount', where);
@@ -82,12 +88,26 @@ class LevelConfig {
     }
     final rule = j['passRule'];
     if (rule is! Map<String, dynamic>) fail(where, '"passRule" が必要です');
+    final subjectCounts = optIntMap(j, 'subjectQuestionCounts', where);
+    if (subjectCounts != null) {
+      if (subjectCounts.values.any((v) => v <= 0)) {
+        fail(where, '"subjectQuestionCounts" の値は1以上が必要です');
+      }
+      final sum = subjectCounts.values.fold(0, (a, b) => a + b);
+      if (sum != count) {
+        fail(
+          where,
+          '"subjectQuestionCounts" の合計($sum)が"questionCount"($count)と一致しません',
+        );
+      }
+    }
     return LevelConfig(
       levelId: reqString(j, 'levelId', where),
       name: reqString(j, 'name', where),
       questionCount: count,
       timeLimitSec: limit as int?,
       passRule: PassRule.fromJson(rule, '$where.passRule'),
+      subjectQuestionCounts: subjectCounts,
     );
   }
 
@@ -97,6 +117,8 @@ class LevelConfig {
         'questionCount': questionCount,
         if (timeLimitSec != null) 'timeLimitSec': timeLimitSec,
         'passRule': passRule.toJson(),
+        if (subjectQuestionCounts != null)
+          'subjectQuestionCounts': subjectQuestionCounts,
       };
 }
 
@@ -135,6 +157,19 @@ class ExamConfig {
     ];
     _requireUnique(subjects.map((s) => s.subjectId), 'subjectId');
     _requireUnique(levels.map((l) => l.levelId), 'levelId');
+    final subjectIds = subjects.map((s) => s.subjectId).toSet();
+    for (final level in levels) {
+      final counts = level.subjectQuestionCounts;
+      if (counts == null) continue;
+      for (final id in counts.keys) {
+        if (!subjectIds.contains(id)) {
+          fail(
+            where,
+            'level ${level.levelId} の subjectQuestionCounts に未知の subjectId: $id',
+          );
+        }
+      }
+    }
 
     final dates = j['examDates'];
     return ExamConfig(

@@ -45,6 +45,18 @@ double? optNum(Map<String, dynamic> j, String key, String where) {
   return v.toDouble();
 }
 
+Map<String, int>? optIntMap(Map<String, dynamic> j, String key, String where) {
+  final v = j[key];
+  if (v == null) return null;
+  if (v is! Map) fail(where, '"$key" はオブジェクトが必要です');
+  final result = <String, int>{};
+  v.forEach((k, value) {
+    if (value is! int) fail(where, '"$key.$k" は整数が必要です');
+    result[k as String] = value;
+  });
+  return result;
+}
+
 List<Map<String, dynamic>> reqObjectList(
   Map<String, dynamic> j,
   String key,

@@ -53,4 +53,54 @@ void main() {
     });
     expectInvalid('試験日が不正', (j) => j['examDates'] = ['明日']);
   });
+
+  group('subjectQuestionCounts（科目別の出題数配分）', () {
+    Map<String, dynamic> sampleWithCounts(Map<String, int> counts) {
+      final j = sample();
+      ((j['levels'] as List<dynamic>).first as Map<String, dynamic>)
+          ['subjectQuestionCounts'] = counts;
+      return j;
+    }
+
+    test('指定すれば読み込め、合計は questionCount と一致する', () {
+      final exam = ExamConfig.fromJson(sampleWithCounts({'math': 2, 'word': 2}));
+      final level = exam.level('basic')!;
+      expect(level.questionCount, 4);
+      expect(level.subjectQuestionCounts, {'math': 2, 'word': 2});
+    });
+
+    test('指定しなければ null（全体から抽出する従来の挙動）', () {
+      final exam = ExamConfig.fromJson(sample());
+      expect(exam.level('basic')!.subjectQuestionCounts, isNull);
+    });
+
+    test('toJson → fromJson で往復できる', () {
+      final exam = ExamConfig.fromJson(sampleWithCounts({'math': 2, 'word': 2}));
+      final again = ExamConfig.fromJson(
+        jsonDecode(jsonEncode(exam.toJson())) as Map<String, dynamic>,
+      );
+      expect(again.toJson(), exam.toJson());
+    });
+
+    test('合計が questionCount と一致しなければ FormatException', () {
+      expect(
+        () => ExamConfig.fromJson(sampleWithCounts({'math': 2, 'word': 3})),
+        throwsFormatException,
+      );
+    });
+
+    test('未知の subjectId を含むと FormatException', () {
+      expect(
+        () => ExamConfig.fromJson(sampleWithCounts({'math': 2, 'nazo': 2})),
+        throwsFormatException,
+      );
+    });
+
+    test('値が0以下だと FormatException', () {
+      expect(
+        () => ExamConfig.fromJson(sampleWithCounts({'math': 4, 'word': 0})),
+        throwsFormatException,
+      );
+    });
+  });
 }

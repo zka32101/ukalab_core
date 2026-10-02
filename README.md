@@ -59,6 +59,16 @@ result.subjectShortfalls;    // 足切りに満たない科目 → あと何点
 result.failedBySubjectCutoff // 総合は届いたが足切りで不合格
 ```
 
+出題を選ぶには `pickMockExamQuestions` を使う。`ExamConfig` の `LevelConfig.subjectQuestionCounts`（科目別の出題数。例: 乙4の法令15問・物理化学10問・性質消火10問）を指定すれば科目ごとに決まった数を抽出し、省略すれば全体から `questionCount` 問をランダムに抽出する。
+
+```dart
+final picked = pickMockExamQuestions(
+  pool: examQuestions,
+  level: exam.level('otsu4')!, // subjectQuestionCounts を持つ level
+  seed: 1,
+);
+```
+
 ### 演習と間隔反復
 
 ```dart

@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [Unreleased]
+
+危険物乙4（法令15問・物理化学10問・性質消火10問のように科目ごとに固定数を出題する試験）向け。追加のみで、v0.3 の API に破壊的変更はない。
+
+### Added
+- `LevelConfig.subjectQuestionCounts`: 科目別の出題数配分（`Map<String, int>`、subjectId → 問数）。省略すると従来どおり全体から `questionCount` 問を抽出する。指定する場合は値の合計が `questionCount` と一致すること、キーが `subjects` に存在することを検証する
+- `pickMockExamQuestions`: 模擬試験の出題を選ぶ関数。`subjectQuestionCounts` があれば科目ごとにその数だけ、無ければ全体からランダムに抽出する（無効=disabledの問題は除く。科目の問題が不足する場合は例外にせずあるだけ返す）
+
 ## [0.3.0] - 2026-10-02
 
 簿記3級（仕訳）向け。追加のみで、v0.2 の API に破壊的変更はない。
