@@ -1,0 +1,5 @@
+// 架空のサンプル問題。実在の試験の問題ではない。
+{"qid":"sample-0001","examId":"sample","levelId":"basic","subjectId":"math","topicId":"add","prompt":"2 + 3 はいくつ？","choices":["4","5","6","7"],"answerIndex":1,"explanation":"2に3を足すと5。","difficulty":1,"source":"original","sourceRef":"自作（四則演算の基本）","contentVer":"2026.10.0"}
+{"qid":"sample-0002","examId":"sample","subjectId":"math","topicId":"mul","prompt":"6 × 7 はいくつ？","choices":["36","40","42","48"],"answerIndex":2,"explanation":"6×7=42。","difficulty":2,"points":2,"source":"original","sourceRef":"自作（九九）","contentVer":"2026.10.0"}
+{"qid":"sample-0003","examId":"sample","levelId":"basic","subjectId":"word","topicId":"kana","prompt":"「さくら」を漢字で書くと？","choices":["桜","梅","松","竹"],"answerIndex":0,"explanation":"桜（さくら）。","difficulty":1,"source":"original","sourceRef":"自作（一般的な語彙）","contentVer":"2026.10.0"}
+{"qid":"sample-0004","examId":"sample","levelId":"basic","subjectId":"word","topicId":"law","prompt":"サンプル条文の施行日は？","choices":["公布の日","公布から1年後","公布から2年後"],"answerIndex":1,"explanation":"架空の条文で、公布から1年後に施行される。","difficulty":3,"source":"statute","sourceRef":"架空法 第1条","lawVersion":"2026-04","contentVer":"2026.10.0"}

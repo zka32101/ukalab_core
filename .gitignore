@@ -1,0 +1,8 @@
+.dart_tool/
+.packages
+build/
+pubspec.lock
+pubspec_overrides.yaml
+*.log
+.idea/
+.vscode/
