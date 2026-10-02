@@ -1,0 +1,19 @@
+{
+  "examId": "sample",
+  "name": "サンプル検定（架空）",
+  "audience": "adult",
+  "subjects": [
+    { "subjectId": "math", "name": "計算", "order": 1 },
+    { "subjectId": "word", "name": "言葉", "order": 2 }
+  ],
+  "levels": [
+    {
+      "levelId": "basic",
+      "name": "基礎",
+      "questionCount": 4,
+      "timeLimitSec": 600,
+      "passRule": { "totalPct": 70, "subjectMinPct": 60 }
+    }
+  ],
+  "examDates": ["2027-03-14"]
+}
