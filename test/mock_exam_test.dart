@@ -186,4 +186,72 @@ void main() {
       expect(r.passed, isTrue);
     });
   });
+
+  group('pickMockExamQuestions', () {
+    const levelWithoutCounts = LevelConfig(
+      levelId: 'l',
+      name: 'レベル',
+      questionCount: 6,
+      passRule: PassRule(totalPct: 60),
+    );
+    const levelWithCounts = LevelConfig(
+      levelId: 'l',
+      name: 'レベル',
+      questionCount: 6,
+      passRule: PassRule(totalPct: 60),
+      subjectQuestionCounts: {'math': 4, 'word': 2},
+    );
+
+    test('配分指定が無ければ全体から questionCount 問をランダムに選ぶ', () {
+      final picked = pickMockExamQuestions(pool: qs, level: levelWithoutCounts);
+      expect(picked.length, 6);
+      expect(picked.toSet().length, 6); // 重複なし
+    });
+
+    test('配分指定があれば科目ごとに指定数だけ選ぶ', () {
+      final picked = pickMockExamQuestions(pool: qs, level: levelWithCounts);
+      expect(picked.where((q) => q.subjectId == 'math').length, 4);
+      expect(picked.where((q) => q.subjectId == 'word').length, 2);
+    });
+
+    test('同じ seed なら同じ出題になる', () {
+      final a = pickMockExamQuestions(pool: qs, level: levelWithCounts, seed: 1);
+      final b = pickMockExamQuestions(pool: qs, level: levelWithCounts, seed: 1);
+      expect(a.map((q) => q.qid).toList(), b.map((q) => q.qid).toList());
+    });
+
+    test('無効（disabled）の問題は選ばれない', () {
+      final disabled = Question(
+        qid: 'm_disabled',
+        examId: 'sample',
+        subjectId: 'math',
+        topicId: 't',
+        prompt: 'p',
+        choices: const ['a', 'b'],
+        answerIndex: 0,
+        explanation: 'e',
+        source: QuestionSource.original,
+        sourceRef: '自作',
+        contentVer: '1',
+        disabled: true,
+      );
+      final picked = pickMockExamQuestions(
+        pool: [...qs, disabled],
+        level: levelWithCounts,
+      );
+      expect(picked.any((q) => q.qid == 'm_disabled'), isFalse);
+    });
+
+    test('科目の問題が足りない場合はあるだけ返す（例外にならない）', () {
+      const shortLevel = LevelConfig(
+        levelId: 'l',
+        name: 'レベル',
+        questionCount: 100,
+        passRule: PassRule(totalPct: 60),
+        subjectQuestionCounts: {'math': 50, 'word': 50},
+      );
+      final picked = pickMockExamQuestions(pool: qs, level: shortLevel);
+      expect(picked.length, 10); // math5 + word5 しかない
+    });
+  });
 }
