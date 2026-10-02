@@ -85,21 +85,41 @@ List<ContentIssue> validateQuestions(
       add(q, 'no-law-version', 'statute の問題には lawVersion が必要です');
     }
 
-    // 選択肢と正解の一意性
-    final n = q.choices.length;
-    if (n < options.minChoices || n > options.maxChoices) {
-      add(q, 'choice-count',
-          '選択肢は${options.minChoices}〜${options.maxChoices}個（現在$n個）');
-    }
-    final normalized = [for (final c in q.choices) c.trim()];
-    if (normalized.any((c) => c.isEmpty)) {
-      add(q, 'empty-choice', '空の選択肢があります');
-    }
-    if (normalized.toSet().length != normalized.length) {
-      add(q, 'duplicate-choice', '同じ文面の選択肢があり、正解が一意になりません');
-    }
-    if (q.answerIndex < 0 || q.answerIndex >= n) {
-      add(q, 'answer-range', 'answerIndex(${q.answerIndex}) が選択肢の範囲外です');
+    switch (q.type) {
+      case QuestionType.choice:
+        // 選択肢と正解の一意性
+        final n = q.choices.length;
+        if (n < options.minChoices || n > options.maxChoices) {
+          add(q, 'choice-count',
+              '選択肢は${options.minChoices}〜${options.maxChoices}個（現在$n個）');
+        }
+        final normalized = [for (final c in q.choices) c.trim()];
+        if (normalized.any((c) => c.isEmpty)) {
+          add(q, 'empty-choice', '空の選択肢があります');
+        }
+        if (normalized.toSet().length != normalized.length) {
+          add(q, 'duplicate-choice', '同じ文面の選択肢があり、正解が一意になりません');
+        }
+        if (q.answerIndex < 0 || q.answerIndex >= n) {
+          add(q, 'answer-range', 'answerIndex(${q.answerIndex}) が選択肢の範囲外です');
+        }
+      case QuestionType.journal:
+        // 仕訳: 借方合計＝貸方合計を機械検証（企画設計書3-2「正解は仕訳エンジンで再計算」）
+        final answer = q.journalAnswer;
+        if (answer == null || answer.lines.isEmpty) {
+          add(q, 'journal-empty', '仕訳の行がありません');
+        } else {
+          if (answer.lines.any((l) => l.amount <= 0)) {
+            add(q, 'journal-amount', '仕訳の金額は1以上である必要があります');
+          }
+          if (answer.lines.any((l) => l.account.trim().isEmpty)) {
+            add(q, 'journal-account', '仕訳の勘定科目が空です');
+          }
+          if (answer.debitTotal != answer.creditTotal) {
+            add(q, 'journal-unbalanced',
+                '借方合計(${answer.debitTotal})と貸方合計(${answer.creditTotal})が一致しません');
+          }
+        }
     }
 
     if (q.difficulty < 1 || q.difficulty > 5) {

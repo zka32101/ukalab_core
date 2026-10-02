@@ -2,6 +2,19 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.3.0] - 2026-10-02
+
+簿記3級（仕訳）向け。追加のみで、v0.2 の API に破壊的変更はない。
+
+### Added
+- `QuestionType.journal`: 仕訳問題タイプ。`JournalSide`（debit/credit）・`JournalLine`（side・account・amount）・`JournalAnswer`（複合仕訳＝行の配列）
+- `judgeJournal`: 仕訳の正解とユーザー入力を比較し、行ごとに `correct` / `wrongAccount`（科目違い）/ `wrongAmount`（金額違い）/ `sideSwapped`（貸借逆）/ `missing`（不足）/ `extra`（余分）を判定。入力中の貸借合計一致（`balanced`）も返す
+- `validateQuestions`: journal型の検証を追加（行が空でない、金額1以上、勘定科目が空でない、借方合計＝貸方合計）。choice型の検証（選択肢数・正解の一意性など）は従来どおり type が choice の問題にのみ適用
+- `scoreMockExam`: journal型の問題を採点できるよう `answers` の値の型を `int?` から `Object?` に広げた（choice型は `int`、journal型は `List<JournalLine>` を渡す）。既存の `Map<String, int?>` の呼び出しはそのまま動く
+
+### Notes
+- `PracticeSession`（演習セッション）はまだ choice 型専用（`answer(int choiceIndex)`）。journal型の演習は、アプリ側で `judgeJournal` を直接呼ぶか、対応は次回以降
+
 ## [0.2.0] - 2026-10-02
 
 ### Added

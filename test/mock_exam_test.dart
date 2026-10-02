@@ -108,4 +108,82 @@ void main() {
     expect(requiredScore(66.7, 3), 3); // 2.001 → 3
     expect(requiredScore(0, 10), 0);
   });
+
+  group('journal型の採点', () {
+    final correctAnswer = JournalAnswer(lines: const [
+      JournalLine(side: JournalSide.debit, account: 'cash', amount: 1000),
+      JournalLine(side: JournalSide.credit, account: 'sales', amount: 1000),
+    ]);
+    final journalQuestion = Question(
+      qid: 'j1',
+      examId: 'sample',
+      subjectId: 'shiwake',
+      topicId: 't',
+      prompt: '仕訳せよ',
+      type: QuestionType.journal,
+      journalAnswer: correctAnswer,
+      explanation: 'e',
+      source: QuestionSource.original,
+      sourceRef: '自作',
+      points: 3,
+      contentVer: '1',
+    );
+
+    test('仕訳が正解なら満点', () {
+      final r = scoreMockExam(
+        questions: [journalQuestion],
+        answers: {
+          'j1': const [
+            JournalLine(side: JournalSide.debit, account: 'cash', amount: 1000),
+            JournalLine(side: JournalSide.credit, account: 'sales', amount: 1000),
+          ],
+        },
+        rule: const PassRule(totalPct: 100),
+      );
+      expect(r.total.score, 3);
+      expect(r.passed, isTrue);
+    });
+
+    test('仕訳が不正解なら0点', () {
+      final r = scoreMockExam(
+        questions: [journalQuestion],
+        answers: {
+          'j1': const [
+            JournalLine(side: JournalSide.debit, account: 'cash', amount: 999),
+            JournalLine(side: JournalSide.credit, account: 'sales', amount: 999),
+          ],
+        },
+        rule: const PassRule(totalPct: 60),
+      );
+      expect(r.total.score, 0);
+    });
+
+    test('未回答・型違いは不正解扱い（例外にならない）', () {
+      final r1 = scoreMockExam(questions: [journalQuestion], answers: const {}, rule: const PassRule(totalPct: 60));
+      expect(r1.total.score, 0);
+      final r2 = scoreMockExam(
+        questions: [journalQuestion],
+        answers: {'j1': 0},
+        rule: const PassRule(totalPct: 60),
+      );
+      expect(r2.total.score, 0);
+    });
+
+    test('choice型とjournal型が混在する模試を採点できる', () {
+      final choiceQuestion = q('c1', 'riron');
+      final r = scoreMockExam(
+        questions: [choiceQuestion, journalQuestion],
+        answers: {
+          'c1': 0,
+          'j1': const [
+            JournalLine(side: JournalSide.debit, account: 'cash', amount: 1000),
+            JournalLine(side: JournalSide.credit, account: 'sales', amount: 1000),
+          ],
+        },
+        rule: const PassRule(totalPct: 100),
+      );
+      expect(r.total.score, 4); // choice 1点 + journal 3点
+      expect(r.passed, isTrue);
+    });
+  });
 }
