@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.5.0] - 2026-10-03
+
+専門用語の解説（決定50「専門用語の解説（全アプリ共通）」）向け。追加のみで、v0.4 の API に破壊的変更はない。
+
+### Added
+- `Term`: 専門用語の解説カード（termId・term・headline・definition・analogy・commonMistake・relatedTermIds・relatedQuestionIds・diagramId・出典）
+- `parseTermsJsonl`: JSON Lines（1行1用語）を読む。読めない行は issue に入れて続行する
+- `validateTerms`: 配信前の品質ゲート。①〜③（headline・definition）が空でないか、関連用語・関連問題のリンク切れ、見出し語（表記）の重複、出典の有無、試験定義との整合を検査する
+
 ## [0.4.0] - 2026-10-03
 
 危険物乙4（法令15問・物理化学10問・性質消火10問のように科目ごとに固定数を出題する試験）向け。追加のみで、v0.3 の API に破壊的変更はない。

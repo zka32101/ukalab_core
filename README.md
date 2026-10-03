@@ -18,7 +18,8 @@
 lib/
   config/     ExamConfig（試験定義）
   question/   Question（選択式。出典区分・配点・無効フラグ）
-  content/    問題データの検証（配信前の品質ゲート）
+  term/       Term（専門用語の解説カード。決定50）
+  content/    問題データ・用語データの検証（配信前の品質ゲート）
   engine/     scoreMockExam（採点・合否）, Srs（間隔反復）, PracticeSession（演習）
 bin/
   validate_content.dart   問題データ検証 CLI
@@ -44,6 +45,21 @@ dart run yourwish_kentei:validate_content exam.json questions.jsonl
 ```
 
 検査する項目: 出典の説明が必須／`licensed` は `license` 必須／`statute` は `lawVersion` 必須／qid の重複／選択肢の個数／同じ文面の選択肢（正解の一意性）／`answerIndex` の範囲／解説・`contentVer` の有無／試験定義との整合（examId・subjectId・levelId）。問題が1件でもあれば終了コード 1。
+
+### 用語データを検証する（配信前・CI、決定50）
+
+専門用語の解説カードも JSON Lines（1行1用語）。[example/sample_terms.jsonl](example/sample_terms.jsonl) を参照。問題文・解説文からは `termId` で参照する（アプリ側の責務）。
+
+```bash
+dart run yourwish_kentei:validate_content exam.json --terms terms.jsonl questions.jsonl
+```
+
+検査する項目: `headline`（①ひとことで言うと）・`definition`（②正確な意味）が空でないか／`termId` の重複／見出し語（表記）の重複（同義語は `relatedTermIds` で結ぶ）／`relatedTermIds`・`relatedQuestionIds` のリンク切れ／出典の有無／試験定義との整合。`--terms` は複数指定できる。
+
+```dart
+final parsed = parseTermsJsonl(text);
+final issues = validateTerms(parsed.terms, exam: exam, questions: questions);
+```
 
 ### 模擬試験を採点する
 
