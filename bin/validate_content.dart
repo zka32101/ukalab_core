@@ -5,12 +5,13 @@ import 'package:yourwish_kentei/yourwish_kentei.dart';
 
 /// 問題データ・用語データの配信前チェック。
 ///
-/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... questions.jsonl...`
+/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... questions.jsonl...`
 /// 問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
     stderr.writeln(
-      '使い方: validate_content <exam_config.json> [--terms terms.jsonl]... <questions.jsonl>...',
+      '使い方: validate_content <exam_config.json> [--terms terms.jsonl]... '
+      '[--boundary boundary.jsonl]... <questions.jsonl>...',
     );
     exit(64);
   }
@@ -26,6 +27,7 @@ Future<void> main(List<String> args) async {
 
   final questionPaths = <String>[];
   final termPaths = <String>[];
+  final boundaryPaths = <String>[];
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
     if (rest[i] == '--terms') {
@@ -34,6 +36,12 @@ Future<void> main(List<String> args) async {
         exit(64);
       }
       termPaths.add(rest[++i]);
+    } else if (rest[i] == '--boundary') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--boundary の後にファイルパスが必要です');
+        exit(64);
+      }
+      boundaryPaths.add(rest[++i]);
     } else {
       questionPaths.add(rest[i]);
     }
@@ -62,12 +70,26 @@ Future<void> main(List<String> args) async {
     issues.addAll(validateTerms(terms, exam: exam, questions: questions));
   }
 
+  final boundaryScenarios = <BoundaryScenario>[];
+  for (final path in boundaryPaths) {
+    final parsed = parseBoundaryScenariosJsonl(await File(path).readAsString());
+    boundaryScenarios.addAll(parsed.scenarios);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (boundaryScenarios.isNotEmpty) {
+    issues.addAll(validateBoundaryScenarios(boundaryScenarios, exam: exam));
+  }
+
   for (final issue in issues) {
     stdout.writeln(issue);
   }
   final termsSummary = terms.isEmpty ? '' : '、${terms.length}語を検査';
+  final boundarySummary =
+      boundaryScenarios.isEmpty ? '' : '、${boundaryScenarios.length}場面を検査';
   stdout.writeln(
-    '${exam.examId}: ${questions.length}問を検査$termsSummary、問題${issues.length}件',
+    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary、問題${issues.length}件',
   );
   exit(issues.isEmpty ? 0 : 1);
 }
