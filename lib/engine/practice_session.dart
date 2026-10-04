@@ -1,22 +1,26 @@
 import 'dart:math';
 
+import 'journal_judge.dart';
 import '../question/question.dart';
 
 enum PracticeMode { practice, mock, weak }
 
-/// 解答ログ1件。
+/// 解答ログ1件。[choiceIndex] は type が choice の問題、[journalLines] は
+/// type が journal の問題のときにそれぞれ入る（もう一方は null）。
 class AnswerRecord {
   const AnswerRecord({
     required this.qid,
-    required this.choiceIndex,
     required this.correct,
     required this.ms,
     required this.at,
     required this.mode,
+    this.choiceIndex,
+    this.journalLines,
   });
 
   final String qid;
-  final int choiceIndex;
+  final int? choiceIndex;
+  final List<JournalLine>? journalLines;
   final bool correct;
   final int ms;
   final DateTime at;
@@ -64,10 +68,15 @@ class PracticeSession {
   Question? get current => finished ? null : questions[index];
   int get correctCount => _records.where((r) => r.correct).length;
 
-  /// 現在の問題に答える。終了後に呼ぶと [StateError]。
+  /// 選択式（type: choice）の現在の問題に答える。終了後に呼ぶと [StateError]。
+  /// type が choice 以外の問題に呼ぶと [StateError]。
   AnswerRecord answer(int choiceIndex, {int ms = 0, DateTime? at}) {
-    final q = current;
-    if (q == null) throw StateError('セッションは終了しています');
+    final q = _currentOrThrow();
+    if (q.type != QuestionType.choice) {
+      throw StateError(
+        'type が choice の問題にのみ answer() が使えます（qid: ${q.qid}, type: ${q.type.name}）',
+      );
+    }
     final record = AnswerRecord(
       qid: q.qid,
       choiceIndex: choiceIndex,
@@ -78,5 +87,34 @@ class PracticeSession {
     );
     _records.add(record);
     return record;
+  }
+
+  /// 仕訳（type: journal）の現在の問題に答える。[lines] はユーザーが入力した仕訳。
+  /// 正誤判定は [judgeJournal] の完全一致（[JournalJudgeResult.isCorrect]）で行う。
+  /// 終了後、または type が journal 以外の問題に呼ぶと [StateError]。
+  AnswerRecord answerJournal(List<JournalLine> lines, {int ms = 0, DateTime? at}) {
+    final q = _currentOrThrow();
+    if (q.type != QuestionType.journal) {
+      throw StateError(
+        'type が journal の問題にのみ answerJournal() が使えます（qid: ${q.qid}, type: ${q.type.name}）',
+      );
+    }
+    final result = judgeJournal(q.journalAnswer!, lines);
+    final record = AnswerRecord(
+      qid: q.qid,
+      journalLines: lines,
+      correct: result.isCorrect,
+      ms: ms,
+      at: at ?? DateTime.now(),
+      mode: mode,
+    );
+    _records.add(record);
+    return record;
+  }
+
+  Question _currentOrThrow() {
+    final q = current;
+    if (q == null) throw StateError('セッションは終了しています');
+    return q;
   }
 }
