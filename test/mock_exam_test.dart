@@ -187,6 +187,58 @@ void main() {
     });
   });
 
+  group('worksheet型の採点', () {
+    final worksheetQuestion = Question(
+      qid: 'w1',
+      examId: 'sample',
+      subjectId: 'kessan',
+      topicId: 't',
+      prompt: '精算表を完成させよ',
+      type: QuestionType.worksheet,
+      worksheetAnswer: const WorksheetAnswer(blankCells: [
+        WorksheetCell(
+          account: 'depreciation_expense',
+          column: WorksheetColumn.incomeStatementDebit,
+          amount: 5000,
+        ),
+      ]),
+      explanation: 'e',
+      source: QuestionSource.original,
+      sourceRef: '自作',
+      points: 3,
+      contentVer: '1',
+    );
+
+    test('全セル正解なら満点', () {
+      final r = scoreMockExam(
+        questions: [worksheetQuestion],
+        answers: {
+          'w1': const [
+            WorksheetCell(
+              account: 'depreciation_expense',
+              column: WorksheetColumn.incomeStatementDebit,
+              amount: 5000,
+            ),
+          ],
+        },
+        rule: const PassRule(totalPct: 100),
+      );
+      expect(r.total.score, 3);
+      expect(r.passed, isTrue);
+    });
+
+    test('未回答・型違いは不正解扱い（例外にならない）', () {
+      final r1 = scoreMockExam(questions: [worksheetQuestion], answers: const {}, rule: const PassRule(totalPct: 60));
+      expect(r1.total.score, 0);
+      final r2 = scoreMockExam(
+        questions: [worksheetQuestion],
+        answers: {'w1': 0},
+        rule: const PassRule(totalPct: 60),
+      );
+      expect(r2.total.score, 0);
+    });
+  });
+
   group('pickMockExamQuestions', () {
     const levelWithoutCounts = LevelConfig(
       levelId: 'l',

@@ -120,6 +120,25 @@ List<ContentIssue> validateQuestions(
                 '借方合計(${answer.debitTotal})と貸方合計(${answer.creditTotal})が一致しません');
           }
         }
+      case QuestionType.worksheet:
+        // 表埋め（精算表・財務諸表など）: セルの金額・科目・重複を検証
+        final answer = q.worksheetAnswer;
+        if (answer == null || answer.blankCells.isEmpty) {
+          add(q, 'worksheet-empty', '表埋め問題の blankCells がありません');
+        } else {
+          final allCells = [...answer.givenCells, ...answer.blankCells];
+          if (allCells.any((c) => c.amount <= 0)) {
+            add(q, 'worksheet-amount', '表埋め問題の金額は1以上である必要があります');
+          }
+          if (allCells.any((c) => c.account.trim().isEmpty)) {
+            add(q, 'worksheet-account', '表埋め問題の勘定科目が空です');
+          }
+          final positions = [for (final c in allCells) (c.account, c.column)];
+          if (positions.toSet().length != positions.length) {
+            add(q, 'worksheet-duplicate-cell',
+                '同じ勘定科目・列の組み合わせのセルが重複しています（givenCellsとblankCellsの重複を含む）');
+          }
+        }
     }
 
     if (q.difficulty < 1 || q.difficulty > 5) {

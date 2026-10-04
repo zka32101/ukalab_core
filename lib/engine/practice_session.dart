@@ -1,12 +1,14 @@
 import 'dart:math';
 
 import 'journal_judge.dart';
+import 'worksheet_judge.dart';
 import '../question/question.dart';
 
 enum PracticeMode { practice, mock, weak }
 
 /// 解答ログ1件。[choiceIndex] は type が choice の問題、[journalLines] は
-/// type が journal の問題のときにそれぞれ入る（もう一方は null）。
+/// type が journal の問題、[worksheetCells] は type が worksheet の問題の
+/// ときにそれぞれ入る（他は null）。
 class AnswerRecord {
   const AnswerRecord({
     required this.qid,
@@ -16,11 +18,13 @@ class AnswerRecord {
     required this.mode,
     this.choiceIndex,
     this.journalLines,
+    this.worksheetCells,
   });
 
   final String qid;
   final int? choiceIndex;
   final List<JournalLine>? journalLines;
+  final List<WorksheetCell>? worksheetCells;
   final bool correct;
   final int ms;
   final DateTime at;
@@ -103,6 +107,30 @@ class PracticeSession {
     final record = AnswerRecord(
       qid: q.qid,
       journalLines: lines,
+      correct: result.isCorrect,
+      ms: ms,
+      at: at ?? DateTime.now(),
+      mode: mode,
+    );
+    _records.add(record);
+    return record;
+  }
+
+  /// 表埋め（type: worksheet）の現在の問題に答える。[cells] はユーザーが入力したセル
+  /// （[WorksheetAnswer.blankCells] に対応する分のみでよい）。正誤判定は [judgeWorksheet]
+  /// の完全一致（[WorksheetJudgeResult.isCorrect]）で行う。
+  /// 終了後、または type が worksheet 以外の問題に呼ぶと [StateError]。
+  AnswerRecord answerWorksheet(List<WorksheetCell> cells, {int ms = 0, DateTime? at}) {
+    final q = _currentOrThrow();
+    if (q.type != QuestionType.worksheet) {
+      throw StateError(
+        'type が worksheet の問題にのみ answerWorksheet() が使えます（qid: ${q.qid}, type: ${q.type.name}）',
+      );
+    }
+    final result = judgeWorksheet(q.worksheetAnswer!, cells);
+    final record = AnswerRecord(
+      qid: q.qid,
+      worksheetCells: cells,
       correct: result.isCorrect,
       ms: ms,
       at: at ?? DateTime.now(),

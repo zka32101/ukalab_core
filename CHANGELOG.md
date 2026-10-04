@@ -2,6 +2,30 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.10.0] - 2026-10-04
+
+簿記3級の精算表・財務諸表の穴埋め向け。追加のみで、既存 API に破壊的変更はない。
+
+### Added
+- `QuestionType.worksheet`: 表埋め問題タイプ（精算表・財務諸表などのセル単位の金額入力）。
+  `WorksheetColumn`（残高試算表・修正記入・損益計算書・貸借対照表の借方/貸方、計8列）・
+  `WorksheetCell`（勘定科目・列・金額）・`WorksheetAnswer`（`givenCells`＝問題文で与える値、
+  `blankCells`＝採点対象の正解セル）
+- `judgeWorksheet`: 表埋め問題の正解とユーザー入力を、勘定科目×列の組み合わせで対応づけて
+  比較し、セルごとに `correct` / `wrongAmount`（金額違い）/ `missing`（未入力）/
+  `extra`（余分な入力）を判定
+- `validateQuestions`: worksheet型の検証を追加（`blankCells` が空でない、金額1以上、
+  勘定科目が空でない、`givenCells`・`blankCells` 内でセル位置の重複がない）
+- `scoreMockExam`: worksheet型の問題を採点できるよう対応（`answers` に `List<WorksheetCell>` を渡す）
+- `PracticeSession.answerWorksheet`: 表埋め（type: worksheet）の現在の問題に
+  `List<WorksheetCell>` で答える。正誤判定は `judgeWorksheet` の完全一致
+  （`WorksheetJudgeResult.isCorrect`）。type不一致・セッション終了後は `StateError`
+
+### Notes
+- 財務諸表（貸借対照表・損益計算書）は精算表と列構成・科目の表示名が異なる場合がある
+  （例: 「売上」→ 損益計算書では「売上高」）。今回は `WorksheetColumn` を共用する設計とし、
+  差異が問題になった場合は専用の列挙値を別途検討する
+
 ## [0.9.1] - 2026-10-04
 
 `PracticeSession`（演習セッション）の journal 型対応。追加のみで、既存 API に破壊的変更はない。
