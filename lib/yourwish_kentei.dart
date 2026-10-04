@@ -2,6 +2,7 @@
 library;
 
 export 'config/exam_config.dart';
+export 'content/ai_news_validator.dart';
 export 'content/boundary_validator.dart';
 export 'content/confusion_matrix_lab_validator.dart';
 export 'content/failure_gallery_validator.dart';
@@ -16,6 +17,7 @@ export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';
 export 'engine/worksheet_judge.dart';
+export 'experience/ai_news.dart';
 export 'experience/boundary_slider.dart';
 export 'experience/confusion_matrix_lab.dart';
 export 'experience/failure_gallery.dart';
