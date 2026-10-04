@@ -12,6 +12,7 @@ export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';
 export 'experience/boundary_slider.dart';
+export 'experience/pace_runner.dart';
 export 'experience/predict_run.dart';
 export 'experience/route_planner.dart';
 export 'experience/teach_mascot.dart';
