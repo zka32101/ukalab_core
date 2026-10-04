@@ -21,6 +21,7 @@ class Term {
     this.relatedTermIds = const [],
     this.relatedQuestionIds = const [],
     this.diagramId,
+    this.era,
     this.license,
     this.lawVersion,
     this.disabled = false,
@@ -55,6 +56,11 @@ class Term {
 
   /// 図が役立つ用語に添えるコード描画（SVG）図のID。null なら図なし。
   final String? diagramId;
+
+  /// 用語マップ・AI系譜図（決定41・画期的な機能9）向けの時代区分。
+  /// null なら系譜図には出さず用語マップ側のみに表示する。表示順はアプリ側が
+  /// 時代区分の一覧で決める（このIDだけでは順序を持たない）。
+  final String? era;
 
   final QuestionSource source;
 
@@ -91,6 +97,7 @@ class Term {
       relatedTermIds: _stringList(j, 'relatedTermIds', where),
       relatedQuestionIds: _stringList(j, 'relatedQuestionIds', where),
       diagramId: optString(j, 'diagramId', where),
+      era: optString(j, 'era', where),
       source: source.first,
       sourceRef: reqString(j, 'sourceRef', where),
       license: optString(j, 'license', where),
@@ -126,6 +133,7 @@ class Term {
         if (relatedQuestionIds.isNotEmpty)
           'relatedQuestionIds': relatedQuestionIds,
         if (diagramId != null) 'diagramId': diagramId,
+        if (era != null) 'era': era,
         'source': source.name,
         'sourceRef': sourceRef,
         if (license != null) 'license': license,
