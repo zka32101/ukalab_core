@@ -53,6 +53,7 @@ MockExamResult score(
 }
 
 void main() {
+  sampleQuestionTests();
   test('試験定義: 35問・2時間・科目別15/10/10', () {
     final exam = otsu4();
     final level = exam.level('otsu4')!;
@@ -103,5 +104,20 @@ void main() {
     int n(String s) => picked.where((x) => x.subjectId == s).length;
     expect(picked.length, 35);
     expect([n('law'), n('phys'), n('prop')], [15, 10, 10]);
+  });
+}
+
+void sampleQuestionTests() {
+  test('条文に基づくサンプル問題は配信前検証を通り、全て statute・lawVersion付き', () {
+    final parsed = parseQuestionsJsonl(
+      File('example/otsu4_sample_questions.jsonl').readAsStringSync(),
+    );
+    expect(parsed.questions, hasLength(6));
+    expect(validateQuestions(parsed.questions, exam: otsu4()), isEmpty);
+    for (final x in parsed.questions) {
+      expect(x.source, QuestionSource.statute);
+      expect(x.lawVersion, isNotEmpty);
+      expect(x.choices, hasLength(5));
+    }
   });
 }
