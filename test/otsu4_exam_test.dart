@@ -112,7 +112,7 @@ void sampleQuestionTests() {
     final parsed = parseQuestionsJsonl(
       File('example/otsu4_sample_questions.jsonl').readAsStringSync(),
     );
-    expect(parsed.questions, hasLength(6));
+    expect(parsed.questions, hasLength(15));
     expect(validateQuestions(parsed.questions, exam: otsu4()), isEmpty);
     for (final x in parsed.questions) {
       expect(x.source, QuestionSource.statute);
