@@ -3,6 +3,7 @@ library;
 
 export 'config/exam_config.dart';
 export 'content/boundary_validator.dart';
+export 'content/failure_gallery_validator.dart';
 export 'content/predict_run_validator.dart';
 export 'content/question_validator.dart';
 export 'content/teach_mascot_validator.dart';
@@ -12,6 +13,7 @@ export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';
 export 'experience/boundary_slider.dart';
+export 'experience/failure_gallery.dart';
 export 'experience/pace_runner.dart';
 export 'experience/predict_run.dart';
 export 'experience/route_planner.dart';
