@@ -3,6 +3,7 @@ library;
 
 export 'config/exam_config.dart';
 export 'content/ai_news_validator.dart';
+export 'content/attention_viz_validator.dart';
 export 'content/boundary_validator.dart';
 export 'content/confusion_matrix_lab_validator.dart';
 export 'content/conv_lab_validator.dart';
@@ -19,6 +20,7 @@ export 'engine/practice_session.dart';
 export 'engine/srs.dart';
 export 'engine/worksheet_judge.dart';
 export 'experience/ai_news.dart';
+export 'experience/attention_viz.dart';
 export 'experience/boundary_slider.dart';
 export 'experience/confusion_matrix_lab.dart';
 export 'experience/conv_lab.dart';
