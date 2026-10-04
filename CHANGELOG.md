@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.9.1] - 2026-10-04
+
+`PracticeSession`（演習セッション）の journal 型対応。追加のみで、既存 API に破壊的変更はない。
+
+### Added
+- `PracticeSession.answerJournal`: 仕訳（type: journal）の現在の問題に、ユーザーが入力した `List<JournalLine>` で答える。正誤判定は `judgeJournal` の完全一致（`JournalJudgeResult.isCorrect`）。type が journal 以外の問題や、セッション終了後に呼ぶと `StateError`
+- `AnswerRecord`: `choiceIndex`・`journalLines` をどちらも省略可能にし、choice型は `choiceIndex`、journal型は `journalLines` を持つようにした
+- `PracticeSession.answer`（choice用）に、type が choice 以外の問題へ呼んだ場合の `StateError` を追加（従来は無条件で `answerIndex` と比較していた）
+
 ## [0.5.0] - 2026-10-03
 
 専門用語の解説（決定50「専門用語の解説（全アプリ共通）」）向け。追加のみで、v0.4 の API に破壊的変更はない。
