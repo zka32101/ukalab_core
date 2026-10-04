@@ -191,6 +191,99 @@ void main() {
     });
   });
 
+  group('表埋め(worksheet)の検証', () {
+    Question worksheetQ({
+      List<WorksheetCell> given = const [
+        WorksheetCell(account: 'cash', column: WorksheetColumn.trialBalanceDebit, amount: 100000),
+      ],
+      List<WorksheetCell> blank = const [
+        WorksheetCell(
+          account: 'depreciation_expense',
+          column: WorksheetColumn.incomeStatementDebit,
+          amount: 5000,
+        ),
+      ],
+    }) =>
+        Question(
+          qid: 'w1',
+          examId: 'sample',
+          subjectId: 'math',
+          topicId: 't',
+          prompt: '精算表を完成させよ',
+          type: QuestionType.worksheet,
+          worksheetAnswer: WorksheetAnswer(givenCells: given, blankCells: blank),
+          explanation: '解説',
+          source: QuestionSource.original,
+          sourceRef: '自作',
+          contentVer: '1',
+        );
+
+    test('正しい表埋め問題は指摘なし', () {
+      expect(validateQuestions([worksheetQ()]), isEmpty);
+    });
+
+    test('blankCells が空', () {
+      expect(
+        codes(validateQuestions([worksheetQ(blank: const [])])),
+        contains('worksheet-empty'),
+      );
+    });
+
+    test('金額が0以下', () {
+      expect(
+        codes(validateQuestions([
+          worksheetQ(blank: const [
+            WorksheetCell(
+              account: 'depreciation_expense',
+              column: WorksheetColumn.incomeStatementDebit,
+              amount: 0,
+            ),
+          ])
+        ])),
+        contains('worksheet-amount'),
+      );
+    });
+
+    test('勘定科目が空', () {
+      expect(
+        codes(validateQuestions([
+          worksheetQ(blank: const [
+            WorksheetCell(
+              account: '',
+              column: WorksheetColumn.incomeStatementDebit,
+              amount: 5000,
+            ),
+          ])
+        ])),
+        contains('worksheet-account'),
+      );
+    });
+
+    test('givenCells と blankCells で同じセルが重複', () {
+      expect(
+        codes(validateQuestions([
+          worksheetQ(
+            given: const [
+              WorksheetCell(account: 'cash', column: WorksheetColumn.trialBalanceDebit, amount: 100000),
+            ],
+            blank: const [
+              WorksheetCell(account: 'cash', column: WorksheetColumn.trialBalanceDebit, amount: 999),
+            ],
+          )
+        ])),
+        contains('worksheet-duplicate-cell'),
+      );
+    });
+
+    test('toJson → fromJson で往復できる', () {
+      final original = worksheetQ();
+      final again = Question.fromJson(
+        jsonDecode(jsonEncode(original.toJson())) as Map<String, dynamic>,
+      );
+      expect(again.toJson(), original.toJson());
+    });
+  });
+
   test('試験定義との整合', () {
     expect(codes(validateQuestions([q(examId: 'other')], exam: exam)), {'exam-mismatch'});
     expect(codes(validateQuestions([q(subjectId: 'zzz')], exam: exam)), {'unknown-subject'});

@@ -1,6 +1,6 @@
 name: yourwish_kentei
 description: "うかラボ（成人向け検定アプリ）の共通エンジン。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッション。"
-version: 0.9.1
+version: 0.10.0
 publish_to: 'none'
 
 environment:

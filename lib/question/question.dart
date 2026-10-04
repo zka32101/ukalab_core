@@ -1,8 +1,9 @@
 import '../src/json_util.dart';
 
-/// 問題タイプ。choice=選択式、journal=仕訳（借方・貸方の勘定科目＋金額を入力）。
+/// 問題タイプ。choice=選択式、journal=仕訳（借方・貸方の勘定科目＋金額を入力）、
+/// worksheet=精算表・財務諸表などの表の空欄埋め（セル単位の金額入力）。
 /// 他の型（truefalse・numeric 等）は後続。
-enum QuestionType { choice, journal }
+enum QuestionType { choice, journal, worksheet }
 
 /// 出典の区分。出典なし（区分なし）の問題は配信しない。
 enum QuestionSource { original, statute, licensed }
@@ -79,6 +80,93 @@ class JournalAnswer {
   List<Map<String, dynamic>> toJson() => [for (final l in lines) l.toJson()];
 }
 
+/// 精算表・財務諸表の列（表埋め問題のセルがどの列に属するか）。
+enum WorksheetColumn {
+  trialBalanceDebit,
+  trialBalanceCredit,
+  adjustmentDebit,
+  adjustmentCredit,
+  incomeStatementDebit,
+  incomeStatementCredit,
+  balanceSheetDebit,
+  balanceSheetCredit,
+}
+
+/// 表埋め問題の1セル（勘定科目 × 列 の金額）。
+class WorksheetCell {
+  const WorksheetCell({required this.account, required this.column, required this.amount});
+
+  /// 勘定科目コード（出題区分表の科目一覧に基づく。表示名はアプリ側で持つ）。
+  final String account;
+  final WorksheetColumn column;
+
+  /// 金額。0以下は不正（[validateQuestions] で検査）。
+  final int amount;
+
+  factory WorksheetCell.fromJson(Map<String, dynamic> j, String where) {
+    final columnName = reqString(j, 'column', where);
+    final column = WorksheetColumn.values.where((c) => c.name == columnName);
+    if (column.isEmpty) fail(where, '未対応の column: $columnName');
+    return WorksheetCell(
+      account: reqString(j, 'account', where),
+      column: column.first,
+      amount: reqInt(j, 'amount', where),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'account': account,
+        'column': column.name,
+        'amount': amount,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      other is WorksheetCell &&
+      other.account == account &&
+      other.column == column &&
+      other.amount == amount;
+
+  @override
+  int get hashCode => Object.hash(account, column, amount);
+
+  @override
+  String toString() => 'WorksheetCell($account, $column, $amount)';
+}
+
+/// 表埋め問題（精算表・財務諸表など）の正解。
+class WorksheetAnswer {
+  const WorksheetAnswer({this.givenCells = const [], required this.blankCells});
+
+  /// 問題文で最初から与える値（残高試算表など）。採点対象ではない。
+  final List<WorksheetCell> givenCells;
+
+  /// ユーザーが埋めるべき正解セル。
+  final List<WorksheetCell> blankCells;
+
+  factory WorksheetAnswer.fromJson(Map<String, dynamic> j, String where) {
+    final rawGiven = j['givenCells'];
+    final rawBlank = j['blankCells'];
+    if (rawBlank is! List) fail(where, '"blankCells" は配列が必要です');
+    List<WorksheetCell> cells(List<dynamic> raw, String field) => [
+          for (var i = 0; i < raw.length; i++)
+            if (raw[i] is Map<String, dynamic>)
+              WorksheetCell.fromJson(raw[i] as Map<String, dynamic>, '$where.$field[$i]')
+            else
+              fail(where, '$field の要素はオブジェクトが必要です'),
+        ];
+    return WorksheetAnswer(
+      givenCells: rawGiven is List ? cells(rawGiven, 'givenCells') : const [],
+      blankCells: cells(rawBlank, 'blankCells'),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        if (givenCells.isNotEmpty) 'givenCells': [for (final c in givenCells) c.toJson()],
+        'blankCells': [for (final c in blankCells) c.toJson()],
+      };
+}
+
 /// 1問。IDは不変で、削除は [disabled] で表す（解答履歴は残す）。
 class Question {
   const Question({
@@ -96,14 +184,19 @@ class Question {
     this.choices = const [],
     this.answerIndex = -1,
     this.journalAnswer,
+    this.worksheetAnswer,
     this.difficulty = 3,
     this.points = 1,
     this.license,
     this.lawVersion,
     this.disabled = false,
-  }) : assert(
+  })  : assert(
           type != QuestionType.journal || journalAnswer != null,
           'type が journal の問題には journalAnswer が必要です',
+        ),
+        assert(
+          type != QuestionType.worksheet || worksheetAnswer != null,
+          'type が worksheet の問題には worksheetAnswer が必要です',
         );
 
   final String qid;
@@ -124,6 +217,9 @@ class Question {
 
   /// type が journal のときの正解（複合仕訳）。
   final JournalAnswer? journalAnswer;
+
+  /// type が worksheet のときの正解（精算表・財務諸表などの表埋め）。
+  final WorksheetAnswer? worksheetAnswer;
 
   final String explanation;
 
@@ -163,6 +259,7 @@ class Question {
     var choices = const <String>[];
     var answerIndex = -1;
     JournalAnswer? journalAnswer;
+    WorksheetAnswer? worksheetAnswer;
 
     switch (type) {
       case QuestionType.choice:
@@ -176,6 +273,12 @@ class Question {
         final rawAnswer = j['journalAnswer'];
         if (rawAnswer is! List) fail(where, '"journalAnswer" は配列が必要です');
         journalAnswer = JournalAnswer.fromJson(rawAnswer, '$where.journalAnswer');
+      case QuestionType.worksheet:
+        final rawAnswer = j['worksheetAnswer'];
+        if (rawAnswer is! Map<String, dynamic>) {
+          fail(where, '"worksheetAnswer" はオブジェクトが必要です');
+        }
+        worksheetAnswer = WorksheetAnswer.fromJson(rawAnswer, '$where.worksheetAnswer');
     }
 
     return Question(
@@ -189,6 +292,7 @@ class Question {
       choices: choices,
       answerIndex: answerIndex,
       journalAnswer: journalAnswer,
+      worksheetAnswer: worksheetAnswer,
       explanation: reqString(j, 'explanation', where),
       difficulty: optInt(j, 'difficulty', where, 3),
       points: optInt(j, 'points', where, 1),
@@ -214,6 +318,7 @@ class Question {
           'answerIndex': answerIndex,
         },
         if (journalAnswer != null) 'journalAnswer': journalAnswer!.toJson(),
+        if (worksheetAnswer != null) 'worksheetAnswer': worksheetAnswer!.toJson(),
         'explanation': explanation,
         'difficulty': difficulty,
         'points': points,

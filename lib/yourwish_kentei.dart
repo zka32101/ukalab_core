@@ -12,6 +12,7 @@ export 'engine/journal_judge.dart';
 export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';
+export 'engine/worksheet_judge.dart';
 export 'experience/boundary_slider.dart';
 export 'experience/failure_gallery.dart';
 export 'experience/pace_runner.dart';

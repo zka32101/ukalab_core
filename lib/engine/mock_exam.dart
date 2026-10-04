@@ -3,6 +3,7 @@ import 'dart:math';
 import '../config/exam_config.dart';
 import '../question/question.dart';
 import 'journal_judge.dart';
+import 'worksheet_judge.dart';
 
 /// 得点と満点。
 class ScoreLine {
@@ -78,13 +79,18 @@ bool _isCorrect(Question q, Object? answer) {
       final expected = q.journalAnswer;
       if (expected == null || answer is! List<JournalLine>) return false;
       return judgeJournal(expected, answer).isCorrect;
+    case QuestionType.worksheet:
+      final expected = q.worksheetAnswer;
+      if (expected == null || answer is! List<WorksheetCell>) return false;
+      return judgeWorksheet(expected, answer).isCorrect;
   }
 }
 
 /// 模擬試験を採点して合否を判定する。
 ///
 /// [answers] は qid → 回答。choice型は選んだ選択肢の番号（int）、journal型は
-/// 入力した仕訳の行（`List<JournalLine>`）。未回答は null・型違い・欠落のいずれも
+/// 入力した仕訳の行（`List<JournalLine>`）、worksheet型は入力したセル
+/// （`List<WorksheetCell>`）。未回答は null・型違い・欠落のいずれも
 /// 不正解扱い。科目別の最低得点率は、出題が1問以上ある科目にだけ適用する。
 MockExamResult scoreMockExam({
   required List<Question> questions,

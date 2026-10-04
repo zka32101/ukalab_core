@@ -34,6 +34,26 @@ Question journalQ(String qid) => Question(
       contentVer: '1',
     );
 
+Question worksheetQ(String qid) => Question(
+      qid: qid,
+      examId: 'boki3',
+      subjectId: 'q3_kessan',
+      topicId: 't',
+      type: QuestionType.worksheet,
+      prompt: '精算表を完成させよ',
+      worksheetAnswer: const WorksheetAnswer(blankCells: [
+        WorksheetCell(
+          account: 'depreciation_expense',
+          column: WorksheetColumn.incomeStatementDebit,
+          amount: 5000,
+        ),
+      ]),
+      explanation: 'e',
+      source: QuestionSource.original,
+      sourceRef: '自作',
+      contentVer: '1',
+    );
+
 void main() {
   group('PracticeSession.answer（choice）', () {
     test('正解・不正解を記録する', () {
@@ -85,6 +105,40 @@ void main() {
         JournalLine(side: JournalSide.credit, account: 'sales', amount: 1000),
       ]);
       expect(() => session.answerJournal(const []), throwsStateError);
+    });
+  });
+
+  group('PracticeSession.answerWorksheet', () {
+    test('全セル一致なら正解になる', () {
+      final session = PracticeSession(pool: [worksheetQ('w')], size: 1);
+      final record = session.answerWorksheet(const [
+        WorksheetCell(
+          account: 'depreciation_expense',
+          column: WorksheetColumn.incomeStatementDebit,
+          amount: 5000,
+        ),
+      ]);
+      expect(record.correct, isTrue);
+      expect(record.worksheetCells, hasLength(1));
+      expect(record.choiceIndex, isNull);
+      expect(record.journalLines, isNull);
+    });
+
+    test('金額違いなら不正解になる', () {
+      final session = PracticeSession(pool: [worksheetQ('w')], size: 1);
+      final record = session.answerWorksheet(const [
+        WorksheetCell(
+          account: 'depreciation_expense',
+          column: WorksheetColumn.incomeStatementDebit,
+          amount: 1,
+        ),
+      ]);
+      expect(record.correct, isFalse);
+    });
+
+    test('type が journal の問題には使えない', () {
+      final session = PracticeSession(pool: [journalQ('j')], size: 1);
+      expect(() => session.answerWorksheet(const []), throwsStateError);
     });
   });
 }
