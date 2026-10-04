@@ -5,7 +5,7 @@ import 'package:yourwish_kentei/yourwish_kentei.dart';
 
 /// 問題データ・用語データの配信前チェック。
 ///
-/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... questions.jsonl...`
+/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... questions.jsonl...`
 /// 問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
@@ -17,6 +17,7 @@ Future<void> main(List<String> args) async {
       '[--method-choice method_choice.jsonl]... '
       '[--ml-lab ml_lab.jsonl]... '
       '[--ai-news ai_news.jsonl]... '
+      '[--conv-lab conv_lab.jsonl]... '
       '<questions.jsonl>...',
     );
     exit(64);
@@ -41,6 +42,7 @@ Future<void> main(List<String> args) async {
   final methodChoicePaths = <String>[];
   final mlLabPaths = <String>[];
   final aiNewsPaths = <String>[];
+  final convLabPaths = <String>[];
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
     if (rest[i] == '--terms') {
@@ -97,6 +99,12 @@ Future<void> main(List<String> args) async {
         exit(64);
       }
       aiNewsPaths.add(rest[++i]);
+    } else if (rest[i] == '--conv-lab') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--conv-lab の後にファイルパスが必要です');
+        exit(64);
+      }
+      convLabPaths.add(rest[++i]);
     } else {
       questionPaths.add(rest[i]);
     }
@@ -227,6 +235,18 @@ Future<void> main(List<String> args) async {
     ));
   }
 
+  final convLabImages = <ConvLabImage>[];
+  for (final path in convLabPaths) {
+    final parsed = parseConvLabImagesJsonl(await File(path).readAsString());
+    convLabImages.addAll(parsed.images);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (convLabImages.isNotEmpty) {
+    issues.addAll(validateConvLabImages(convLabImages, exam: exam));
+  }
+
   for (final issue in issues) {
     stdout.writeln(issue);
   }
@@ -249,8 +269,9 @@ Future<void> main(List<String> args) async {
   final mlLabSummary =
       mlLabDatasets.isEmpty ? '' : '、${mlLabDatasets.length}データセットを検査';
   final aiNewsSummary = aiNewsItems.isEmpty ? '' : '、${aiNewsItems.length}件を検査';
+  final convLabSummary = convLabImages.isEmpty ? '' : '、${convLabImages.length}画像を検査';
   stdout.writeln(
-    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary、問題${issues.length}件',
+    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary、問題${issues.length}件',
   );
   exit(issues.isEmpty ? 0 : 1);
 }
