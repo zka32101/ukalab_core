@@ -23,6 +23,7 @@ Term t({
   String? license,
   String? lawVersion,
   String contentVer = '1',
+  String? era,
 }) =>
     Term(
       termId: termId,
@@ -38,6 +39,7 @@ Term t({
       license: license,
       lawVersion: lawVersion,
       contentVer: contentVer,
+      era: era,
     );
 
 Set<String> codes(List<ContentIssue> issues) => {for (final i in issues) i.code};
@@ -54,6 +56,18 @@ void main() {
 
   test('正しい用語は指摘なし', () {
     expect(validateTerms([t()], exam: exam), isEmpty);
+  });
+
+  test('era は fromJson/toJson を往復する', () {
+    final json = t(era: 'generative_ai').toJson();
+    expect(json['era'], 'generative_ai');
+    expect(Term.fromJson(json).era, 'generative_ai');
+  });
+
+  test('era 未指定なら toJson に含まれず、fromJson は null', () {
+    final json = t().toJson();
+    expect(json.containsKey('era'), isFalse);
+    expect(Term.fromJson(json).era, isNull);
   });
 
   test('termId の重複', () {
