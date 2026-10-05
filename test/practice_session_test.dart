@@ -54,6 +54,30 @@ Question worksheetQ(String qid) => Question(
       contentVer: '1',
     );
 
+Question ledgerQ(String qid) => Question(
+      qid: qid,
+      examId: 'boki3',
+      subjectId: 'q2_choubo',
+      topicId: 't',
+      type: QuestionType.ledger,
+      prompt: '商品有高帳に記入せよ',
+      ledgerAnswer: const LedgerAnswer(
+        rows: [LedgerRowMeta(rowIndex: 0, date: '4/10', description: '売上げ')],
+        blankCells: [
+          LedgerCell(
+            rowIndex: 0,
+            group: LedgerColumnGroup.issue,
+            field: LedgerField.amount,
+            value: 500,
+          ),
+        ],
+      ),
+      explanation: 'e',
+      source: QuestionSource.original,
+      sourceRef: '自作',
+      contentVer: '1',
+    );
+
 void main() {
   group('PracticeSession.answer（choice）', () {
     test('正解・不正解を記録する', () {
@@ -139,6 +163,43 @@ void main() {
     test('type が journal の問題には使えない', () {
       final session = PracticeSession(pool: [journalQ('j')], size: 1);
       expect(() => session.answerWorksheet(const []), throwsStateError);
+    });
+  });
+
+  group('PracticeSession.answerLedger', () {
+    test('全セル一致なら正解になる', () {
+      final session = PracticeSession(pool: [ledgerQ('l')], size: 1);
+      final record = session.answerLedger(const [
+        LedgerCell(
+          rowIndex: 0,
+          group: LedgerColumnGroup.issue,
+          field: LedgerField.amount,
+          value: 500,
+        ),
+      ]);
+      expect(record.correct, isTrue);
+      expect(record.ledgerCells, hasLength(1));
+      expect(record.choiceIndex, isNull);
+      expect(record.journalLines, isNull);
+      expect(record.worksheetCells, isNull);
+    });
+
+    test('値違いなら不正解になる', () {
+      final session = PracticeSession(pool: [ledgerQ('l')], size: 1);
+      final record = session.answerLedger(const [
+        LedgerCell(
+          rowIndex: 0,
+          group: LedgerColumnGroup.issue,
+          field: LedgerField.amount,
+          value: 1,
+        ),
+      ]);
+      expect(record.correct, isFalse);
+    });
+
+    test('type が journal の問題には使えない', () {
+      final session = PracticeSession(pool: [journalQ('j')], size: 1);
+      expect(() => session.answerLedger(const []), throwsStateError);
     });
   });
 }

@@ -9,6 +9,7 @@ export 'content/question_validator.dart';
 export 'content/teach_mascot_validator.dart';
 export 'content/term_validator.dart';
 export 'engine/journal_judge.dart';
+export 'engine/ledger_judge.dart';
 export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/srs.dart';

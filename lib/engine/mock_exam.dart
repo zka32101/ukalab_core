@@ -3,6 +3,7 @@ import 'dart:math';
 import '../config/exam_config.dart';
 import '../question/question.dart';
 import 'journal_judge.dart';
+import 'ledger_judge.dart';
 import 'worksheet_judge.dart';
 
 /// 得点と満点。
@@ -83,6 +84,10 @@ bool _isCorrect(Question q, Object? answer) {
       final expected = q.worksheetAnswer;
       if (expected == null || answer is! List<WorksheetCell>) return false;
       return judgeWorksheet(expected, answer).isCorrect;
+    case QuestionType.ledger:
+      final expected = q.ledgerAnswer;
+      if (expected == null || answer is! List<LedgerCell>) return false;
+      return judgeLedger(expected, answer).isCorrect;
   }
 }
 

@@ -1,14 +1,15 @@
 import 'dart:math';
 
 import 'journal_judge.dart';
+import 'ledger_judge.dart';
 import 'worksheet_judge.dart';
 import '../question/question.dart';
 
 enum PracticeMode { practice, mock, weak }
 
 /// 解答ログ1件。[choiceIndex] は type が choice の問題、[journalLines] は
-/// type が journal の問題、[worksheetCells] は type が worksheet の問題の
-/// ときにそれぞれ入る（他は null）。
+/// type が journal の問題、[worksheetCells] は type が worksheet の問題、
+/// [ledgerCells] は type が ledger の問題のときにそれぞれ入る（他は null）。
 class AnswerRecord {
   const AnswerRecord({
     required this.qid,
@@ -19,12 +20,14 @@ class AnswerRecord {
     this.choiceIndex,
     this.journalLines,
     this.worksheetCells,
+    this.ledgerCells,
   });
 
   final String qid;
   final int? choiceIndex;
   final List<JournalLine>? journalLines;
   final List<WorksheetCell>? worksheetCells;
+  final List<LedgerCell>? ledgerCells;
   final bool correct;
   final int ms;
   final DateTime at;
@@ -131,6 +134,30 @@ class PracticeSession {
     final record = AnswerRecord(
       qid: q.qid,
       worksheetCells: cells,
+      correct: result.isCorrect,
+      ms: ms,
+      at: at ?? DateTime.now(),
+      mode: mode,
+    );
+    _records.add(record);
+    return record;
+  }
+
+  /// 補助簿（type: ledger）の現在の問題に答える。[cells] はユーザーが入力したセル
+  /// （[LedgerAnswer.blankCells] に対応する分のみでよい）。正誤判定は [judgeLedger]
+  /// の完全一致（[LedgerJudgeResult.isCorrect]）で行う。
+  /// 終了後、または type が ledger 以外の問題に呼ぶと [StateError]。
+  AnswerRecord answerLedger(List<LedgerCell> cells, {int ms = 0, DateTime? at}) {
+    final q = _currentOrThrow();
+    if (q.type != QuestionType.ledger) {
+      throw StateError(
+        'type が ledger の問題にのみ answerLedger() が使えます（qid: ${q.qid}, type: ${q.type.name}）',
+      );
+    }
+    final result = judgeLedger(q.ledgerAnswer!, cells);
+    final record = AnswerRecord(
+      qid: q.qid,
+      ledgerCells: cells,
       correct: result.isCorrect,
       ms: ms,
       at: at ?? DateTime.now(),

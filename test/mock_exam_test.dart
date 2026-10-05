@@ -239,6 +239,63 @@ void main() {
     });
   });
 
+  group('ledger型の採点', () {
+    final ledgerQuestion = Question(
+      qid: 'l1',
+      examId: 'sample',
+      subjectId: 'choubo',
+      topicId: 't',
+      prompt: '商品有高帳に記入せよ',
+      type: QuestionType.ledger,
+      ledgerAnswer: const LedgerAnswer(
+        rows: [LedgerRowMeta(rowIndex: 0, date: '4/10', description: '売上げ')],
+        blankCells: [
+          LedgerCell(
+            rowIndex: 0,
+            group: LedgerColumnGroup.issue,
+            field: LedgerField.amount,
+            value: 500,
+          ),
+        ],
+      ),
+      explanation: 'e',
+      source: QuestionSource.original,
+      sourceRef: '自作',
+      points: 3,
+      contentVer: '1',
+    );
+
+    test('全セル正解なら満点', () {
+      final r = scoreMockExam(
+        questions: [ledgerQuestion],
+        answers: {
+          'l1': const [
+            LedgerCell(
+              rowIndex: 0,
+              group: LedgerColumnGroup.issue,
+              field: LedgerField.amount,
+              value: 500,
+            ),
+          ],
+        },
+        rule: const PassRule(totalPct: 100),
+      );
+      expect(r.total.score, 3);
+      expect(r.passed, isTrue);
+    });
+
+    test('未回答・型違いは不正解扱い（例外にならない）', () {
+      final r1 = scoreMockExam(questions: [ledgerQuestion], answers: const {}, rule: const PassRule(totalPct: 60));
+      expect(r1.total.score, 0);
+      final r2 = scoreMockExam(
+        questions: [ledgerQuestion],
+        answers: {'l1': 0},
+        rule: const PassRule(totalPct: 60),
+      );
+      expect(r2.total.score, 0);
+    });
+  });
+
   group('pickMockExamQuestions', () {
     const levelWithoutCounts = LevelConfig(
       levelId: 'l',

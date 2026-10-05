@@ -139,6 +139,26 @@ List<ContentIssue> validateQuestions(
                 '同じ勘定科目・列の組み合わせのセルが重複しています（givenCellsとblankCellsの重複を含む）');
           }
         }
+      case QuestionType.ledger:
+        // 補助簿（商品有高帳・現金出納帳など）: セルの値・行参照・重複を検証
+        final answer = q.ledgerAnswer;
+        if (answer == null || answer.blankCells.isEmpty) {
+          add(q, 'ledger-empty', '補助簿問題の blankCells がありません');
+        } else {
+          final allCells = [...answer.givenCells, ...answer.blankCells];
+          if (allCells.any((c) => c.value <= 0)) {
+            add(q, 'ledger-value', '補助簿問題の値は1以上である必要があります');
+          }
+          final rowIndices = answer.rows.map((r) => r.rowIndex).toSet();
+          if (allCells.any((c) => !rowIndices.contains(c.rowIndex))) {
+            add(q, 'ledger-unknown-row', '補助簿問題のセルが rows に無い rowIndex を参照しています');
+          }
+          final positions = [for (final c in allCells) (c.rowIndex, c.group, c.field)];
+          if (positions.toSet().length != positions.length) {
+            add(q, 'ledger-duplicate-cell',
+                '同じ行・列グループ・項目の組み合わせのセルが重複しています（givenCellsとblankCellsの重複を含む）');
+          }
+        }
     }
 
     if (q.difficulty < 1 || q.difficulty > 5) {

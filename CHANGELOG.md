@@ -2,6 +2,29 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.11.0] - 2026-10-05
+
+簿記3級の補助簿（商品有高帳・現金出納帳など）記入向け。追加のみで、既存 API に破壊的変更はない。
+
+### Added
+- `QuestionType.ledger`: 補助簿記入問題タイプ（行×列グループ×項目のセル単位の数値入力）。
+  `LedgerColumnGroup`（受入・払出・残高）・`LedgerField`（数量・単価・金額。数量・単価を
+  使わない帳簿は金額のみ使う）・`LedgerCell`（記入行・列グループ・項目・値）・
+  `LedgerRowMeta`（記入行の日付・摘要）・`LedgerAnswer`（`rows`＝記入行の固定情報、
+  `givenCells`＝問題文で与える値、`blankCells`＝採点対象の正解セル）
+- `judgeLedger`: 補助簿問題の正解とユーザー入力を、記入行×列グループ×項目の組み合わせで
+  対応づけて比較し、セルごとに `correct` / `wrongValue`（値違い）/ `missing`（未入力）/
+  `extra`（余分な入力）を判定
+- `validateQuestions`: ledger型の検証を追加（`blankCells` が空でない、値1以上、セルが
+  `rows` に存在する `rowIndex` を参照している、`givenCells`・`blankCells` 内でセル位置の
+  重複がない）
+- `scoreMockExam`: ledger型の問題を採点できるよう対応（`answers` に `List<LedgerCell>` を渡す）
+- `PracticeSession.answerLedger`: 補助簿（type: ledger）の現在の問題に答え、`AnswerRecord`
+  に記録する（`judgeLedger` の完全一致で正誤判定）
+
+設計の詳細・対象範囲（移動平均法を優先し、複数ロットが並存する一般の先入先出法は
+Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_design.md` を参照。
+
 ## [0.10.0] - 2026-10-04
 
 簿記3級の精算表・財務諸表の穴埋め向け。追加のみで、既存 API に破壊的変更はない。

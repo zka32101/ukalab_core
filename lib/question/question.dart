@@ -1,9 +1,10 @@
 import '../src/json_util.dart';
 
 /// 問題タイプ。choice=選択式、journal=仕訳（借方・貸方の勘定科目＋金額を入力）、
-/// worksheet=精算表・財務諸表などの表の空欄埋め（セル単位の金額入力）。
+/// worksheet=精算表・財務諸表などの表の空欄埋め（セル単位の金額入力）、
+/// ledger=補助簿の記入（商品有高帳・現金出納帳など、行×列グループ×項目のセル入力）。
 /// 他の型（truefalse・numeric 等）は後続。
-enum QuestionType { choice, journal, worksheet }
+enum QuestionType { choice, journal, worksheet, ledger }
 
 /// 出典の区分。出典なし（区分なし）の問題は配信しない。
 enum QuestionSource { original, statute, licensed }
@@ -167,6 +168,138 @@ class WorksheetAnswer {
       };
 }
 
+/// 補助簿（商品有高帳・現金出納帳など）の列グループ。
+enum LedgerColumnGroup { receipt, issue, balance }
+
+/// 補助簿の項目。数量・単価を使わない帳簿（現金出納帳など）は amount のみ使う。
+enum LedgerField { quantity, unitPrice, amount }
+
+/// 補助簿問題の1セル（記入行 × 列グループ × 項目 の数値）。
+class LedgerCell {
+  const LedgerCell({
+    required this.rowIndex,
+    required this.group,
+    required this.field,
+    required this.value,
+  });
+
+  /// 何行目か（0始まり。[LedgerAnswer.rows] の [LedgerRowMeta.rowIndex] に対応）。
+  final int rowIndex;
+  final LedgerColumnGroup group;
+  final LedgerField field;
+
+  /// 値。0以下は不正（[validateQuestions] で検査）。
+  final int value;
+
+  factory LedgerCell.fromJson(Map<String, dynamic> j, String where) {
+    final groupName = reqString(j, 'group', where);
+    final group = LedgerColumnGroup.values.where((g) => g.name == groupName);
+    if (group.isEmpty) fail(where, '未対応の group: $groupName');
+    final fieldName = reqString(j, 'field', where);
+    final field = LedgerField.values.where((f) => f.name == fieldName);
+    if (field.isEmpty) fail(where, '未対応の field: $fieldName');
+    return LedgerCell(
+      rowIndex: reqInt(j, 'rowIndex', where),
+      group: group.first,
+      field: field.first,
+      value: reqInt(j, 'value', where),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'rowIndex': rowIndex,
+        'group': group.name,
+        'field': field.name,
+        'value': value,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      other is LedgerCell &&
+      other.rowIndex == rowIndex &&
+      other.group == group &&
+      other.field == field &&
+      other.value == value;
+
+  @override
+  int get hashCode => Object.hash(rowIndex, group, field, value);
+
+  @override
+  String toString() => 'LedgerCell($rowIndex, $group, $field, $value)';
+}
+
+/// 補助簿問題の1記入行の固定情報（日付・摘要）。同一取引が複数行にまたがる
+/// 場合（先入先出法で複数ロットが並存するなど）、2行目以降は date・
+/// description を空文字にする（実際の帳簿の見た目を踏襲）。本バージョンは
+/// 単純化シナリオ（移動平均法、または残高が常に単一ロットになる先入先出法）
+/// を対象とするため、通常は1取引＝1行になる。
+class LedgerRowMeta {
+  const LedgerRowMeta({required this.rowIndex, required this.date, required this.description});
+
+  final int rowIndex;
+  final String date;
+  final String description;
+
+  factory LedgerRowMeta.fromJson(Map<String, dynamic> j, String where) => LedgerRowMeta(
+        rowIndex: reqInt(j, 'rowIndex', where),
+        date: reqString(j, 'date', where),
+        description: reqString(j, 'description', where),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'rowIndex': rowIndex,
+        'date': date,
+        'description': description,
+      };
+}
+
+/// 補助簿問題（商品有高帳・現金出納帳など）の正解。
+class LedgerAnswer {
+  const LedgerAnswer({required this.rows, this.givenCells = const [], required this.blankCells});
+
+  /// 記入行の固定情報（日付・摘要）。
+  final List<LedgerRowMeta> rows;
+
+  /// 最初から埋まっているセル（前月繰越など、問題文で与える値）。採点対象ではない。
+  final List<LedgerCell> givenCells;
+
+  /// ユーザーが埋めるべき正解セル。
+  final List<LedgerCell> blankCells;
+
+  factory LedgerAnswer.fromJson(Map<String, dynamic> j, String where) {
+    final rawRows = j['rows'];
+    if (rawRows is! List) fail(where, '"rows" は配列が必要です');
+    final rows = [
+      for (var i = 0; i < rawRows.length; i++)
+        if (rawRows[i] is Map<String, dynamic>)
+          LedgerRowMeta.fromJson(rawRows[i] as Map<String, dynamic>, '$where.rows[$i]')
+        else
+          fail(where, 'rows の要素はオブジェクトが必要です'),
+    ];
+    final rawGiven = j['givenCells'];
+    final rawBlank = j['blankCells'];
+    if (rawBlank is! List) fail(where, '"blankCells" は配列が必要です');
+    List<LedgerCell> cells(List<dynamic> raw, String field) => [
+          for (var i = 0; i < raw.length; i++)
+            if (raw[i] is Map<String, dynamic>)
+              LedgerCell.fromJson(raw[i] as Map<String, dynamic>, '$where.$field[$i]')
+            else
+              fail(where, '$field の要素はオブジェクトが必要です'),
+        ];
+    return LedgerAnswer(
+      rows: rows,
+      givenCells: rawGiven is List ? cells(rawGiven, 'givenCells') : const [],
+      blankCells: cells(rawBlank, 'blankCells'),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'rows': [for (final r in rows) r.toJson()],
+        if (givenCells.isNotEmpty) 'givenCells': [for (final c in givenCells) c.toJson()],
+        'blankCells': [for (final c in blankCells) c.toJson()],
+      };
+}
+
 /// 1問。IDは不変で、削除は [disabled] で表す（解答履歴は残す）。
 class Question {
   const Question({
@@ -185,6 +318,7 @@ class Question {
     this.answerIndex = -1,
     this.journalAnswer,
     this.worksheetAnswer,
+    this.ledgerAnswer,
     this.difficulty = 3,
     this.points = 1,
     this.license,
@@ -197,6 +331,10 @@ class Question {
         assert(
           type != QuestionType.worksheet || worksheetAnswer != null,
           'type が worksheet の問題には worksheetAnswer が必要です',
+        ),
+        assert(
+          type != QuestionType.ledger || ledgerAnswer != null,
+          'type が ledger の問題には ledgerAnswer が必要です',
         );
 
   final String qid;
@@ -220,6 +358,9 @@ class Question {
 
   /// type が worksheet のときの正解（精算表・財務諸表などの表埋め）。
   final WorksheetAnswer? worksheetAnswer;
+
+  /// type が ledger のときの正解（補助簿の記入）。
+  final LedgerAnswer? ledgerAnswer;
 
   final String explanation;
 
@@ -260,6 +401,7 @@ class Question {
     var answerIndex = -1;
     JournalAnswer? journalAnswer;
     WorksheetAnswer? worksheetAnswer;
+    LedgerAnswer? ledgerAnswer;
 
     switch (type) {
       case QuestionType.choice:
@@ -279,6 +421,12 @@ class Question {
           fail(where, '"worksheetAnswer" はオブジェクトが必要です');
         }
         worksheetAnswer = WorksheetAnswer.fromJson(rawAnswer, '$where.worksheetAnswer');
+      case QuestionType.ledger:
+        final rawAnswer = j['ledgerAnswer'];
+        if (rawAnswer is! Map<String, dynamic>) {
+          fail(where, '"ledgerAnswer" はオブジェクトが必要です');
+        }
+        ledgerAnswer = LedgerAnswer.fromJson(rawAnswer, '$where.ledgerAnswer');
     }
 
     return Question(
@@ -293,6 +441,7 @@ class Question {
       answerIndex: answerIndex,
       journalAnswer: journalAnswer,
       worksheetAnswer: worksheetAnswer,
+      ledgerAnswer: ledgerAnswer,
       explanation: reqString(j, 'explanation', where),
       difficulty: optInt(j, 'difficulty', where, 3),
       points: optInt(j, 'points', where, 1),
@@ -319,6 +468,7 @@ class Question {
         },
         if (journalAnswer != null) 'journalAnswer': journalAnswer!.toJson(),
         if (worksheetAnswer != null) 'worksheetAnswer': worksheetAnswer!.toJson(),
+        if (ledgerAnswer != null) 'ledgerAnswer': ledgerAnswer!.toJson(),
         'explanation': explanation,
         'difficulty': difficulty,
         'points': points,

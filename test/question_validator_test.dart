@@ -284,6 +284,121 @@ void main() {
     });
   });
 
+  group('補助簿(ledger)の検証', () {
+    Question ledgerQ({
+      List<LedgerRowMeta> rows = const [
+        LedgerRowMeta(rowIndex: 0, date: '4/1', description: '前月繰越'),
+        LedgerRowMeta(rowIndex: 1, date: '4/10', description: '売上げ'),
+      ],
+      List<LedgerCell> given = const [
+        LedgerCell(
+          rowIndex: 0,
+          group: LedgerColumnGroup.balance,
+          field: LedgerField.quantity,
+          value: 10,
+        ),
+      ],
+      List<LedgerCell> blank = const [
+        LedgerCell(
+          rowIndex: 1,
+          group: LedgerColumnGroup.issue,
+          field: LedgerField.amount,
+          value: 500,
+        ),
+      ],
+    }) =>
+        Question(
+          qid: 'l1',
+          examId: 'sample',
+          subjectId: 'math',
+          topicId: 't',
+          prompt: '商品有高帳に記入せよ',
+          type: QuestionType.ledger,
+          ledgerAnswer: LedgerAnswer(rows: rows, givenCells: given, blankCells: blank),
+          explanation: '解説',
+          source: QuestionSource.original,
+          sourceRef: '自作',
+          contentVer: '1',
+        );
+
+    test('正しい補助簿問題は指摘なし', () {
+      expect(validateQuestions([ledgerQ()]), isEmpty);
+    });
+
+    test('blankCells が空', () {
+      expect(
+        codes(validateQuestions([ledgerQ(blank: const [])])),
+        contains('ledger-empty'),
+      );
+    });
+
+    test('値が0以下', () {
+      expect(
+        codes(validateQuestions([
+          ledgerQ(blank: const [
+            LedgerCell(
+              rowIndex: 1,
+              group: LedgerColumnGroup.issue,
+              field: LedgerField.amount,
+              value: 0,
+            ),
+          ])
+        ])),
+        contains('ledger-value'),
+      );
+    });
+
+    test('rows に無い rowIndex を参照', () {
+      expect(
+        codes(validateQuestions([
+          ledgerQ(blank: const [
+            LedgerCell(
+              rowIndex: 99,
+              group: LedgerColumnGroup.issue,
+              field: LedgerField.amount,
+              value: 500,
+            ),
+          ])
+        ])),
+        contains('ledger-unknown-row'),
+      );
+    });
+
+    test('givenCells と blankCells で同じセルが重複', () {
+      expect(
+        codes(validateQuestions([
+          ledgerQ(
+            given: const [
+              LedgerCell(
+                rowIndex: 0,
+                group: LedgerColumnGroup.balance,
+                field: LedgerField.quantity,
+                value: 10,
+              ),
+            ],
+            blank: const [
+              LedgerCell(
+                rowIndex: 0,
+                group: LedgerColumnGroup.balance,
+                field: LedgerField.quantity,
+                value: 999,
+              ),
+            ],
+          )
+        ])),
+        contains('ledger-duplicate-cell'),
+      );
+    });
+
+    test('toJson → fromJson で往復できる', () {
+      final original = ledgerQ();
+      final again = Question.fromJson(
+        jsonDecode(jsonEncode(original.toJson())) as Map<String, dynamic>,
+      );
+      expect(again.toJson(), original.toJson());
+    });
+  });
+
   test('試験定義との整合', () {
     expect(codes(validateQuestions([q(examId: 'other')], exam: exam)), {'exam-mismatch'});
     expect(codes(validateQuestions([q(subjectId: 'zzz')], exam: exam)), {'unknown-subject'});
