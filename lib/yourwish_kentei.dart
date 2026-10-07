@@ -40,5 +40,7 @@ export 'experience/story_mode.dart';
 export 'experience/teach_mascot.dart';
 export 'policy/free_tier.dart';
 export 'policy/usage_quota.dart';
+export 'progress/progress_record.dart';
+export 'progress/review_priority.dart';
 export 'question/question.dart';
 export 'term/term.dart';
