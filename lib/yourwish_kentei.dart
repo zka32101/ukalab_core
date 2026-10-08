@@ -1,10 +1,12 @@
 /// うかラボ検定エンジン。
 library;
 
+export 'company_mode/company_scenario.dart';
 export 'config/exam_config.dart';
 export 'content/ai_news_validator.dart';
 export 'content/attention_viz_validator.dart';
 export 'content/boundary_validator.dart';
+export 'content/company_mode_validator.dart';
 export 'content/confusion_matrix_lab_validator.dart';
 export 'content/conv_lab_validator.dart';
 export 'content/ethics_case_validator.dart';
