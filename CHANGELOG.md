@@ -2,6 +2,18 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.22.0] - 2026-10-09
+
+パッケージ名を `yourwish_kentei` から `ukalab_core` に改名する（命名ルール: うかラボ専用の基盤は `ukalab_` 接頭辞）。
+機能の追加・変更はない。**破壊的変更**: Dart のパッケージ名が変わるため、利用するアプリは次の移行が必要。
+
+### 移行手順
+1. `pubspec.yaml` の依存のキーを `yourwish_kentei:` から `ukalab_core:` に変え、`ref` を `v0.22.0` にする。
+   `url` は改名前の `https://github.com/zka32101/yourwish_kentei.git` のままでも動く。
+   リポジトリを `ukalab_core` に改名した後は、GitHub が旧URLを転送する（新URLに直すのが望ましい）。
+2. `import 'package:yourwish_kentei/yourwish_kentei.dart';` を `import 'package:ukalab_core/ukalab_core.dart';` に置き換える。
+3. 問題データの検証は `dart run ukalab_core:validate_content ...` に変える。
+
 ## [0.21.0] - 2026-10-09
 
 違いの比較表示の自動生成、今週の弱点トップ・弱点の推移、`validate_content` への組み込み

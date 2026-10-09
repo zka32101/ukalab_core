@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:yourwish_kentei/yourwish_kentei.dart';
+import 'package:ukalab_core/ukalab_core.dart';
 
 Map<String, dynamic> questionJson({
   String qid = 'q1',

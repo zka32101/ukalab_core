@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:yourwish_kentei/yourwish_kentei.dart';
+import 'package:ukalab_core/ukalab_core.dart';
 
 /// 乙種第4類の試験定義が、公式の合格基準
 /// 「試験科目ごとの成績が、それぞれ60％以上」を正しく表せることを確かめる。

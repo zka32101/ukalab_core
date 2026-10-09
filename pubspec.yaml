@@ -1,12 +1,12 @@
-name: yourwish_kentei
+name: ukalab_core
 description: "うかラボ（成人向け検定アプリ）の共通エンジン。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッション。"
-version: 0.21.0
+version: 0.22.0
 publish_to: 'none'
 
 environment:
   sdk: ^3.9.0
 
-# 依存の向き: アプリ → yourwish_kentei → app_common_kit。
+# 依存の向き: アプリ → ukalab_core → app_common_kit。
 # コア（このバージョン）は純Dartで app_common_kit をまだ使わない。UI・課金・広告を載せる段階で追加する。
 dependencies: {}
 
