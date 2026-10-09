@@ -1,0 +1,3 @@
+{"itemId":"c-ticket","examId":"sample","category":"admission","label":"受験票を確認する","officialConfirmed":true}
+{"itemId":"c-pen","examId":"sample","category":"belongings","label":"筆記用具を用意する","venue":"venue"}
+{"itemId":"c-net","examId":"sample","category":"environment","label":"通信環境とカメラを確認する","venue":"online","note":"公式の案内で条件を確認する"}
