@@ -17,4 +17,4 @@ jobs:
       - run: dart analyze
       - run: dart test
       - name: サンプル問題データの検証
-        run: dart run yourwish_kentei:validate_content example/sample_exam.json example/sample_questions.jsonl
+        run: dart run yourwish_kentei:validate_content example/sample_exam.json --update-log example/sample_update_log.jsonl --next-steps example/sample_next_steps.jsonl --checklist example/sample_checklist.jsonl example/sample_questions.jsonl

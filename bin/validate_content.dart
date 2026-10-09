@@ -5,7 +5,7 @@ import 'package:yourwish_kentei/yourwish_kentei.dart';
 
 /// 問題データ・用語データの配信前チェック。
 ///
-/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... questions.jsonl...`
+/// 使い方: `dart run yourwish_kentei:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... [--update-log update_log.jsonl]... [--next-steps next_steps.jsonl]... [--checklist checklist.jsonl]... questions.jsonl...`
 /// 問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
@@ -22,6 +22,9 @@ Future<void> main(List<String> args) async {
       '[--nn-builder nn_builder.jsonl]... '
       '[--ethics-case ethics_case.jsonl]... '
       '[--story story_mode.jsonl]... '
+      '[--update-log update_log.jsonl]... '
+      '[--next-steps next_steps.jsonl]... '
+      '[--checklist checklist.jsonl]... '
       '<questions.jsonl>...',
     );
     exit(64);
@@ -51,6 +54,9 @@ Future<void> main(List<String> args) async {
   final nnBuilderPaths = <String>[];
   final ethicsCasePaths = <String>[];
   final storyPaths = <String>[];
+  final updateLogPaths = <String>[];
+  final nextStepPaths = <String>[];
+  final checklistPaths = <String>[];
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
     if (rest[i] == '--terms') {
@@ -137,6 +143,24 @@ Future<void> main(List<String> args) async {
         exit(64);
       }
       storyPaths.add(rest[++i]);
+    } else if (rest[i] == '--update-log') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--update-log の後にファイルパスが必要です');
+        exit(64);
+      }
+      updateLogPaths.add(rest[++i]);
+    } else if (rest[i] == '--next-steps') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--next-steps の後にファイルパスが必要です');
+        exit(64);
+      }
+      nextStepPaths.add(rest[++i]);
+    } else if (rest[i] == '--checklist') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--checklist の後にファイルパスが必要です');
+        exit(64);
+      }
+      checklistPaths.add(rest[++i]);
     } else {
       questionPaths.add(rest[i]);
     }
@@ -331,6 +355,42 @@ Future<void> main(List<String> args) async {
   for (final issue in issues) {
     stdout.writeln(issue);
   }
+  final updateLogEntries = <UpdateLogEntry>[];
+  for (final path in updateLogPaths) {
+    final parsed = parseUpdateLogJsonl(await File(path).readAsString());
+    updateLogEntries.addAll(parsed.entries);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (updateLogEntries.isNotEmpty) {
+    issues.addAll(validateUpdateLog(updateLogEntries, exam: exam));
+  }
+
+  final nextStepRules = <NextStepRule>[];
+  for (final path in nextStepPaths) {
+    final parsed = parseNextStepsJsonl(await File(path).readAsString());
+    nextStepRules.addAll(parsed.rules);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (nextStepRules.isNotEmpty) {
+    issues.addAll(validateNextSteps(nextStepRules));
+  }
+
+  final checklistItems = <ChecklistItem>[];
+  for (final path in checklistPaths) {
+    final parsed = parseChecklistItemsJsonl(await File(path).readAsString());
+    checklistItems.addAll(parsed.items);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (checklistItems.isNotEmpty) {
+    issues.addAll(validateChecklistItems(checklistItems, exam: exam));
+  }
+
   final termsSummary = terms.isEmpty ? '' : '、${terms.length}語を検査';
   final boundarySummary =
       boundaryScenarios.isEmpty ? '' : '、${boundaryScenarios.length}場面を検査';
@@ -359,8 +419,14 @@ Future<void> main(List<String> args) async {
       ethicsCaseScenarios.isEmpty ? '' : '、${ethicsCaseScenarios.length}場面を検査';
   final storySummary =
       storyScenarios.isEmpty ? '' : '、${storyScenarios.length}シナリオを検査';
+  final updateLogSummary =
+      updateLogEntries.isEmpty ? '' : '、更新ログ${updateLogEntries.length}件を検査';
+  final nextStepSummary =
+      nextStepRules.isEmpty ? '' : '、次の一手${nextStepRules.length}件を検査';
+  final checklistSummary =
+      checklistItems.isEmpty ? '' : '、チェックリスト${checklistItems.length}項目を検査';
   stdout.writeln(
-    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary、問題${issues.length}件',
+    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary$updateLogSummary$nextStepSummary$checklistSummary、問題${issues.length}件',
   );
   exit(issues.isEmpty ? 0 : 1);
 }

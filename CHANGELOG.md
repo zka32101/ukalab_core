@@ -2,6 +2,21 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.21.0] - 2026-10-09
+
+違いの比較表示の自動生成、今週の弱点トップ・弱点の推移、`validate_content` への組み込み
+（企画: 追加差別化機能 §1・§2、決定事項ログ追補3）。追加のみで、既存 API に破壊的変更はない。
+
+### Added
+- `buildComparison` / `ComparisonView` / `ComparisonRow`: 問題の比較対象タグ（`compareWith`）から、
+  正解の用語（`Term.relatedQuestionIds` にその問題を持つ用語）と紛らわしい相手の用語を並べた
+  違いの比較表示を自動生成する。無効・未定義・重複は除き、2つに満たなければ null
+- `weeklyWeakTop`: 今週の弱点トップ（章単位、既定3件）
+- `weakTrend` / `WeakTrend`: 章ごとの弱点スコアの推移（今と1週間前を、それぞれその時点までの
+  解答で計算して比較。自分の過去との比較のみ）
+- `validate_content`: `--update-log`・`--next-steps`・`--checklist` を追加。CI のサンプル検証にも
+  `example/sample_update_log.jsonl`・`sample_next_steps.jsonl`・`sample_checklist.jsonl` を追加
+
 ## [0.20.0] - 2026-10-09
 
 学習履歴の書き出し（企画: 追加差別化機能 §1・§3。premium 機能 `PremiumFeature.historyExport`）。
