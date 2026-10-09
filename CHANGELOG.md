@@ -2,6 +2,23 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.19.0] - 2026-10-09
+
+更新ログ・合格後の次の一手・試験当日チェックリスト（企画: 追加差別化機能 §1）。追加のみで、
+既存 API に破壊的変更はない。いずれも配信データの構造・読み込み・配信前検証と、画面が使う
+最小の関数だけを持つ（画面はアプリ側）。
+
+### Added
+- `UpdateLogEntry` / `UpdateKind` / `recentUpdates` / `parseUpdateLogJsonl` / `validateUpdateLog`:
+  「法改正で◯問を差し替えた」を見える化する更新ログ。法改正・シラバス改訂には根拠の版
+  （`versionRef`）が必須。一覧は新しい順で、未来の予定と古い更新（既定90日超）を除く
+- `NextStepRule` / `suggestNextSteps` / `parseNextStepsJsonl` / `validateNextSteps`:
+  合格後に提案する関連資格の対応表。公開済みの資格だけを提案する
+- `ChecklistItem` / `ChecklistCategory` / `ExamVenueKind` / `checklistFor` / `unconfirmedItems` /
+  `ChecklistProgress` / `parseChecklistItemsJsonl` / `validateChecklistItems`: 試験当日チェックリスト。
+  自宅（オンライン）／会場で項目を出し分け。公式で未確認の項目は `officialConfirmed: false`
+  のままにして、画面で「公式で要確認」と出す
+
 ## [0.18.0] - 2026-10-09
 
 今日の10分プラン（企画: 追加差別化機能 §1・§3）。追加のみで、既存 API に破壊的変更はない。
