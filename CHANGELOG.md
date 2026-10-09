@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.23.0] - 2026-10-09
+
+アプリごとに重複していた純Dartの処理を共通化する。追加のみで、既存 API に破壊的変更はない。
+
+### Added
+- `appendHistory` / `historyRecordFor` / `encodeHistory` / `decodeHistory` / `historyCsv` / `historyMaxRecords`:
+  解答履歴の追記（上限で古いものを捨てる）・保存形式・CSV。端末への保存（SharedPreferences など）はアプリ側
+- `effectiveExamDates` / `encodeExamDate` / `decodeExamDate`: 利用者入力の受験日を試験定義より優先する選び方と保存形式
+
 ## [0.22.0] - 2026-10-09
 
 パッケージ名を `yourwish_kentei` から `ukalab_core` に改名する（命名ルール: うかラボ専用の基盤は `ukalab_` 接頭辞）。
