@@ -52,6 +52,7 @@ export 'experience/update_log.dart';
 export 'policy/free_tier.dart';
 export 'policy/premium_features.dart';
 export 'policy/usage_quota.dart';
+export 'progress/history_export.dart';
 export 'progress/progress_record.dart';
 export 'progress/review_priority.dart';
 export 'progress/weak_topics.dart';
