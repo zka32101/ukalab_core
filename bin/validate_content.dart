@@ -161,6 +161,7 @@ Future<void> main(List<String> args) async {
       (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
     ));
   }
+  issues.addAll(validateCompareTargets(questions, [for (final t in terms) t.termId]));
   if (terms.isNotEmpty) {
     issues.addAll(validateTerms(terms, exam: exam, questions: questions));
   }

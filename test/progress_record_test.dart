@@ -49,4 +49,64 @@ void main() {
       expect(await store.loadRecords(), isEmpty);
     });
   });
+
+  group('ProgressRecord 追加項目（論点・回答時間・原因ラベル）', () {
+    test('追加項目も含めて往復できる', () {
+      final record = ProgressRecord(
+        qid: 'q1',
+        subjectId: 's1',
+        correct: false,
+        at: DateTime(2026, 10, 9, 9, 0),
+        topicId: 'ch1',
+        subtopicId: 'ch1-a',
+        ms: 8400,
+        cause: WrongCause.trap,
+      );
+
+      expect(record.toJson()['cause'], 'trap');
+      expect(ProgressRecord.fromJson(record.toJson()), record);
+    });
+
+    test('追加項目の無い旧データも読める（追加項目は null）', () {
+      final restored = ProgressRecord.fromJson({
+        'qid': 'q1',
+        'subjectId': 's1',
+        'correct': true,
+        'at': DateTime(2026, 10, 6).toIso8601String(),
+      });
+
+      expect(restored, isNotNull);
+      expect(restored!.topicId, isNull);
+      expect(restored.ms, isNull);
+      expect(restored.cause, isNull);
+    });
+
+    test('追加項目が不正な型・値でも、必須項目は復元する', () {
+      final restored = ProgressRecord.fromJson({
+        'qid': 'q1',
+        'subjectId': 's1',
+        'correct': false,
+        'at': DateTime(2026, 10, 6).toIso8601String(),
+        'topicId': 123,
+        'ms': 'fast',
+        'cause': 'unknown',
+      });
+
+      expect(restored, isNotNull);
+      expect(restored!.topicId, isNull);
+      expect(restored.ms, isNull);
+      expect(restored.cause, isNull);
+    });
+
+    test('追加項目が無い記録は toJson にキーを出さない', () {
+      final json = ProgressRecord(
+        qid: 'q1',
+        subjectId: 's1',
+        correct: true,
+        at: DateTime(2026, 10, 6),
+      ).toJson();
+
+      expect(json.keys, unorderedEquals(['qid', 'subjectId', 'correct', 'at']));
+    });
+  });
 }

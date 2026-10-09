@@ -323,6 +323,8 @@ class Question {
     this.points = 1,
     this.license,
     this.lawVersion,
+    this.subtopicId,
+    this.compareWith = const [],
     this.disabled = false,
   })  : assert(
           type != QuestionType.journal || journalAnswer != null,
@@ -380,6 +382,15 @@ class Question {
   /// source が statute のときの法令の版。
   final String? lawVersion;
   final String contentVer;
+
+  /// 論点タグの細目（任意）。章は [topicId]（必須）。弱点スコアは細目単位、
+  /// 集計表示は章単位で行う。細目が未付与の問題は章単位で扱う。
+  final String? subtopicId;
+
+  /// 比較対象の用語ID（[Term.termId]）。紛らわしい相手の用語・物質・標識などを指し、
+  /// 「違いの比較表示」はこのタグから自動生成する。存在チェックは
+  /// [validateCompareTargets] で行う。
+  final List<String> compareWith;
   final bool disabled;
 
   factory Question.fromJson(Map<String, dynamic> j) {
@@ -450,6 +461,8 @@ class Question {
       license: optString(j, 'license', where),
       lawVersion: optString(j, 'lawVersion', where),
       contentVer: reqString(j, 'contentVer', where),
+      subtopicId: optString(j, 'subtopicId', where),
+      compareWith: _optStringList(j, 'compareWith', where),
       disabled: j['disabled'] == true,
     );
   }
@@ -477,6 +490,17 @@ class Question {
         if (license != null) 'license': license,
         if (lawVersion != null) 'lawVersion': lawVersion,
         'contentVer': contentVer,
+        if (subtopicId != null) 'subtopicId': subtopicId,
+        if (compareWith.isNotEmpty) 'compareWith': compareWith,
         if (disabled) 'disabled': true,
       };
+}
+
+List<String> _optStringList(Map<String, dynamic> j, String key, String where) {
+  final v = j[key];
+  if (v == null) return const [];
+  if (v is! List || v.any((e) => e is! String)) {
+    fail(where, '"$key" は文字列の配列が必要です');
+  }
+  return List<String>.from(v);
 }
