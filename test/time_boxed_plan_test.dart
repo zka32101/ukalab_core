@@ -124,7 +124,8 @@ void main() {
     });
 
     test('収まらない長い問題は飛ばし、後ろの短い問題を入れる', () {
-      final qs = [q('long'), q('s1'), q('s2')];
+      // 時間の目安は章の平均にも使われるので、長い問題だけ別の章にする。
+      final qs = [q('long', topicId: 'chL'), q('s1'), q('s2')];
 
       final plan = buildTimeBoxedPlan(
         qs,
