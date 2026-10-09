@@ -182,3 +182,26 @@ List<ContentIssue> validateQuestions(
   }
   return issues;
 }
+
+/// 比較対象（[Question.compareWith]）の存在チェック。[termIds] は用語データの
+/// [Term.termId] の一覧。存在しないID・同じIDの重複・空のIDを検出する。
+List<ContentIssue> validateCompareTargets(
+  List<Question> questions,
+  Iterable<String> termIds,
+) {
+  final known = termIds.toSet();
+  final issues = <ContentIssue>[];
+  for (final q in questions) {
+    final seen = <String>{};
+    for (final id in q.compareWith) {
+      if (id.trim().isEmpty) {
+        issues.add(ContentIssue(q.qid, 'compare-empty', '比較対象のIDが空です'));
+      } else if (!seen.add(id)) {
+        issues.add(ContentIssue(q.qid, 'compare-duplicate', '比較対象 "$id" が重複しています'));
+      } else if (!known.contains(id)) {
+        issues.add(ContentIssue(q.qid, 'compare-unknown', '比較対象 "$id" が用語データにありません'));
+      }
+    }
+  }
+  return issues;
+}
