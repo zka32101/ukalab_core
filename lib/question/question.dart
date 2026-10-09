@@ -300,6 +300,15 @@ class LedgerAnswer {
       };
 }
 
+/// [Question.tags] に使う、うかラボ共通のタグ。
+abstract final class QuestionTag {
+  /// 頻出（試験直前モードで優先する）。
+  static const frequent = 'frequent';
+
+  /// 計算式（試験直前モードで優先する）。
+  static const formula = 'formula';
+}
+
 /// 1問。IDは不変で、削除は [disabled] で表す（解答履歴は残す）。
 class Question {
   const Question({
@@ -325,6 +334,7 @@ class Question {
     this.lawVersion,
     this.subtopicId,
     this.compareWith = const [],
+    this.tags = const [],
     this.disabled = false,
   })  : assert(
           type != QuestionType.journal || journalAnswer != null,
@@ -391,6 +401,10 @@ class Question {
   /// 「違いの比較表示」はこのタグから自動生成する。存在チェックは
   /// [validateCompareTargets] で行う。
   final List<String> compareWith;
+
+  /// 出題の絞り込み用のタグ。試験直前モードは [QuestionTag.frequent]（頻出）と
+  /// [QuestionTag.formula]（計算式）を使う。
+  final List<String> tags;
   final bool disabled;
 
   factory Question.fromJson(Map<String, dynamic> j) {
@@ -463,6 +477,7 @@ class Question {
       contentVer: reqString(j, 'contentVer', where),
       subtopicId: optString(j, 'subtopicId', where),
       compareWith: _optStringList(j, 'compareWith', where),
+      tags: _optStringList(j, 'tags', where),
       disabled: j['disabled'] == true,
     );
   }
@@ -492,6 +507,7 @@ class Question {
         'contentVer': contentVer,
         if (subtopicId != null) 'subtopicId': subtopicId,
         if (compareWith.isNotEmpty) 'compareWith': compareWith,
+        if (tags.isNotEmpty) 'tags': tags,
         if (disabled) 'disabled': true,
       };
 }
