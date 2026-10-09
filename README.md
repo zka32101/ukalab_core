@@ -1,11 +1,11 @@
-# yourwish_kentei
+# ukalab_core
 
 うかラボ（成人向け検定アプリ）の共通エンジン。ジャンル追加 = **ExamConfig(JSON) + 問題データ + テーマ**で、コード変更は問題タイプ追加時のみ。
 
 ## 位置づけ
 
 ```
-アプリ（資格ごとの薄いリポジトリ） → yourwish_kentei（本リポジトリ） → app_common_kit
+アプリ（資格ごとの薄いリポジトリ） → ukalab_core（本リポジトリ） → app_common_kit
 ```
 
 - 依存は一方向、アプリ側は `ref: vX.Y.Z` のタグ固定で参照する（`main` は参照しない）。
@@ -41,7 +41,7 @@ final exam = ExamConfig.fromJson(jsonDecode(text) as Map<String, dynamic>);
 問題は JSON Lines（1行1問）。[example/sample_questions.jsonl](example/sample_questions.jsonl) を参照。
 
 ```bash
-dart run yourwish_kentei:validate_content exam.json questions.jsonl
+dart run ukalab_core:validate_content exam.json questions.jsonl
 ```
 
 検査する項目: 出典の説明が必須／`licensed` は `license` 必須／`statute` は `lawVersion` 必須／qid の重複／選択肢の個数／同じ文面の選択肢（正解の一意性）／`answerIndex` の範囲／解説・`contentVer` の有無／試験定義との整合（examId・subjectId・levelId）。問題が1件でもあれば終了コード 1。
@@ -51,7 +51,7 @@ dart run yourwish_kentei:validate_content exam.json questions.jsonl
 専門用語の解説カードも JSON Lines（1行1用語）。[example/sample_terms.jsonl](example/sample_terms.jsonl) を参照。問題文・解説文からは `termId` で参照する（アプリ側の責務）。
 
 ```bash
-dart run yourwish_kentei:validate_content exam.json --terms terms.jsonl questions.jsonl
+dart run ukalab_core:validate_content exam.json --terms terms.jsonl questions.jsonl
 ```
 
 検査する項目: `headline`（①ひとことで言うと）・`definition`（②正確な意味）が空でないか／`termId` の重複／見出し語（表記）の重複（同義語は `relatedTermIds` で結ぶ）／`relatedTermIds`・`relatedQuestionIds` のリンク切れ／出典の有無／試験定義との整合。`--terms` は複数指定できる。

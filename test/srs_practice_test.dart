@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:yourwish_kentei/yourwish_kentei.dart';
+import 'package:ukalab_core/ukalab_core.dart';
 
 Question q(String qid, {bool disabled = false}) => Question(
       qid: qid,
