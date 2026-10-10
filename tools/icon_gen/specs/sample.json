@@ -1,0 +1,9 @@
+[
+  {"id": "g_kentei", "short": "G検定", "symbol": "network"},
+  {"id": "hazmat4", "short": "乙4", "symbol": "flask"},
+  {"id": "boki3", "short": "簿記3", "symbol": "yen"},
+  {"id": "denken3", "short": "電験3", "symbol": "bolt"},
+  {"id": "it_passport", "short": "ITパス", "symbol": "chip"},
+  {"id": "sme_consultant", "short": "診断士", "symbol": "bars"},
+  {"id": "gen_ai_passport", "short": "AIパス", "symbol": "passport_ai"}
+]

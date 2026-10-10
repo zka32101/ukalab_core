@@ -18,3 +18,19 @@ jobs:
       - run: flutter test
       - name: サンプル問題データの検証
         run: dart run ukalab_core:validate_content example/sample_exam.json --update-log example/sample_update_log.jsonl --next-steps example/sample_next_steps.jsonl --checklist example/sample_checklist.jsonl example/sample_questions.jsonl
+  icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - run: pip install -r tools/icon_gen/requirements.txt
+      - run: python -m unittest discover -s tools/icon_gen -v
+      - run: python tools/icon_gen/icon_gen.py --spec tools/icon_gen/specs/sample.json --out build/icons
+      - run: python tools/icon_gen/check_icons.py --spec tools/icon_gen/specs/sample.json --out build/icons
+      - uses: actions/upload-artifact@v4
+        with:
+          name: icons
+          path: build/icons
