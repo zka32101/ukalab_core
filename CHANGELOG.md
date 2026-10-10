@@ -20,7 +20,7 @@ app_common_kit v1.0.0 で、うかラボ専用の UI をこのパッケージへ
 - `import 'package:ukalab_core/ui.dart';` を足す（`mascot`・`outfit`・`coin`・テーマ・学習ラボの import 元が変わる）
 - 推しのセリフを差し替えていたら、`KitStringsScope(mascotLines:)` を `UkalabScope(mascotLines:)` に
 
-## [0.24.0] - 2026-10-10
+## [0.25.0] - 2026-10-10
 
 otsu4 にあった受験日まわりの純Dartの計算を共通化する。追加のみで、既存 API に破壊的変更はない。
 
