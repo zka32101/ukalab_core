@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.30.0] - 2026-10-10
+
+ブックマーク・メモの部品と画面を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `BookmarkToggleButton`（しおりボタン）/ `QuestionMemoField`（自分用メモの入力欄。フォーカスが外れたら保存）/ `QuestionDetailScreen`（読み取り専用の問題詳細。解説は `explanationBuilder` で差し替え可）/ `MemoListScreen`（メモの一覧。問題は `loadQuestions` で読み込む）
+- いずれも `bookmarkServiceProvider` / `questionMemoServiceProvider` の override が前提
+
 ## [0.29.0] - 2026-10-10
 
 ブックマークのタグ編集画面を共通化する。追加のみ。
