@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.32.0] - 2026-10-10
+
+ブックマーク・メモの導入配線を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `studyNotesOverrides(appId)`（3サービスを読み込んで ProviderScope の override を返す。main() で1回呼ぶだけ）、`StudyNotesHomeCards`（ホームの「ブックマーク」「自分用メモ」カード）
+
 ## [0.31.0] - 2026-10-10
 
 ブックマークの一覧画面を共通化する。追加のみ。
