@@ -2,6 +2,24 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.24.0] - 2026-10-10
+
+app_common_kit v1.0.0 で、うかラボ専用の UI をこのパッケージへ移した。**Flutter パッケージになる**（純Dartのエンジンと検証CLIはそのまま使える）。
+
+### Added
+- `package:ukalab_core/ui.dart`（Flutter）: 推し（`mascot/`）・衣装/着せ替え/共有カード（`outfit/`）・学習コイン（`coin/`）・学習の引き継ぎ（`transfer/`）・`UkalabTheme`/`UkalabPalette`・学習ラボ系の部品（機械学習ラボ・畳み込み・NN組み立て・注意の可視化・AI動向・手法の選び方・評価指標・ストーリー・境界・失敗ギャラリー・予測実行・ルート）・`UkalabShell`・`CoinBreakdownCard`・`ReadinessProgressCard`・`TeachMascot`
+- `UkalabScope`: 推しのセリフの差し替え（app_common_kit の `KitStringsScope.mascotLines` の移動先）
+- マスコットの画像（`assets/mascot/`、`package: 'ukalab_core'`）。テストも移した
+
+### Changed
+- `pubspec.yaml`: Flutter と `app_common_kit` v1.0.0 に依存。CI は Flutter 版（`flutter analyze`/`flutter test`）
+- `package:ukalab_core/ukalab_core.dart` は従来どおり純Dart。`validate_content` は変わらず `dart run ukalab_core:validate_content` で動く
+
+### 移行（app_common_kit v0.30 までから）
+- アプリは、`app_common_kit` を `v1.0.0`、`ukalab_core` を `v0.24.0` に上げる
+- `import 'package:ukalab_core/ui.dart';` を足す（`mascot`・`outfit`・`coin`・テーマ・学習ラボの import 元が変わる）
+- 推しのセリフを差し替えていたら、`KitStringsScope(mascotLines:)` を `UkalabScope(mascotLines:)` に
+
 ## [0.23.0] - 2026-10-09
 
 アプリごとに重複していた純Dartの処理を共通化する。追加のみで、既存 API に破壊的変更はない。

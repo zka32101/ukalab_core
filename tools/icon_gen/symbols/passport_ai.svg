@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+  <!-- パスポート本体 -->
+  <rect x="-22" y="-34" width="44" height="64" rx="5" fill="#fff"/>
+  <!-- 地球儀（本体に背景色で抜く） -->
+  <circle cx="0" cy="-10" r="13" fill="__BG__"/>
+  <g stroke="#fff" stroke-width="2.2" fill="none">
+    <ellipse cx="0" cy="-10" rx="5.2" ry="13"/>
+    <line x1="-13" y1="-10" x2="13" y2="-10"/>
+    <line x1="-11.5" y1="-17" x2="11.5" y2="-17"/>
+    <line x1="-11.5" y1="-3" x2="11.5" y2="-3"/>
+  </g>
+  <!-- ネットワーク接続線（地球儀から下へ、本体に背景色で抜く） -->
+  <g stroke="__BG__" stroke-width="3.6" stroke-linecap="round" fill="none">
+    <path d="M0 3V10M0 10L-9 18M0 10L9 18M0 10V20"/>
+  </g>
+  <g fill="__BG__">
+    <circle cx="-9" cy="20" r="3"/>
+    <circle cx="9" cy="20" r="3"/>
+    <circle cx="0" cy="23" r="3"/>
+  </g>
+  <!-- スパークル（右上、本体の外） -->
+  <path d="M28 -34 Q31 -24 41 -21 Q31 -18 28 -8 Q25 -18 15 -21 Q25 -24 28 -34Z" fill="#fff"/>
+</svg>

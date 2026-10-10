@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:ukalab_core/ukalab_core.dart';
 
 Question _q(String qid) => Question.fromJson({

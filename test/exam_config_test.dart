@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:ukalab_core/ukalab_core.dart';
 
 Map<String, dynamic> sample() =>

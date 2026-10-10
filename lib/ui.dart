@@ -1,0 +1,52 @@
+/// うかラボ専用の UI（マスコット・着せ替え・コイン・テーマ・学習ラボ）。Flutter が要る。
+///
+/// 純 Dart の部分（検証 CLI など）は `package:ukalab_core/ukalab_core.dart` を使う。
+library;
+
+export 'ui/mascot/character_selection.dart';
+export 'ui/mascot/mascot_lines.dart';
+export 'ui/mascot/mascot_logic.dart';
+export 'ui/mascot/mascot_models.dart';
+export 'ui/mascot/mascot_widget.dart';
+export 'ui/mascot/oshi_home_card.dart';
+export 'ui/mascot/standard_character.dart';
+export 'ui/mascot/ukalab_characters.dart';
+export 'ui/mascot/ukalab_props.dart';
+export 'ui/mascot/ukalab_rooms.dart';
+export 'ui/outfit/mock_record.dart';
+export 'ui/outfit/outfit_models.dart';
+export 'ui/outfit/outfit_provider.dart';
+export 'ui/outfit/outfit_service.dart';
+export 'ui/outfit/pass_report.dart';
+export 'ui/outfit/readiness.dart';
+export 'ui/outfit/share_card.dart';
+export 'ui/outfit/wardrobe_screen.dart';
+export 'ui/coin/coin_ledger.dart';
+export 'ui/coin/coin_provider.dart';
+export 'ui/coin/coin_rules.dart';
+export 'ui/coin/coin_service.dart';
+export 'ui/coin/coin_sync.dart';
+export 'ui/coin/firebase_coin_remote.dart';
+export 'ui/coin/shop.dart';
+export 'ui/transfer/firebase_transfer_remote.dart';
+export 'ui/transfer/learning_transfer.dart';
+export 'ui/theme/ukalab_palette.dart';
+export 'ui/theme/ukalab_theme.dart';
+export 'ui/ui_kit/teach_mascot.dart';
+export 'ui/ui_kit/coin_breakdown.dart';
+export 'ui/ui_kit/readiness_progress.dart';
+export 'ui/ui_kit/ml_lab.dart';
+export 'ui/ui_kit/conv_lab.dart';
+export 'ui/ui_kit/nn_builder.dart';
+export 'ui/ui_kit/attention_viz.dart';
+export 'ui/ui_kit/ai_news_card.dart';
+export 'ui/ui_kit/story_mode.dart';
+export 'ui/ui_kit/confusion_matrix_lab.dart';
+export 'ui/ui_kit/lab_controls.dart';
+export 'ui/ui_kit/method_choice.dart';
+export 'ui/ui_kit/boundary_slider.dart';
+export 'ui/ui_kit/failure_gallery.dart';
+export 'ui/ui_kit/predict_run.dart';
+export 'ui/ui_kit/route_planner.dart';
+export 'ui/ui_kit/app_shell.dart';
+export 'ui/ukalab_scope.dart';

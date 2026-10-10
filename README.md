@@ -10,7 +10,7 @@
 
 - 依存は一方向、アプリ側は `ref: vX.Y.Z` のタグ固定で参照する（`main` は参照しない）。
 - アプリ側リポジトリは ExamConfig・問題データ・テーマ・ストア設定だけを持つ。
-- v0.1.0 は純Dart。`app_common_kit`（権利管理・広告ゲート・フィードバック）への依存は、UI・課金を載せる段階で追加する。
+- `package:ukalab_core/ukalab_core.dart` は純Dart（エンジン・検証CLI）。`package:ukalab_core/ui.dart` は Flutter の UI（推し・衣装・コイン・テーマ・学習ラボ）。v0.24.0 から Flutter パッケージで、`app_common_kit` v1.0.0 に依存する。
 
 ## 構成
 
@@ -24,6 +24,15 @@ lib/
 bin/
   validate_content.dart   問題データ検証 CLI
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
+```
+
+## UI（`ui.dart`）
+
+推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
+
+```dart
+import 'package:app_common_kit/app_common_kit.dart'; // 全アプリ共通（KitStrings・設定画面など）
+import 'package:ukalab_core/ui.dart';              // うかラボ専用のUI
 ```
 
 ## 使い方
@@ -112,17 +121,35 @@ final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全�
 
 `KeyValueStore` はアプリ側で SharedPreferences などを使って実装する。premium だけが対象で、noads のみの人は無料と同じ扱い。
 
+## アイコン生成（tools/icon_gen）
+
+共通テンプレート（上段「うかラボ」／中央にシンボル／下部に試験名。組織ロゴ・✓バッジなし）で、データから量産する。
+
+```bash
+pip install -r tools/icon_gen/requirements.txt
+python tools/icon_gen/icon_gen.py --spec tools/icon_gen/specs/sample.json --out build/icons
+python tools/icon_gen/check_icons.py --spec tools/icon_gen/specs/sample.json --out build/icons
+```
+
+- 定義（JSON）: `{"id": 資格ID, "short": 試験名の短縮, "symbol": symbols/ のファイル名}`。資格ID（例: `g_kentei`）
+- シンボルは白一色の SVG（viewBox `-50 -50 100 100`）を `tools/icon_gen/symbols/` に置く。中抜きの色が必要なら `__BG__`（背景色に置換）
+- 出力: `<id>_1024.png`、`<id>_fg.png`／`<id>_bg.png`（Android adaptive。前景は中央66%以内）、`<id>_small_1024.png`（最小サイズ用）
+- 日本語の太字フォントが必要（Windows は游ゴシック、CI は fonts-noto-cjk）。`--font` で指定もできる
+- AI 画像は使わない。試験団体のロゴ・「公式」「認定」の文字は入れない
+- シンボルの最終デザインは未決（サンプルは仮）
+- 実際のアプリ用の定義は `tools/icon_gen/specs/ukalab_apps.json`（今は `bike_license` のみ。シンボル `motorcycle` は仮のデザイン）。アプリのアイコンを更新するときは、これで生成して `<id>_1024.png`・`<id>_fg.png`・`<id>_bg.png` を使う
+
 ## まだ入っていないもの
 
-テーマ（分野色・資格別テーマ色）、推し・コイン、共通UI部品、学習体験の「型」9部品、Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
+Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
 設計は `kentei-engine（うかラボ）` の企画設計書・決定ログ・`app_common_kit_v0_2_追加仕様.md` を参照。
 
 ## 開発
 
 ```bash
-dart pub get
-dart analyze
-dart test
+flutter pub get
+flutter analyze
+flutter test
 ```
 
 ローカルで `app_common_kit` などを path 参照に切り替えるときは `pubspec_overrides.yaml` を使う（コミットしない）。
