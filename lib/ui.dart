@@ -52,6 +52,7 @@ export 'ui/ui_kit/app_shell.dart';
 export 'ui/ukalab_scope.dart';
 export 'ui/study_notes/bookmark_store.dart';
 export 'ui/study_notes/bookmark_tag_edit_screen.dart';
+export 'ui/study_notes/bookmarked_questions_screen.dart';
 export 'ui/study_notes/bookmark_toggle_button.dart';
 export 'ui/study_notes/memo_list_screen.dart';
 export 'ui/study_notes/question_detail_screen.dart';

@@ -39,6 +39,7 @@ Question _q(String qid, String prompt) => Question(
     );
 
 void main() {
+  bookmarkedQuestionsScreenTests();
   testWidgets('BookmarkToggleButton: タップでブックマークが付き外れる', (tester) async {
     final service = BookmarkService(store: _BookmarkStore());
     await service.load();
@@ -97,5 +98,67 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('問題の詳細'), findsOneWidget);
     expect(find.text('乙'), findsOneWidget);
+  });
+}
+
+class _TagStore implements BookmarkTagStore {
+  Map<String, Set<String>> saved = {};
+
+  @override
+  Future<Map<String, Set<String>>> read() async => saved;
+
+  @override
+  Future<void> write(Map<String, Set<String>> tags) async => saved = tags;
+}
+
+void bookmarkedQuestionsScreenTests() {
+  testWidgets('BookmarkedQuestionsScreen: ブックマーク済みだけ出て、タグで絞り込める', (tester) async {
+    final bookmarks = BookmarkService(store: _BookmarkStore());
+    await bookmarks.load();
+    await bookmarks.toggle('q1');
+    await bookmarks.toggle('q2');
+    final tags = BookmarkTagService(store: _TagStore());
+    await tags.load();
+    await tags.addTag('q1', '要復習');
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        bookmarkServiceProvider.overrideWithValue(bookmarks),
+        bookmarkTagServiceProvider.overrideWithValue(tags),
+      ],
+      child: MaterialApp(
+        home: BookmarkedQuestionsScreen(
+          loadQuestions: () async => [_q('q1', '引火点とは'), _q('q2', '指定数量とは'), _q('q3', '無関係')],
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('引火点とは'), findsOneWidget);
+    expect(find.text('指定数量とは'), findsOneWidget);
+    expect(find.text('無関係'), findsNothing);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, '要復習'));
+    await tester.pumpAndSettle();
+    expect(find.text('引火点とは'), findsOneWidget);
+    expect(find.text('指定数量とは'), findsNothing);
+
+    await tester.tap(find.text('引火点とは'));
+    await tester.pumpAndSettle();
+    expect(find.text('問題の詳細'), findsOneWidget);
+  });
+
+  testWidgets('BookmarkedQuestionsScreen: ブックマークが無ければ案内を出す', (tester) async {
+    final bookmarks = BookmarkService(store: _BookmarkStore());
+    await bookmarks.load();
+    final tags = BookmarkTagService(store: _TagStore());
+    await tags.load();
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        bookmarkServiceProvider.overrideWithValue(bookmarks),
+        bookmarkTagServiceProvider.overrideWithValue(tags),
+      ],
+      child: MaterialApp(home: BookmarkedQuestionsScreen(loadQuestions: () async => [_q('q1', '問')])),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('ブックマークはまだありません'), findsOneWidget);
   });
 }
