@@ -59,3 +59,4 @@ export 'ui/study_notes/question_detail_screen.dart';
 export 'ui/study_notes/question_memo_field.dart';
 export 'ui/study_notes/bookmark_tag_store.dart';
 export 'ui/study_notes/question_memo_store.dart';
+export 'ui/study_notes/study_notes_setup.dart';
