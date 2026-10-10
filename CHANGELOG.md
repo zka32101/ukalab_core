@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.29.0] - 2026-10-10
+
+ブックマークのタグ編集画面を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `BookmarkTagEditScreen`（問題ごとのタグの追加・削除。`bookmarkTagServiceProvider` の override が前提）
+
 ## [0.28.0] - 2026-10-10
 
 `app_common_kit` を v1.5.0 から v1.9.0 に上げる。機能の追加・変更はない。
