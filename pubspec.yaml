@@ -1,18 +1,50 @@
 name: ukalab_core
-description: "うかラボ（成人向け検定アプリ）の共通エンジン。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッション。"
-version: 0.23.0
+description: "うかラボ（成人向け検定アプリ）の共通エンジンとUI。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッションと、推し・衣装・コイン・テーマ・学習ラボのUI。"
+version: 0.24.0
 publish_to: 'none'
 
 environment:
   sdk: ^3.9.0
+  flutter: ">=1.17.0"
 
 # 依存の向き: アプリ → ukalab_core → app_common_kit。
-# コア（このバージョン）は純Dartで app_common_kit をまだ使わない。UI・課金・広告を載せる段階で追加する。
-dependencies: {}
+# `package:ukalab_core/ukalab_core.dart` は純Dart（検証CLIなど）、`package:ukalab_core/ui.dart` は Flutter の UI。
+dependencies:
+  flutter:
+    sdk: flutter
+  app_common_kit:
+    git:
+      url: https://github.com/zka32101/app_common_kit.git
+      ref: v1.0.0
+  flutter_riverpod: ^2.6.1
+  shared_preferences: ^2.3.0
+  cloud_firestore: ">=5.0.0 <7.0.0"
 
 dev_dependencies:
-  test: ^1.25.0
-  lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  assets:
+    - assets/mascot/rooms/
+    - assets/mascot/props/
+    - assets/mascot/kai/
+    - assets/mascot/kai/outfits/
+    - assets/mascot/kai/scenes/
+    - assets/mascot/kai/guide/
+    - assets/mascot/mio/
+    - assets/mascot/mio/outfits/
+    - assets/mascot/mio/scenes/
+    - assets/mascot/mio/guide/
+    - assets/mascot/moka/
+    - assets/mascot/moka/outfits/
+    - assets/mascot/moka/scenes/
+    - assets/mascot/moka/guide/
+    - assets/mascot/mike/
+    - assets/mascot/mike/outfits/
+    - assets/mascot/mike/scenes/
+    - assets/mascot/mike/guide/
 
 executables:
   validate_content:

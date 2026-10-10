@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
         with:
-          sdk: stable
-      - run: dart pub get
-      - run: dart analyze
-      - run: dart test
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
       - name: サンプル問題データの検証
         run: dart run ukalab_core:validate_content example/sample_exam.json --update-log example/sample_update_log.jsonl --next-steps example/sample_next_steps.jsonl --checklist example/sample_checklist.jsonl example/sample_questions.jsonl

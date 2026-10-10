@@ -10,7 +10,7 @@
 
 - 依存は一方向、アプリ側は `ref: vX.Y.Z` のタグ固定で参照する（`main` は参照しない）。
 - アプリ側リポジトリは ExamConfig・問題データ・テーマ・ストア設定だけを持つ。
-- v0.1.0 は純Dart。`app_common_kit`（権利管理・広告ゲート・フィードバック）への依存は、UI・課金を載せる段階で追加する。
+- `package:ukalab_core/ukalab_core.dart` は純Dart（エンジン・検証CLI）。`package:ukalab_core/ui.dart` は Flutter の UI（推し・衣装・コイン・テーマ・学習ラボ）。v0.24.0 から Flutter パッケージで、`app_common_kit` v1.0.0 に依存する。
 
 ## 構成
 
@@ -24,6 +24,15 @@ lib/
 bin/
   validate_content.dart   問題データ検証 CLI
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
+```
+
+## UI（`ui.dart`）
+
+推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
+
+```dart
+import 'package:app_common_kit/app_common_kit.dart'; // 全アプリ共通（KitStrings・設定画面など）
+import 'package:ukalab_core/ui.dart';              // うかラボ専用のUI
 ```
 
 ## 使い方
@@ -114,15 +123,15 @@ final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全�
 
 ## まだ入っていないもの
 
-テーマ（分野色・資格別テーマ色）、推し・コイン、共通UI部品、学習体験の「型」9部品、Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
+Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
 設計は `kentei-engine（うかラボ）` の企画設計書・決定ログ・`app_common_kit_v0_2_追加仕様.md` を参照。
 
 ## 開発
 
 ```bash
-dart pub get
-dart analyze
-dart test
+flutter pub get
+flutter analyze
+flutter test
 ```
 
 ローカルで `app_common_kit` などを path 参照に切り替えるときは `pubspec_overrides.yaml` を使う（コミットしない）。
