@@ -50,3 +50,6 @@ export 'ui/ui_kit/predict_run.dart';
 export 'ui/ui_kit/route_planner.dart';
 export 'ui/ui_kit/app_shell.dart';
 export 'ui/ukalab_scope.dart';
+export 'ui/study_notes/bookmark_store.dart';
+export 'ui/study_notes/bookmark_tag_store.dart';
+export 'ui/study_notes/question_memo_store.dart';

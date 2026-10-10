@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.27.0] - 2026-10-10
+
+otsu4 にあった「ブックマーク・タグ・問題メモ・検索」のデータ部分を共通化する。追加のみで、既存 API に破壊的変更はない。画面（一覧・編集）は次の版で足す。
+
+### Added
+- `package:ukalab_core/ukalab_core.dart`（純Dart）: `filterByBookmark` / `searchQuestions` / `filterMemoedQuestions` / `allBookmarkTags`
+- `package:ukalab_core/ui.dart`（Flutter）: `BookmarkService` / `BookmarkTagService` / `QuestionMemoService`（と、それぞれの Notifier・provider・保存先）。保存先は端末内 `SharedPreferences*Store(アプリID)`。キーは `ukalab_<アプリID>_bookmarks` / `_bookmark_tags` / `_question_memos`（otsu4 の従来のキーと同じなので、保存済みの値がそのまま読める）
+
 ## [0.26.0] - 2026-10-10
 
 `app_common_kit` を v1.0.0 から v1.5.0 に上げる。機能の追加・変更はない。
