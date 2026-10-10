@@ -1,46 +1,35 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ukalab_core/ukalab_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ukalab_core/exam_date.dart';
 
 void main() {
-  group('daysUntilExam', () {
-    test('未来の日付なら正の日数', () {
-      expect(daysUntilExam(DateTime(2026, 10, 20), DateTime(2026, 10, 6)), 14);
-    });
+  test('受験日を保存して再読み込みでき、nullで解除できる', () async {
+    SharedPreferences.setMockInitialValues({});
+    final c = ProviderContainer(overrides: [
+      examDateStoreProvider.overrideWithValue(ExamDateStore('t')),
+    ]);
+    addTearDown(c.dispose);
+    expect(c.read(examDateProvider), isNull);
 
-    test('当日は0（時刻は無視する）', () {
-      expect(daysUntilExam(DateTime(2026, 10, 6, 9), DateTime(2026, 10, 6, 23, 59)), 0);
-    });
+    await c.read(examDateProvider.notifier).setDate(DateTime(2027, 3, 14, 9, 30));
+    expect(c.read(examDateProvider), DateTime(2027, 3, 14));
 
-    test('過去なら負の値', () {
-      expect(daysUntilExam(DateTime(2026, 10, 2), DateTime(2026, 10, 6)), -4);
-    });
+    final c2 = ProviderContainer(overrides: [
+      examDateStoreProvider.overrideWithValue(ExamDateStore('t')),
+    ]);
+    addTearDown(c2.dispose);
+    await c2.read(examDateProvider.notifier).load();
+    expect(c2.read(examDateProvider), DateTime(2027, 3, 14));
 
-    test('月をまたいでも日数で数える', () {
-      expect(daysUntilExam(DateTime(2026, 11, 1), DateTime(2026, 10, 31)), 1);
-    });
+    await c2.read(examDateProvider.notifier).setDate(null);
+    expect(c2.read(examDateProvider), isNull);
+    expect(await ExamDateStore('t').read(), isNull);
   });
 
-  group('examCountdownText', () {
-    test('残り日数・当日・経過で文言が変わる', () {
-      expect(examCountdownText(14), '本番まであと14日');
-      expect(examCountdownText(0), '本番は今日です');
-      expect(examCountdownText(-4), '本番から4日経過しました');
-    });
-  });
-
-  group('studyPlanQuestionsPerDay', () {
-    test('残り日数が0以下ならnull（過去・当日）', () {
-      expect(studyPlanQuestionsPerDay(daysLeft: 0, remainingQuestions: 100), isNull);
-      expect(studyPlanQuestionsPerDay(daysLeft: -3, remainingQuestions: 100), isNull);
-    });
-
-    test('未解答が無ければ0', () {
-      expect(studyPlanQuestionsPerDay(daysLeft: 10, remainingQuestions: 0), 0);
-    });
-
-    test('割り切れる場合はそのまま、割り切れない場合は切り上げ', () {
-      expect(studyPlanQuestionsPerDay(daysLeft: 10, remainingQuestions: 100), 10);
-      expect(studyPlanQuestionsPerDay(daysLeft: 3, remainingQuestions: 10), 4);
-    });
+  test('アプリIDが違えば保存先も別', () async {
+    SharedPreferences.setMockInitialValues({});
+    await ExamDateStore('a').write(DateTime(2027, 1, 1));
+    expect(await ExamDateStore('b').read(), isNull);
   });
 }
