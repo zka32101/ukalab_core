@@ -29,10 +29,12 @@ Future<WidgetRef> _ref(WidgetTester tester, {List<Override> overrides = const []
   await tester.pumpWidget(ProviderScope(
     overrides: overrides,
     child: MaterialApp(
-      home: Consumer(builder: (context, ref, _) {
-        captured = ref;
-        return DataManagementSection(parts: _parts());
-      }),
+      home: Scaffold(
+        body: Consumer(builder: (context, ref, _) {
+          captured = ref;
+          return DataManagementSection(parts: _parts());
+        }),
+      ),
     ),
   ));
   return captured;
