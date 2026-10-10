@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.33.0] - 2026-10-10
+
+受験日（利用者入力）の保存と状態を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/exam_date.dart`: `ExamDateStore`（アプリID別の端末内保存）、`ExamDateNotifier` / `examDateProvider` / `examDateStoreProvider`。`ui.dart` には含めない（独自の同名プロバイダーを持つアプリとの衝突を避けるため。使うアプリが明示的に import する）
+
 ## [0.32.0] - 2026-10-10
 
 ブックマーク・メモの導入配線を共通化する。追加のみ。
