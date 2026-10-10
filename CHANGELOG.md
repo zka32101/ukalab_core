@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.34.0] - 2026-10-10
+
+学習データのバックアップ・リセットを共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `DataPart`（バックアップ・リセット対象の学習データ1つ分。id・export・restore・reset）、`encodeLearningDataBackup` / `restoreLearningDataBackup` / `resetLearningData`、`DataManagementSection`（設定画面の「データの管理」: 書き出す・読み込む・リセット）。バックアップに無い部品は触らないので、後から部品を足しても古いバックアップを読める
+
 ## [0.33.0] - 2026-10-10
 
 受験日（利用者入力）の保存と状態を共通化する。追加のみ。
