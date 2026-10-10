@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.34.0] - 2026-10-10
+
+`app_common_kit` を v1.9.0 → v1.10.0 に追従する。
+
+### Changed
+- `app_common_kit` が追加した `KitSectionHeader`・`MinutesBadge`・`PremiumLockTrailing`・`CountdownProgressBar` を、依存の更新により利用可能にする（本体に変更なし）
+
 ## [0.33.0] - 2026-10-10
 
 受験日（利用者入力）の保存と状態を共通化する。追加のみ。
