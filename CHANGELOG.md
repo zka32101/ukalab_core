@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.31.0] - 2026-10-10
+
+ブックマークの一覧画面を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `BookmarkedQuestionsScreen`（ブックマークした問題の一覧。タグで絞り込み・「タグを編集」・タップで詳細。読み取り専用で、続けて演習する画面は各アプリで作る）。`bookmarkServiceProvider` / `bookmarkTagServiceProvider` の override が前提
+
 ## [0.30.0] - 2026-10-10
 
 ブックマーク・メモの部品と画面を共通化する。追加のみ。
