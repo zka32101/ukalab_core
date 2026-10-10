@@ -59,28 +59,49 @@ class BookmarkTagEditScreen extends ConsumerWidget {
   }
 
   Future<void> _showAddTagDialog(BuildContext context, WidgetRef ref, String qid) async {
-    final controller = TextEditingController();
     final tag = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('タグを追加'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(hintText: '例: 要復習・暗記・計算問題'),
-          onSubmitted: (v) => Navigator.of(context).pop(v),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('キャンセル')),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('追加'),
-          ),
-        ],
-      ),
+      builder: (context) => const _AddTagDialog(),
     );
-    controller.dispose();
     if (tag == null || tag.trim().isEmpty) return;
     await ref.read(bookmarkTagProvider.notifier).addTag(qid, tag);
+  }
+}
+
+/// タグ名の入力ダイアログ。コントローラはダイアログが閉じるアニメーションの後に破棄する。
+class _AddTagDialog extends StatefulWidget {
+  const _AddTagDialog();
+
+  @override
+  State<_AddTagDialog> createState() => _AddTagDialogState();
+}
+
+class _AddTagDialogState extends State<_AddTagDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('タグを追加'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        decoration: const InputDecoration(hintText: '例: 要復習・暗記・計算問題'),
+        onSubmitted: (v) => Navigator.of(context).pop(v),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('キャンセル')),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: const Text('追加'),
+        ),
+      ],
+    );
   }
 }
