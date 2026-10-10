@@ -47,7 +47,7 @@ void main() {
     expect(find.text('要復習'), findsOneWidget);
     expect(service.tags['q1'], {'要復習'});
 
-    await tester.tap(find.byIcon(Icons.cancel));
+    await tester.tap(find.descendant(of: find.byType(InputChip), matching: find.byType(Icon)));
     await tester.pumpAndSettle();
     expect(find.text('要復習'), findsNothing);
   });
