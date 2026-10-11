@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.40.0] - 2026-10-11
+
+実績バッジの共通部品を追加する。追加のみ。
+
+### Added
+- `package:ukalab_core/achievements.dart`: `Achievement`（バッジ1件。定義と達成判定はアプリ側）/ `achievementsProvider`（アプリ側で override）/ 解除日時の保存（キーは `ukalab_<アプリID>_notified_achievement_ids`）/ `achievementUnlockOverrides(appId)`（main で1回呼ぶ）/ `watchAchievementUnlocks(ref, key)`（解除スナックバー）/ `AchievementsView`（カテゴリ別タブ付きの一覧。達成カードは `shareCardBuilder` で任意）。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
 ## [0.39.0] - 2026-10-11
 
 アプリ内リマインダー（学習）を共通化する。追加のみ。
