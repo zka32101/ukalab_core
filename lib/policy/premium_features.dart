@@ -14,6 +14,12 @@ enum PremiumFeature {
 
   /// 学習履歴の書き出し（CSV / PDF）。
   historyExport,
+
+  /// 模擬試験の成長グラフ（複数回分の得点率の比較）。
+  mockExamHistory,
+
+  /// カスタム模擬試験（科目を指定して出題）。
+  customMockExam,
 }
 
 /// [feature] を使えるか。premium でなければ使えない。

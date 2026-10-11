@@ -72,6 +72,35 @@ List<Question> pickMockExamQuestions({
   return result;
 }
 
+/// カスタム模擬試験の出題を選ぶ（プレミアム機能）。指定した [subjectIds] の
+/// 問題だけから、無効（disabled）の問題を除いて [count] 問を抽出する。
+/// [subjectIds] が空、又は該当する問題が無ければ空リストを返す。
+/// 各科目からの出題数は均等になるよう割り振り、余りは先頭の科目から順に割り当てる。
+List<Question> pickCustomMockExamQuestions({
+  required Iterable<Question> pool,
+  required List<String> subjectIds,
+  required int count,
+  int seed = 0,
+}) {
+  if (subjectIds.isEmpty || count <= 0) return [];
+  final active = pool.where((q) => !q.disabled && subjectIds.contains(q.subjectId)).toList();
+  if (active.length <= count) {
+    return (List<Question>.from(active)..shuffle(Random(seed)));
+  }
+  final base = count ~/ subjectIds.length;
+  final remainder = count % subjectIds.length;
+  final result = <Question>[];
+  var salt = 0;
+  for (var i = 0; i < subjectIds.length; i++) {
+    final take = base + (i < remainder ? 1 : 0);
+    final subjectPool = active.where((q) => q.subjectId == subjectIds[i]).toList()
+      ..shuffle(Random(seed + salt));
+    result.addAll(subjectPool.take(take));
+    salt++;
+  }
+  return result;
+}
+
 bool _isCorrect(Question q, Object? answer) {
   switch (q.type) {
     case QuestionType.choice:

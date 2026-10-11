@@ -363,4 +363,64 @@ void main() {
       expect(picked.length, 10); // math5 + word5 しかない
     });
   });
+
+  group('pickCustomMockExamQuestions', () {
+    test('指定した科目だけから出題する', () {
+      final picked = pickCustomMockExamQuestions(
+        pool: qs,
+        subjectIds: ['math'],
+        count: 3,
+      );
+      expect(picked.length, 3);
+      expect(picked.every((q) => q.subjectId == 'math'), isTrue);
+    });
+
+    test('複数科目は均等に、余りは先頭の科目から割り振る', () {
+      final picked = pickCustomMockExamQuestions(
+        pool: qs,
+        subjectIds: ['math', 'word'],
+        count: 5,
+      );
+      expect(picked.length, 5);
+      expect(picked.where((q) => q.subjectId == 'math').length, 3);
+      expect(picked.where((q) => q.subjectId == 'word').length, 2);
+    });
+
+    test('無効な問題は除く', () {
+      final disabled = Question(
+        qid: 'm_disabled',
+        examId: 'sample',
+        subjectId: 'math',
+        topicId: 't',
+        prompt: 'p',
+        choices: const ['a', 'b'],
+        answerIndex: 0,
+        explanation: 'e',
+        source: QuestionSource.original,
+        sourceRef: '自作',
+        contentVer: '1',
+        disabled: true,
+      );
+      final picked = pickCustomMockExamQuestions(
+        pool: [...qs, disabled],
+        subjectIds: ['math'],
+        count: 10,
+      );
+      expect(picked.any((q) => q.qid == 'm_disabled'), isFalse);
+    });
+
+    test('subjectIds が空、count が0以下なら空リスト', () {
+      expect(pickCustomMockExamQuestions(pool: qs, subjectIds: [], count: 5), isEmpty);
+      expect(pickCustomMockExamQuestions(pool: qs, subjectIds: ['math'], count: 0), isEmpty);
+    });
+
+    test('問題が要求数より少なければあるだけ返す', () {
+      final picked = pickCustomMockExamQuestions(
+        pool: qs,
+        subjectIds: ['math'],
+        count: 100,
+      );
+      expect(picked.length, 5);
+    });
+  });
 }
