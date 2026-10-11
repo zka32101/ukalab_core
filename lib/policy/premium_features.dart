@@ -20,6 +20,9 @@ enum PremiumFeature {
 
   /// カスタム模擬試験（科目を指定して出題）。
   customMockExam,
+
+  /// 章ごとの解説読み物の全文読み上げ。
+  readingReadAloud,
 }
 
 /// [feature] を使えるか。premium でなければ使えない。
