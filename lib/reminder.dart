@@ -1,7 +1,7 @@
 // アプリ内リマインダー（学習）の設定と表示。
 //
-// OS のプッシュ通知ではなく、アプリを開いたときにホームへ出すカード。
-// （プッシュ通知は新規ネイティブ依存とプラットフォーム設定が要るため扱わない。）
+// アプリを開いたときにホームへ出すカードと、その設定。
+// OS の通知（端末のローカル通知）は `reminder_notification.dart` が受け持つ。
 //
 // `ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため。
 // 使うアプリが `package:ukalab_core/reminder.dart` を明示的に import する）。
@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'daily_goal.dart';
+import 'reminder_notification.dart';
 
 /// アプリ内リマインダーを個別に表示するかどうかの設定。
 class ReminderSettings {
@@ -207,7 +208,16 @@ class ReminderSettingsSection extends ConsumerWidget {
           title: const Text('学習リマインダー'),
           subtitle: Text('${settings.studyReminderHour}時以降に今日の目標が未達成なら知らせます'),
           value: settings.studyReminderEnabled,
-          onChanged: notifier.setStudyReminderEnabled,
+          onChanged: (enabled) async {
+            await notifier.setStudyReminderEnabled(enabled);
+            if (!enabled) return;
+            // オンにしたとき、端末の通知の許可を求める（対応しない端末では何もしない）。
+            final granted = await ref.read(reminderNotifierProvider).requestPermission();
+            if (!granted || !context.mounted) return;
+            ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+              const SnackBar(content: Text('通知を許可しました。設定した時刻にお知らせします')),
+            );
+          },
         ),
         if (settings.studyReminderEnabled)
           ListTile(
