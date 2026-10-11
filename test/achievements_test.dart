@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ukalab_core/achievements.dart';
+import 'package:ukalab_core/daily_goal.dart';
 
 const _list = [
   Achievement(id: 'a', title: 'Aバッジ', description: 'Aの説明', icon: Icons.star, unlocked: true, category: 'x'),
@@ -46,5 +47,32 @@ void main() {
     await tester.pump();
     expect(find.text('Bバッジ'), findsNothing);
     expect(find.text('Aバッジ'), findsOneWidget);
+  });
+
+  group('dailyGoalAchievements', () {
+    final now = DateTime(2026, 10, 11, 9);
+    DailyGoalHistoryEntry day(int d, {int count = 5}) =>
+        DailyGoalHistoryEntry(date: DateTime(2026, 10, d), count: count, achieved: count >= 5);
+
+    test('今日まで・昨日までの連続学習日数を数える', () {
+      expect(studyStreakFromHistory([day(9), day(10), day(11)], now), 3);
+      expect(studyStreakFromHistory([day(8), day(9), day(10)], now), 3);
+      expect(studyStreakFromHistory([day(7), day(10)], now), 1);
+      expect(studyStreakFromHistory([day(9, count: 0), day(10, count: 0)], now), 0);
+      expect(studyStreakFromHistory([], now), 0);
+    });
+
+    test('連続日数とマイルストーンで解除される', () {
+      final list = dailyGoalAchievements(
+        goal: DailyGoal(target: 5, achievedStreak: 4, lastAchievedDate: DateTime(2026, 10, 10)),
+        history: [day(9), day(10), day(11)],
+        now: now,
+      );
+      bool unlocked(String id) => list.firstWhere((a) => a.id == id).unlocked;
+      expect(unlocked('streak_3'), isTrue);
+      expect(unlocked('streak_7'), isFalse);
+      expect(unlocked('achieved_streak_3'), isTrue);
+      expect(unlocked('achieved_streak_7'), isFalse);
+    });
   });
 }

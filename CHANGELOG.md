@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.41.0] - 2026-10-11
+
+デイリーミッションの記録だけで作れる共通の実績を追加する。追加のみ。
+
+### Added
+- `achievements.dart`: `dailyGoalAchievements`（連続学習日数＝履歴の範囲の直近30日まで・目標達成の連続）/ `dailyGoalAchievementsOverride`（`achievementsProvider` の差し込み）/ `studyStreakFromHistory` / `achievementUnlockDataPart`（バックアップ・リセットの部品）/ `dailyGoalAchievementCategoryLabels`
+
 ## [0.40.0] - 2026-10-11
 
 実績バッジの共通部品を追加する。追加のみ。
