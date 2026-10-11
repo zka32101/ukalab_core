@@ -48,7 +48,7 @@ void main() {
     });
 
     test('月末をまたいでも日付が進む', () {
-      final times = upcomingReminderTimes(now: DateTime(2026, 10, 30, 9), hour: 8, achievedToday: false, days: 3);
+      final times = upcomingReminderTimes(now: DateTime(2026, 10, 30, 7), hour: 8, achievedToday: false, days: 3);
       expect(times, [DateTime(2026, 10, 30, 8), DateTime(2026, 10, 31, 8), DateTime(2026, 11, 1, 8)]);
     });
   });
