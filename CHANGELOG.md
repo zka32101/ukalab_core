@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.39.0] - 2026-10-11
+
+アプリ内リマインダー（学習）を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/reminder.dart`: `ReminderSettings`（学習・模試リマインダーのオン／オフと学習の時刻）/ `shouldShowStudyReminder` / 保存とサービス（キーは `ukalab_<アプリID>_reminder_settings`）/ `reminderOverrides(appId)`（main で1回呼ぶ）/ `StudyReminderCard`（ホームに置く。目標が未達成の夜だけ出る）/ `ReminderSettingsSection`（設定画面）。OS のプッシュ通知ではなく、アプリ内で出すカード。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
 ## [0.38.0] - 2026-10-11
 
 デイリーミッション（今日の目標問題数）と学習カレンダーを共通化する。追加のみ。
