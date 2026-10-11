@@ -5,13 +5,13 @@ import 'package:ukalab_core/ukalab_core.dart';
 
 /// 問題データ・用語データの配信前チェック。
 ///
-/// 使い方: `dart run ukalab_core:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... [--update-log update_log.jsonl]... [--next-steps next_steps.jsonl]... [--checklist checklist.jsonl]... questions.jsonl...`
+/// 使い方: `dart run ukalab_core:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--reading reading.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... [--update-log update_log.jsonl]... [--next-steps next_steps.jsonl]... [--checklist checklist.jsonl]... questions.jsonl...`
 /// 問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
     stderr.writeln(
       '使い方: validate_content <exam_config.json> [--terms terms.jsonl]... '
-      '[--boundary boundary.jsonl]... [--predict predict.jsonl]... '
+      '[--boundary boundary.jsonl]... [--reading reading.jsonl]... [--predict predict.jsonl]... '
       '[--misconception misconception.jsonl]... [--failure failure.jsonl]... '
       '[--confusion-matrix confusion_matrix.jsonl]... '
       '[--method-choice method_choice.jsonl]... '
@@ -42,6 +42,7 @@ Future<void> main(List<String> args) async {
   final questionPaths = <String>[];
   final termPaths = <String>[];
   final boundaryPaths = <String>[];
+  final readingPaths = <String>[];
   final predictPaths = <String>[];
   final misconceptionPaths = <String>[];
   final failurePaths = <String>[];
@@ -71,6 +72,12 @@ Future<void> main(List<String> args) async {
         exit(64);
       }
       boundaryPaths.add(rest[++i]);
+    } else if (rest[i] == '--reading') {
+      if (i + 1 >= rest.length) {
+        stderr.writeln('--reading の後にファイルパスが必要です');
+        exit(64);
+      }
+      readingPaths.add(rest[++i]);
     } else if (rest[i] == '--predict') {
       if (i + 1 >= rest.length) {
         stderr.writeln('--predict の後にファイルパスが必要です');
@@ -188,6 +195,23 @@ Future<void> main(List<String> args) async {
   issues.addAll(validateCompareTargets(questions, [for (final t in terms) t.termId]));
   if (terms.isNotEmpty) {
     issues.addAll(validateTerms(terms, exam: exam, questions: questions));
+  }
+
+  final chapterReadings = <ChapterReading>[];
+  for (final path in readingPaths) {
+    final parsed = parseChapterReadingsJsonl(await File(path).readAsString());
+    chapterReadings.addAll(parsed.items);
+    issues.addAll(parsed.issues.map(
+      (i) => ContentIssue('$path ${i.qid}', i.code, i.message),
+    ));
+  }
+  if (chapterReadings.isNotEmpty) {
+    issues.addAll(validateChapterReadings(
+      chapterReadings,
+      exam: exam,
+      termIds: terms.map((t) => t.termId).toList(),
+      questionIds: questions.map((q) => q.qid).toList(),
+    ));
   }
 
   final boundaryScenarios = <BoundaryScenario>[];
@@ -394,6 +418,8 @@ Future<void> main(List<String> args) async {
   final termsSummary = terms.isEmpty ? '' : '、${terms.length}語を検査';
   final boundarySummary =
       boundaryScenarios.isEmpty ? '' : '、${boundaryScenarios.length}場面を検査';
+  final readingSummary =
+      chapterReadings.isEmpty ? '' : '、読み物${chapterReadings.length}件を検査';
   final predictSummary =
       predictScenarios.isEmpty ? '' : '、${predictScenarios.length}場面を検査';
   final misconceptionSummary = misconceptionScenarios.isEmpty
@@ -426,7 +452,7 @@ Future<void> main(List<String> args) async {
   final checklistSummary =
       checklistItems.isEmpty ? '' : '、チェックリスト${checklistItems.length}項目を検査';
   stdout.writeln(
-    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary$updateLogSummary$nextStepSummary$checklistSummary、問題${issues.length}件',
+    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$readingSummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary$updateLogSummary$nextStepSummary$checklistSummary、問題${issues.length}件',
   );
   exit(issues.isEmpty ? 0 : 1);
 }

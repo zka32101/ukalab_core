@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.35.0] - 2026-10-11
+
+章ごとの解説読み物（教科書的なまとめページ）モデルを追加する。追加のみ。
+
+### Added
+- `ChapterReading`（`readingId`・章`subjectId`・見出しと本文の節`sections`・関連用語/関連問題・出典）
+- `parseChapterReadingsJsonl`・`validateChapterReadings`
+- `validate_content` CLI に `--reading reading.jsonl` オプションを追加
+
 ## [0.34.0] - 2026-10-10
 
 `app_common_kit` を v1.9.0 → v1.10.0 に追従する。
