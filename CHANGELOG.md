@@ -2,7 +2,7 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
-## [0.35.0] - 2026-10-11
+## [0.45.0] - 2026-10-11
 
 章ごとの解説読み物（教科書的なまとめページ）モデルを追加する。追加のみ。
 
@@ -10,6 +10,80 @@
 - `ChapterReading`（`readingId`・章`subjectId`・見出しと本文の節`sections`・関連用語/関連問題・出典）
 - `parseChapterReadingsJsonl`・`validateChapterReadings`
 - `validate_content` CLI に `--reading reading.jsonl` オプションを追加
+
+## [0.44.0] - 2026-10-11
+
+学習リマインダーの OS 通知（端末のローカル通知）の共通部分を追加する。追加のみ。
+
+### Added
+- `package:ukalab_core/reminder_notification.dart`: 通知する時刻の判断（`upcomingReminderTimes`・`goalAchievedToday`・`rescheduleStudyReminders`）/ 端末の通知機能への差し込み口 `ReminderNotifier`（既定は何もしない `NoopReminderNotifier`、`reminderNotifierProvider` を override して差し込む）/ `ReminderNotificationWatcher`（`MaterialApp` の `builder` で包む。起動時に一度、そのあとは設定や今日の目標が変わるたびに予約し直す）
+- `ReminderSettingsSection`: 学習リマインダーをオンにしたとき、端末の通知の許可を求める
+
+端末の通知機能そのもの（プラグイン・権限・タイムゾーン）は core には入れない。アプリ側で `ReminderNotifier` を実装して差し込む。
+
+## [0.43.0] - 2026-10-11
+
+用語集の並び順を選べるようにする。追加のみ（既定は従来どおり用語名順）。
+
+### Added
+- `GlossaryListView.sortByTerm`（既定 true）。false なら渡した用語の並び（データの順）のまま出す
+
+## [0.42.0] - 2026-10-11
+
+用語集の一覧と「覚えた」を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/glossary.dart`: `GlossaryListView`（検索・分野での絞り込み・「覚えた」チェックと「すべて／覚えた／未習得」。Riverpod 不要）/ `LearnedTermsStore`（キーは `ukalab_<アプリID>_learned_term_ids`）/ `learnedTermsDataPart`（バックアップ・リセットの部品）/ `openTermCard`（関連用語を辿れる用語カード）。`ui.dart` には含めない（アプリ側の同名と衝突しないため）
+
+## [0.41.0] - 2026-10-11
+
+デイリーミッションの記録だけで作れる共通の実績を追加する。追加のみ。
+
+### Added
+- `achievements.dart`: `dailyGoalAchievements`（連続学習日数＝履歴の範囲の直近30日まで・目標達成の連続）/ `dailyGoalAchievementsOverride`（`achievementsProvider` の差し込み）/ `studyStreakFromHistory` / `achievementUnlockDataPart`（バックアップ・リセットの部品）/ `dailyGoalAchievementCategoryLabels`
+
+## [0.40.0] - 2026-10-11
+
+実績バッジの共通部品を追加する。追加のみ。
+
+### Added
+- `package:ukalab_core/achievements.dart`: `Achievement`（バッジ1件。定義と達成判定はアプリ側）/ `achievementsProvider`（アプリ側で override）/ 解除日時の保存（キーは `ukalab_<アプリID>_notified_achievement_ids`）/ `achievementUnlockOverrides(appId)`（main で1回呼ぶ）/ `watchAchievementUnlocks(ref, key)`（解除スナックバー）/ `AchievementsView`（カテゴリ別タブ付きの一覧。達成カードは `shareCardBuilder` で任意）。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
+## [0.39.0] - 2026-10-11
+
+アプリ内リマインダー（学習）を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/reminder.dart`: `ReminderSettings`（学習・模試リマインダーのオン／オフと学習の時刻）/ `shouldShowStudyReminder` / 保存とサービス（キーは `ukalab_<アプリID>_reminder_settings`）/ `reminderOverrides(appId)`（main で1回呼ぶ）/ `StudyReminderCard`（ホームに置く。目標が未達成の夜だけ出る）/ `ReminderSettingsSection`（設定画面）。OS のプッシュ通知ではなく、アプリ内で出すカード。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
+## [0.38.0] - 2026-10-11
+
+デイリーミッション（今日の目標問題数）と学習カレンダーを共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/daily_goal.dart`: `DailyGoal` / `DailyGoalHistoryEntry` / 連続達成日数の計算（`nextAchievedStreak`・`effectiveAchievedStreak`）/ カレンダーの計算（`monthCalendarDays` ほか）/ 保存とサービス（キーは `ukalab_<アプリID>_daily_goal`・`_daily_goal_history`）/ `dailyGoalOverrides(appId)`（main で1回呼ぶ）/ `recordDailyAnswer(ref)`（1問答えたときに呼ぶ）/ 画面の部品 `DailyMissionCard`・`DailyGoalSetting`。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
+## [0.37.0] - 2026-10-10
+
+バックアップの部品が非同期の保存先を読めるようにする。追加のみ。
+
+### Added
+- `DataPart.export` が `FutureOr<Object?>` を返せる。`encodeLearningDataBackupAsync`（非同期の部品も扱える書き出し）。`DataManagementSection` の「書き出す」はこちらを使う
+- 既存の `encodeLearningDataBackup`（同期）は変わらない。非同期の部品があれば `StateError`
+
+## [0.36.0] - 2026-10-10
+
+バックアップの読み込みで、共通化前の旧形式を読めるようにする。追加のみ。
+
+### Changed
+- `restoreLearningDataBackup` / `DataManagementSection` の読み込み: `parts` を持たない旧形式（`version` と並んで項目がトップレベルに並ぶ形）も、項目を部品のidとして読む。共通化前に書き出したバックアップを、そのまま読み込める
+
+## [0.35.0] - 2026-10-10
+
+学習データのバックアップ・リセットを共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/ui.dart`: `DataPart`（バックアップ・リセット対象の学習データ1つ分。id・export・restore・reset）、`encodeLearningDataBackup` / `restoreLearningDataBackup` / `resetLearningData`、`DataManagementSection`（設定画面の「データの管理」: 書き出す・読み込む・リセット）。バックアップに無い部品は触らないので、後から部品を足しても古いバックアップを読める
 
 ## [0.34.0] - 2026-10-10
 
