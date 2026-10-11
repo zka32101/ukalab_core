@@ -95,4 +95,24 @@ void main() {
     await tester.pump();
     expect(find.text('みかん'), findsOneWidget);
   });
+
+  testWidgets('sortByTerm: false ならデータの並びのまま出す', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    Future<List<String>> shown({required bool sorted}) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: GlossaryListView(
+            terms: [_t('1', 'りんご'), _t('2', 'みかん')],
+            store: LearnedTermsStore(sorted ? 'o1' : 'o2'),
+            sortByTerm: sorted,
+          ),
+        ),
+      ));
+      await tester.pump();
+      return [for (final w in tester.widgetList<ListTile>(find.byType(ListTile))) ((w.title as Text).data ?? '')];
+    }
+
+    expect(await shown(sorted: true), ['みかん', 'りんご']);
+    expect(await shown(sorted: false), ['りんご', 'みかん']);
+  });
 }

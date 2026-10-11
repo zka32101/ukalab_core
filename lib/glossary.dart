@@ -109,6 +109,7 @@ class GlossaryListView extends StatefulWidget {
     this.subjects = const {},
     this.initialSubjectId,
     this.initialSubjectLabel,
+    this.sortByTerm = true,
   });
 
   final List<Term> terms;
@@ -118,6 +119,9 @@ class GlossaryListView extends StatefulWidget {
 
   /// [subjects] を渡さないときの、絞り込み中の分野の表示名。「で絞り込み中 ×」のチップで解除できる。
   final String? initialSubjectLabel;
+
+  /// true なら用語名の順に並べる。false なら [terms] の並び（データの順）のまま。
+  final bool sortByTerm;
 
   @override
   State<GlossaryListView> createState() => _GlossaryListViewState();
@@ -156,7 +160,7 @@ class _GlossaryListViewState extends State<GlossaryListView> {
 
   List<Term> get _filtered {
     final query = _searchController.text.trim();
-    return [
+    final filtered = [
       for (final t in widget.terms)
         if ((_subjectFilter == null || t.subjectId == _subjectFilter) &&
             (query.isEmpty || t.term.contains(query) || t.headline.contains(query)) &&
@@ -166,7 +170,9 @@ class _GlossaryListViewState extends State<GlossaryListView> {
               _LearnedFilter.unlearned => !_learnedIds.contains(t.termId),
             })
           t,
-    ]..sort((a, b) => a.term.compareTo(b.term));
+    ];
+    if (widget.sortByTerm) filtered.sort((a, b) => a.term.compareTo(b.term));
+    return filtered;
   }
 
   @override
