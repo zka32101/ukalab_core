@@ -2,6 +2,17 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.47.0] - 2026-10-11
+
+模擬試験の成長グラフ・カスタム模擬試験（プレミアム機能）を追加する。追加のみ。
+
+### Added
+- `package:ukalab_core/mock_exam_history.dart`: `MockExamHistoryEntry`（模擬試験1回分の結果のスナップショット）・`MockExamHistoryStore`/`MockExamHistoryService`/`mockExamHistoryProvider`（端末内保存、キーは`ukalab_<アプリID>_mock_exam_history`、保持上限50件）・`mockExamHistoryOverrides(appId)`
+- `pickCustomMockExamQuestions`: 指定した科目だけから出題する（カスタム模擬試験用）。複数科目は均等に、余りは先頭の科目から割り振る
+- `PremiumFeature.mockExamHistory`・`PremiumFeature.customMockExam`
+
+グラフ表示部品（`MockExamTrendChart`）は`app_common_kit`側に追加する（依存の向きを守るため、ukalab_coreの型をapp_common_kitに持ち込まない）。
+
 ## [0.46.0] - 2026-10-11
 
 `app_common_kit` を v1.10.0 → v1.11.0 に追従する。
