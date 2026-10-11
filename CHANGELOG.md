@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.38.0] - 2026-10-11
+
+デイリーミッション（今日の目標問題数）と学習カレンダーを共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/daily_goal.dart`: `DailyGoal` / `DailyGoalHistoryEntry` / 連続達成日数の計算（`nextAchievedStreak`・`effectiveAchievedStreak`）/ カレンダーの計算（`monthCalendarDays` ほか）/ 保存とサービス（キーは `ukalab_<アプリID>_daily_goal`・`_daily_goal_history`）/ `dailyGoalOverrides(appId)`（main で1回呼ぶ）/ `recordDailyAnswer(ref)`（1問答えたときに呼ぶ）/ 画面の部品 `DailyMissionCard`・`DailyGoalSetting`。`ui.dart` には含めない（独自の同名クラスを持つアプリとの衝突を避けるため）
+
 ## [0.37.0] - 2026-10-10
 
 バックアップの部品が非同期の保存先を読めるようにする。追加のみ。
