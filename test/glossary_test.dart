@@ -71,8 +71,9 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('覚えた'));
     await tester.pump();
-    expect(find.text('みかん'), findsNothing);
-    expect(find.text('りんご'), findsOneWidget);
+    // 一覧は用語名の順なので、先頭の「みかん」にチェックが付いている。
+    expect(find.text('りんご'), findsNothing);
+    expect(find.text('みかん'), findsOneWidget);
   });
 
   testWidgets('分野を指定して開くと未習得に絞られ、チップで全件に戻せる', (tester) async {
