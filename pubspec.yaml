@@ -1,6 +1,6 @@
 name: ukalab_core
 description: "うかラボ（成人向け検定アプリ）の共通エンジンとUI。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッションと、推し・衣装・コイン・テーマ・学習ラボのUI。"
-version: 0.36.0
+version: 0.37.0
 publish_to: 'none'
 
 environment:

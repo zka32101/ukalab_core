@@ -82,6 +82,21 @@ void main() {
     }
   });
 
+  testWidgets('非同期の部品は Async 版で書き出せ、同期版は StateError', (tester) async {
+    final ref = await _ref(tester);
+    final parts = [
+      DataPart(
+        id: 'slow',
+        export: (ref) async => [1, 2],
+        restore: (ref, json) async {},
+        reset: (ref) async {},
+      ),
+    ];
+    expect(() => encodeLearningDataBackup(ref, parts), throwsStateError);
+    final text = await encodeLearningDataBackupAsync(ref, parts, now: DateTime(2026, 10, 10));
+    expect((jsonDecode(text) as Map<String, dynamic>)['parts'], {'slow': [1, 2]});
+  });
+
   testWidgets('リセットは確認ダイアログを経る', (tester) async {
     final ref = await _ref(tester);
     ref.read(_countProvider.notifier).state = 5;

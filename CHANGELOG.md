@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.37.0] - 2026-10-10
+
+バックアップの部品が非同期の保存先を読めるようにする。追加のみ。
+
+### Added
+- `DataPart.export` が `FutureOr<Object?>` を返せる。`encodeLearningDataBackupAsync`（非同期の部品も扱える書き出し）。`DataManagementSection` の「書き出す」はこちらを使う
+- 既存の `encodeLearningDataBackup`（同期）は変わらない。非同期の部品があれば `StateError`
+
 ## [0.36.0] - 2026-10-10
 
 バックアップの読み込みで、共通化前の旧形式を読めるようにする。追加のみ。

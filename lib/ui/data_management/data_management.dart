@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,8 +21,9 @@ class DataPart {
   /// 互換を保つため、いったん決めたら変えない。
   final String id;
 
-  /// 現在の内容を JSON にできる値で返す。
-  final Object? Function(WidgetRef ref) export;
+  /// 現在の内容を JSON にできる値で返す。端末内の保存先を非同期で読むなら
+  /// [Future] を返してもよい（その場合は [encodeLearningDataBackupAsync] を使う）。
+  final FutureOr<Object?> Function(WidgetRef ref) export;
 
   /// バックアップの内容で上書きする。
   final Future<void> Function(WidgetRef ref, Object? json) restore;
@@ -34,11 +36,35 @@ class DataPart {
 const learningDataBackupFormatVersion = 1;
 
 /// [parts] の現在の内容を、バックアップのJSON文字列にする。
+///
+/// すべての部品の [DataPart.export] が同期のときだけ使える。[Future] を返す部品が
+/// あれば [StateError]（その場合は [encodeLearningDataBackupAsync]）。
 String encodeLearningDataBackup(WidgetRef ref, List<DataPart> parts, {DateTime? now}) {
+  final values = <String, Object?>{};
+  for (final p in parts) {
+    final v = p.export(ref);
+    if (v is Future) {
+      throw StateError('部品「${p.id}」は非同期です。encodeLearningDataBackupAsync を使ってください');
+    }
+    values[p.id] = v;
+  }
+  return _encode(values, now);
+}
+
+/// [encodeLearningDataBackup] の非同期版。[Future] を返す部品も扱える。
+Future<String> encodeLearningDataBackupAsync(WidgetRef ref, List<DataPart> parts, {DateTime? now}) async {
+  final values = <String, Object?>{};
+  for (final p in parts) {
+    values[p.id] = await p.export(ref);
+  }
+  return _encode(values, now);
+}
+
+String _encode(Map<String, Object?> parts, DateTime? now) {
   final body = <String, Object?>{
     'version': learningDataBackupFormatVersion,
     'exportedAt': (now ?? DateTime.now()).toIso8601String(),
-    'parts': {for (final p in parts) p.id: p.export(ref)},
+    'parts': parts,
   };
   return const JsonEncoder.withIndent('  ').convert(body);
 }
@@ -142,7 +168,7 @@ class DataManagementSection extends ConsumerWidget {
   }
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {
-    await Clipboard.setData(ClipboardData(text: encodeLearningDataBackup(ref, parts)));
+    await Clipboard.setData(ClipboardData(text: await encodeLearningDataBackupAsync(ref, parts)));
     if (!context.mounted) return;
     _snack(context, '学習記録をクリップボードにコピーしました');
   }
