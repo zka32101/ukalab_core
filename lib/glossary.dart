@@ -47,7 +47,7 @@ class LearnedTermsStore {
 /// 画面が開いたままでも反映できるよう、[onChanged] で再読み込みなどを呼べる。
 DataPart learnedTermsDataPart(LearnedTermsStore store, {void Function()? onChanged}) => DataPart(
       id: 'learnedTerms',
-      export: (ref) async => (await store.load()).toList(),
+      export: (ref) async => (await store.load()).toList()..sort(),
       restore: (ref, json) async {
         await store.replace((json as List).cast<String>().toSet());
         onChanged?.call();
@@ -108,12 +108,16 @@ class GlossaryListView extends StatefulWidget {
     required this.store,
     this.subjects = const {},
     this.initialSubjectId,
+    this.initialSubjectLabel,
   });
 
   final List<Term> terms;
   final LearnedTermsStore store;
   final Map<String, String> subjects;
   final String? initialSubjectId;
+
+  /// [subjects] を渡さないときの、絞り込み中の分野の表示名。「で絞り込み中 ×」のチップで解除できる。
+  final String? initialSubjectLabel;
 
   @override
   State<GlossaryListView> createState() => _GlossaryListViewState();
@@ -227,6 +231,18 @@ class _GlossaryListViewState extends State<GlossaryListView> {
                     ),
                   ),
               ],
+            ),
+          ),
+        if (widget.subjects.isEmpty && _subjectFilter != null && widget.initialSubjectLabel != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ActionChip(
+                avatar: const Icon(Icons.filter_alt, size: 16),
+                label: Text('「${widget.initialSubjectLabel}」で絞り込み中 ×'),
+                onPressed: () => setState(() => _subjectFilter = null),
+              ),
             ),
           ),
         const SizedBox(height: 8),

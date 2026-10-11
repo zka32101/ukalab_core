@@ -74,4 +74,24 @@ void main() {
     expect(find.text('みかん'), findsNothing);
     expect(find.text('りんご'), findsOneWidget);
   });
+
+  testWidgets('分野を指定して開くと未習得に絞られ、チップで全件に戻せる', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: GlossaryListView(
+          terms: [_t('1', 'りんご', subject: 's1'), _t('2', 'みかん', subject: 's2')],
+          store: LearnedTermsStore('t3'),
+          initialSubjectId: 's1',
+          initialSubjectLabel: '果物A',
+        ),
+      ),
+    ));
+    await tester.pump();
+    expect(find.text('りんご'), findsOneWidget);
+    expect(find.text('みかん'), findsNothing);
+    await tester.tap(find.textContaining('で絞り込み中'));
+    await tester.pump();
+    expect(find.text('みかん'), findsOneWidget);
+  });
 }
