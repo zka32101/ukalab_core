@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.42.0] - 2026-10-11
+
+用語集の一覧と「覚えた」を共通化する。追加のみ。
+
+### Added
+- `package:ukalab_core/glossary.dart`: `GlossaryListView`（検索・分野での絞り込み・「覚えた」チェックと「すべて／覚えた／未習得」。Riverpod 不要）/ `LearnedTermsStore`（キーは `ukalab_<アプリID>_learned_term_ids`）/ `learnedTermsDataPart`（バックアップ・リセットの部品）/ `openTermCard`（関連用語を辿れる用語カード）。`ui.dart` には含めない（アプリ側の同名と衝突しないため）
+
 ## [0.41.0] - 2026-10-11
 
 デイリーミッションの記録だけで作れる共通の実績を追加する。追加のみ。
