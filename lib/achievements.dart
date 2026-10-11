@@ -14,6 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'daily_goal.dart';
+import 'ui/data_management/data_management.dart';
+
 /// 実績バッジ1件（達成条件の判定はアプリ側で済ませる）。
 class Achievement {
   const Achievement({
@@ -324,3 +327,78 @@ class _AchievementTile extends StatelessWidget {
     );
   }
 }
+
+/// 学習日の連続日数。履歴（直近30日まで）で、今日（まだ学習していなければ昨日）から
+/// 数えて、1問以上解いた日が途切れず続いている日数。
+int studyStreakFromHistory(List<DailyGoalHistoryEntry> history, DateTime now) {
+  final days = {for (final e in history) if (e.count > 0) e.date};
+  var day = DateTime(now.year, now.month, now.day);
+  if (!days.contains(day)) day = day.subtract(const Duration(days: 1));
+  var streak = 0;
+  while (days.contains(day)) {
+    streak++;
+    day = day.subtract(const Duration(days: 1));
+  }
+  return streak;
+}
+
+const _studyStreakMilestones = [3, 7, 14, 30];
+const _achievedStreakMilestones = [3, 7, 14, 30, 60, 100];
+
+/// デイリーミッションの記録だけから作れる共通の実績。
+/// 「学習継続」（連続学習日数は履歴の範囲＝直近30日まで）と「目標達成の連続」。
+List<Achievement> dailyGoalAchievements({
+  required DailyGoal goal,
+  required List<DailyGoalHistoryEntry> history,
+  required DateTime now,
+}) {
+  final studyStreak = studyStreakFromHistory(history, now);
+  final achievedStreak = effectiveAchievedStreak(goal, now);
+  return [
+    for (final d in _studyStreakMilestones)
+      Achievement(
+        id: 'streak_$d',
+        title: '$d日連続学習',
+        description: '$d日間、毎日学習を続けた',
+        icon: Icons.local_fire_department_outlined,
+        unlocked: studyStreak >= d,
+        category: 'streak',
+        progressText: studyStreak >= d ? null : '現在の連続学習日数: $studyStreak日 / $d日',
+      ),
+    for (final d in _achievedStreakMilestones)
+      Achievement(
+        id: 'achieved_streak_$d',
+        title: '目標達成$d日連続',
+        description: 'デイリーミッションの目標を$d日連続で達成した',
+        icon: Icons.flag_outlined,
+        unlocked: achievedStreak >= d,
+        category: 'streak',
+        progressText: achievedStreak >= d ? null : '現在の連続達成日数: $achievedStreak日 / $d日',
+      ),
+  ];
+}
+
+/// [achievementsProvider] の差し込み先に使える、デイリーミッション由来の実績の override。
+/// [achievementUnlockOverrides] と同じ ProviderScope に渡す。
+final dailyGoalAchievementsOverride = achievementsProvider.overrideWith((ref) {
+  return dailyGoalAchievements(
+    goal: ref.watch(dailyGoalProvider),
+    history: ref.watch(dailyGoalHistoryProvider),
+    now: DateTime.now(),
+  );
+});
+
+/// 解除日時をバックアップ・リセットの対象にする部品（`DataManagementSection` の parts に足す）。
+final achievementUnlockDataPart = DataPart(
+  id: 'achievementUnlock',
+  export: (ref) => {
+    for (final e in ref.read(achievementUnlockProvider).entries) e.key: e.value.toIso8601String(),
+  },
+  restore: (ref, json) => ref.read(achievementUnlockProvider.notifier).restore({
+    for (final e in (json as Map<String, dynamic>).entries) e.key: DateTime.parse(e.value as String),
+  }),
+  reset: (ref) => ref.read(achievementUnlockProvider.notifier).reset(),
+);
+
+/// 共通の実績の一覧で使うカテゴリ表示名。
+const dailyGoalAchievementCategoryLabels = {'streak': '学習継続'};
