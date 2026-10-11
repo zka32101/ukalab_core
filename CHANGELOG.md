@@ -7,7 +7,7 @@
 学習リマインダーの OS 通知（端末のローカル通知）の共通部分を追加する。追加のみ。
 
 ### Added
-- `package:ukalab_core/reminder_notification.dart`: 通知する時刻の判断（`upcomingReminderTimes`・`goalAchievedToday`・`rescheduleStudyReminders`）/ 端末の通知機能への差し込み口 `ReminderNotifier`（既定は何もしない `NoopReminderNotifier`、`reminderNotifierProvider` を override して差し込む）/ `watchReminderNotifications(ref)`（アプリのルートで呼ぶ。設定や今日の目標が変わるたびに予約し直す）
+- `package:ukalab_core/reminder_notification.dart`: 通知する時刻の判断（`upcomingReminderTimes`・`goalAchievedToday`・`rescheduleStudyReminders`）/ 端末の通知機能への差し込み口 `ReminderNotifier`（既定は何もしない `NoopReminderNotifier`、`reminderNotifierProvider` を override して差し込む）/ `ReminderNotificationWatcher`（`MaterialApp` の `builder` で包む。起動時に一度、そのあとは設定や今日の目標が変わるたびに予約し直す）
 - `ReminderSettingsSection`: 学習リマインダーをオンにしたとき、端末の通知の許可を求める
 
 端末の通知機能そのもの（プラグイン・権限・タイムゾーン）は core には入れない。アプリ側で `ReminderNotifier` を実装して差し込む。

@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ukalab_core/daily_goal.dart';
 import 'package:ukalab_core/reminder.dart';
 import 'package:ukalab_core/reminder_notification.dart';
@@ -113,5 +116,33 @@ void main() {
     expect(await noop.requestPermission(), isFalse);
     await noop.schedule([DateTime(2026, 10, 11)], title: 't', body: 'b');
     await noop.cancelAll();
+  });
+
+  testWidgets('起動時に予約し、設定を変えると予約し直す', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final fake = _FakeNotifier();
+    final overrides = [
+      ...(await tester.runAsync(() => dailyGoalOverrides('w')))!,
+      ...(await tester.runAsync(() => reminderOverrides('w')))!,
+      reminderNotifierProvider.overrideWithValue(fake),
+    ];
+    final container = ProviderContainer(overrides: overrides);
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(home: ReminderNotificationWatcher(child: Text('home'))),
+    ));
+    await tester.pump();
+    // 目標が未設定なので、起動時は予約の取り消し。
+    expect(fake.cancelled, 1);
+
+    await tester.runAsync(() => container.read(dailyGoalProvider.notifier).setTarget(10));
+    await tester.pump();
+    expect(fake.scheduled, isNotEmpty);
+    expect(fake.body, contains('10問'));
+
+    await tester.runAsync(() => container.read(reminderSettingsProvider.notifier).setStudyReminderEnabled(false));
+    await tester.pump();
+    expect(fake.cancelled, 2);
   });
 }

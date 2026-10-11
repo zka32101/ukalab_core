@@ -6,9 +6,10 @@
 //
 // 使い方:
 // 1. 端末側の [ReminderNotifier] を作り、`reminderNotifierProvider` を override する
-// 2. アプリのルートで `watchReminderNotifications(ref)` を呼ぶ
+// 2. `MaterialApp` の `builder` で `ReminderNotificationWatcher` に包む
 //
 // `ui.dart` には含めない（`package:ukalab_core/reminder_notification.dart` を明示的に import する）。
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'daily_goal.dart';
@@ -100,10 +101,23 @@ Future<void> rescheduleStudyReminders({
   );
 }
 
-/// アプリのルート（`build`）で呼ぶ。設定や今日の目標が変わるたびに通知を予約し直す。
-/// 起動時にも一度予約する。
-void watchReminderNotifications(WidgetRef ref) {
-  void sync() {
+/// アプリのルートを包むウィジェット。起動時に一度、そのあとは設定や今日の目標が変わるたびに、
+/// 通知の予約を作り直す。`MaterialApp` の `builder` で `child` を包むのが簡単。
+///
+/// ```dart
+/// MaterialApp(builder: (context, child) => ReminderNotificationWatcher(child: child ?? const SizedBox()))
+/// ```
+class ReminderNotificationWatcher extends ConsumerStatefulWidget {
+  const ReminderNotificationWatcher({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<ReminderNotificationWatcher> createState() => _ReminderNotificationWatcherState();
+}
+
+class _ReminderNotificationWatcherState extends ConsumerState<ReminderNotificationWatcher> {
+  void _sync() {
     rescheduleStudyReminders(
       notifier: ref.read(reminderNotifierProvider),
       settings: ref.read(reminderSettingsProvider),
@@ -112,7 +126,15 @@ void watchReminderNotifications(WidgetRef ref) {
     );
   }
 
-  ref.listen(reminderSettingsProvider, (_, __) => sync());
-  ref.listen(dailyGoalProvider, (_, __) => sync());
-  ref.listen(reminderNotifierProvider, (_, __) => sync(), fireImmediately: true);
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual(reminderSettingsProvider, (_, __) => _sync());
+    ref.listenManual(dailyGoalProvider, (_, __) => _sync());
+    ref.listenManual(reminderNotifierProvider, (_, __) => _sync());
+    _sync();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
