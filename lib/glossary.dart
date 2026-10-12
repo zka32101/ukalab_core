@@ -5,12 +5,13 @@
 /// `Riverpod` は使わないので、どのアプリの画面にも差し込める。
 library;
 
-import 'package:app_common_kit/app_common_kit.dart' show EmptyState, RelatedTermRef, showTermCard;
+import 'package:app_common_kit/app_common_kit.dart' show EmptyState;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'term/term.dart';
 import 'ui/data_management/data_management.dart';
+import 'ui/ui_kit/term_card.dart' show RelatedTermRef, showTermCard;
 
 /// 「覚えた」にした用語の `termId` の端末内保存。キーは `ukalab_<アプリID>_learned_term_ids`。
 class LearnedTermsStore {
