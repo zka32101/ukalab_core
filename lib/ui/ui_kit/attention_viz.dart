@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// Transformerの注意の可視化（画期的な機能5）の1場面。

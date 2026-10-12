@@ -1,5 +1,6 @@
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// ストーリー型の体験（決定38）の1章での選択肢1つ。

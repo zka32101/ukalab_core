@@ -4,6 +4,7 @@ import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 
 import 'lab_controls.dart';
+import 'lab_strings.dart';
 
 /// 機械学習ラボ（画期的な機能1）のデータ点1件。
 class MlLabPointSpec {

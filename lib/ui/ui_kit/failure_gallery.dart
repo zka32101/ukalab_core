@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 学習曲線の1点。ukalab_core の `LearningCurvePoint` と同じ構造を持つ、

@@ -1,5 +1,6 @@
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 最短ルートプランナー（型④、決定76・77）が選んだ1科目の、UI層の軽量な写し。

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 
 import 'failure_gallery.dart' show FailureChoiceSpec;
+import 'lab_strings.dart';
 
 /// 評価指標ラボ（画期的な機能3）の1場面。
 class ConfusionMatrixScenarioSpec {

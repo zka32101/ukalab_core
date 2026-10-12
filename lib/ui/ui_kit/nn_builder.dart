@@ -4,6 +4,7 @@ import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 
 import 'lab_controls.dart';
+import 'lab_strings.dart';
 
 /// ニューラルネット組み立て（画期的な機能2）のデータ点1件。
 class NnBuilderPointSpec {

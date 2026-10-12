@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 
 import 'failure_gallery.dart' show FailureChoiceSpec;
+import 'lab_strings.dart';
 
 /// 手法の選び方（事例仕分け、画期的な機能6）の1場面。
 class MethodChoiceScenarioSpec {

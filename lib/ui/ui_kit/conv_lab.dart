@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 画像認識の中身を見る（画期的な機能4）の1画像。

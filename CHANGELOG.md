@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.51.0] - 2026-10-12
+
+`app_common_kit` を v2.0.0 に上げ、キットから外れたうかラボ専用の部品を受け取る。`package:ukalab_core/ui.dart` から使う。
+
+- 移ってきた: `LabStrings`・`TermCard`（`showTermCard`・`RelatedTermRef`・`RelatedQuestionRef`）・`TermMapWidget` 系・`ChapterReadingWidget`（`ReadingSectionView`）・`TappableTermText`（`TermReference`）・`StatsCompareWidget`・`ExamStats*`（`ExamStatsService`・`FakeExamStatsService`・`FirebaseExamStatsService`・`examStatsServiceProvider`）
+- `LabStrings.of` は言語に応じた既定のみ（キットの `KitStringsScope.labs` は廃止）
+- アプリ側は、上記の名前を使うファイルに `package:ukalab_core/ui.dart` の import が要る
+
 ## [0.50.0] - 2026-10-12
 
 `CustomMockExamSetupScreen`（カスタム模擬試験の科目・問題数の設定画面）を追加する。G検定・生成AIパスポート両アプリに重複していたUIをここに一本化する。追加のみ。
