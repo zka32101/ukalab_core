@@ -48,6 +48,7 @@ export 'ui/ui_kit/boundary_slider.dart';
 export 'ui/ui_kit/failure_gallery.dart';
 export 'ui/ui_kit/predict_run.dart';
 export 'ui/ui_kit/route_planner.dart';
+export 'ui/ui_kit/custom_mock_exam_screen.dart';
 export 'ui/ui_kit/app_shell.dart';
 export 'ui/ukalab_scope.dart';
 export 'ui/study_notes/bookmark_store.dart';
