@@ -1,8 +1,8 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 
 
 import '../outfit/readiness.dart';
+import 'lab_strings.dart';
 
 /// 「準備完了まで」の進み具合を静かに見せるカード。責める表現は使わない。
 class ReadinessProgressCard extends StatelessWidget {

@@ -1,5 +1,5 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 境界線スライダー（型①、決定76・77）の二値条件1つ。

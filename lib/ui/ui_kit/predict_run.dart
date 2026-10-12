@@ -1,5 +1,5 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 予測→実行（型②、決定76）: 先に答えを予測してから、計算結果とのズレを見て

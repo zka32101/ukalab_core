@@ -1,5 +1,5 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import 'lab_strings.dart';
 
 
 /// 今月のAI動向（画期的な機能10、決定41）の1件。
