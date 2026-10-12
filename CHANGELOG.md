@@ -2,6 +2,13 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.53.0] - 2026-10-12
+
+共通 Firebase（`ukalab-prod`／`ukalab-dev`）のルール・検査・手順を、`app_common_kit` の `firebase/` から `firebase/` へ移す（うかラボ専用のため）。コードの変更なし。
+
+- `firebase/firestore.rules`・`test_rules.py`・`firebase.json`・`.firebaserc`・`README.md`
+- 新しい資格を足すときは、`UkalabCert`（`lib/ui/theme/ukalab_palette.dart`）と `firebase/firestore.rules` の `examIds()` を同じ PR で更新する
+
 ## [0.52.0] - 2026-10-12
 
 `app_common_kit` を v3.0.0 に上げ、キットから外れた画面専用の文言 51 項目を `UkalabStrings` として持つ。`package:ukalab_core/ui.dart` から使う。

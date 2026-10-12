@@ -1,0 +1,257 @@
+rules_version = '2';
+// うかラボ共通の Firebase プロジェクト（ukalab-prod / ukalab-dev）の Firestore ルール。
+// 方針（決定事項ログ §5）: パスに examId を含め、ルールはアプリ（試験）単位で厳密に。
+// 新しい資格を足したら、下の examIds に UkalabCert の id を追加する（追加を忘れると拒否される）。
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 資格ID（ukalab_core の UkalabCert.id と揃える）。
+    function examIds() {
+      return [
+        'g_kentei', 'gen_ai_passport', 'gen_ai_practitioner',
+        'data_management', 'info_security', 'ds_kentei', 'it_passport', 'fe',
+        'boki3', 'sme_consultant', 'sme_ma',
+        'hazmat4', 'denken3', 'drone', 'bike_license',
+        'japanese_teacher', 'kanji_kentei'
+      ];
+    }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // ユーザーの学習データ: users/{uid}/exams/{examId}/...
+    // 本人だけが読み書きできる。examId は登録済みの資格だけ。
+    // 匿名認証 → Google/Apple へのリンクでも uid は変わらないので、そのまま引き継がれる。
+    match /users/{uid}/exams/{examId}/{document=**} {
+      allow read, write: if signedIn()
+        && request.auth.uid == uid
+        && examId in examIds();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // 漢字マスター検定（kanji_kentei）: 旧 kanken-b5ac9 のデータ構造をそのまま
+    // exams/kanji_kentei/ の下に置く。ルールは旧 kanken の firestore.rules と同じ内容を入れ子にしたもの。
+    // （共通の feedback は下の既存ルールを使う。）
+    // ─────────────────────────────────────────────────────────────────────
+    match /exams/kanji_kentei {
+
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(uid) {
+        return isSignedIn() && request.auth.uid == uid;
+      }
+
+      // rankings/{docId} は複数プロフィール対応のため "{uid}_{profileId}" という
+      // 複合IDを使う。ドキュメントIDの先頭(uid部分)が本人かどうかで判定する。
+      // profileIdにはUUID等を使い、アンダースコアを含む値は避けること
+      // （先頭要素だけを見るためprofileId側に含まれても安全ではあるが、
+      // 可読性のため）。
+      function isOwnerOfCompositeDoc(docId) {
+        return isSignedIn() && docId.split('_')[0] == request.auth.uid;
+      }
+
+      // ユーザー本体ドキュメントと配下の全サブコレクション（achievements, notifications,
+      // friends, friendRequests, learningGoals, spacedRepetitionItems, examResults 等）
+      // はすべて本人のみ読み書き可能
+      match /users/{uid} {
+        allow read, write: if isOwner(uid);
+
+        match /{subcollection}/{document=**} {
+          allow read, write: if isOwner(uid);
+        }
+
+        // フレンド一覧: 通常は本人のみだが、フレンド関係は相手のプロフィールの
+        // friendsサブコレクションにも自分自身を表すエントリを書き込む必要がある
+        // （承認・拒否・削除の相互反映のため）。ドキュメントID自体が
+        // "{uid}_{profileId}" 複合IDであり、そのIDが表す本人だけが
+        // 他人のfriendsサブコレクション内の「自分の欄」を書き換えられる。
+        match /profiles/{profileId}/friends/{friendId} {
+          allow read, write: if isOwner(uid) || isOwnerOfCompositeDoc(friendId);
+        }
+
+        // フレンドリクエストの受信箱: 本人のみ閲覧・削除できる。
+        // 送信(create)は、fromUserIdが送信者自身を正しく指している場合のみ
+        // 誰でも行える（他人の受信箱に「あなたにリクエストが来た」旨を書き込むため）。
+        match /profiles/{profileId}/friendRequests/{requestId} {
+          allow read, update, delete: if isOwner(uid);
+          allow create: if isSignedIn() &&
+            isOwnerOfCompositeDoc(request.resource.data.fromUserId) &&
+            request.resource.data.toUserId == uid + '_' + profileId;
+        }
+
+        // 通知: 通常は本人のみだが、フレンドチャレンジの受信通知だけは
+        // 送信者が相手の受信箱に直接書き込む必要がある。
+        match /profiles/{profileId}/notifications/{notificationId} {
+          allow read, update, delete: if isOwner(uid);
+          allow create: if isOwner(uid) ||
+            (isSignedIn() &&
+             request.resource.data.type == 'challenge_received' &&
+             request.resource.data.userId == uid);
+        }
+      }
+
+      // リーダーボード: ランキング表示のため読み取りはログインユーザー全員に許可、
+      // 書き込みは自分のスコアのみ。
+      // ドキュメントIDはプロフィール単位で分けるため "{uid}_{profileId}" という
+      // 複合ID（FirestoreService.rankingDocId）を使っている。以前はここが
+      // isOwner(uid) になっており、request.auth.uid を複合ID文字列全体と
+      // 比較してしまうため常に false になり、スコア更新(updateUserScore)が
+      // 毎回 permission-denied で失敗していた（ランキング機能が壊れていた根本原因）。
+      match /leaderboard/{period}/scores/{docId} {
+        allow read: if isSignedIn();
+        allow write: if isOwnerOfCompositeDoc(docId);
+      }
+
+      // ランキング公開用ミラー: users/{uid} 本体（メール等を含みうる）は非公開のため、
+      // ランキング表示に必要な最小限のフィールド（ニックネーム・レベル・経験値・
+      // 正答率・ストリーク・コイン）だけを本人が書き込む公開ドキュメント。
+      // 読み取りはログインユーザー全員、書き込みは本人のみ。
+      match /rankings/{docId} {
+        allow read: if isSignedIn();
+        allow write: if isOwnerOfCompositeDoc(docId);
+      }
+
+      // フレンド追加用の公開プロフィール検索（ニックネーム等の最小限の情報のみ）。
+      // ランキング参加設定(rankingOptIn)に関わらず全プロフィールが登録される。
+      match /profileDirectory/{docId} {
+        allow read: if isSignedIn();
+        allow write: if isOwnerOfCompositeDoc(docId);
+      }
+
+      // フレンドチャレンジ: 当事者（送信者・受信者）のみ読み書き可能
+      match /friendChallenges/{challengeId} {
+        allow read, update, delete: if isSignedIn() &&
+          (resource.data.challengerUserId == request.auth.uid ||
+           resource.data.challengeeUserId == request.auth.uid);
+        allow create: if isSignedIn() &&
+          request.resource.data.challengerUserId == request.auth.uid;
+      }
+
+      // 模擬試験セッション: 本人のみ読み書き可能
+      match /examSessions/{sessionId} {
+        allow read, update, delete: if isSignedIn() &&
+          resource.data.userId == request.auth.uid;
+        allow create: if isSignedIn() &&
+          request.resource.data.userId == request.auth.uid;
+      }
+
+      // 保護者アカウントと子どものリンク: 保護者本人のみ読み書き可能
+      match /parentLinks/{linkId} {
+        allow read, delete: if isSignedIn() && resource.data.parentId == request.auth.uid;
+        allow create: if isSignedIn() && request.resource.data.parentId == request.auth.uid;
+        allow update: if isSignedIn() &&
+          resource.data.parentId == request.auth.uid &&
+          request.resource.data.parentId == request.auth.uid;
+      }
+
+      // マスターデータ系コレクション: ログインユーザーは読み取りのみ可能。
+      // 書き込みはAdmin SDK/Firebaseコンソール経由のみ（クライアントからは不可）
+      match /questions/{id} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+      match /examQuestions/{id} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+      match /challenges/{id} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+      match /badges/{id} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+      match /config/{id} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+
+      // グローバルイベント: 内容は読み取りのみ、参加登録は本人のみ
+      match /events/{eventId} {
+        allow read: if isSignedIn();
+        allow write: if false;
+
+        match /participants/{uid} {
+          allow read: if isSignedIn();
+          allow write: if isOwner(uid);
+        }
+      }
+
+      // 対戦ルーム: ルーム一覧表示・参加判定のため読み取りはログインユーザー全員に許可。
+      // 書き込みは参加者（作成者を含む）本人がリスト内に含まれる場合のみ許可する。
+      function isParticipantAt(data, i) {
+          return data.participants.size() > i &&
+            data.participants[i].userId == request.auth.uid;
+        }
+
+        // ルールでは filter(ラムダ) が使えないため、参加者は先頭から順に調べる。
+        // 対戦の最大人数は 4 人まで（multiplayer.dart の maxParticipants）。
+        function isParticipant(data) {
+          return isSignedIn() &&
+            data.participants is list &&
+            (isParticipantAt(data, 0) || isParticipantAt(data, 1) ||
+             isParticipantAt(data, 2) || isParticipantAt(data, 3));
+        }
+
+      match /battleRooms/{roomId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() &&
+          request.resource.data.creatorId == request.auth.uid;
+        allow update: if isParticipant(resource.data) ||
+          isParticipant(request.resource.data);
+        allow delete: if isSignedIn() && resource.data.creatorId == request.auth.uid;
+      }
+
+      // 対戦セッション: ルームの参加者のみ読み書き可能（roomIdを介して突合する）
+      match /battleSessions/{sessionId} {
+        allow read, update, delete: if isSignedIn() &&
+          isParticipant(get(/databases/$(database)/documents/exams/kanji_kentei/battleRooms/$(resource.data.roomId)).data);
+        allow create: if isSignedIn() &&
+          isParticipant(get(/databases/$(database)/documents/exams/kanji_kentei/battleRooms/$(request.resource.data.roomId)).data);
+      }
+
+      // 対戦結果: 対戦参加者のみ読み取り可能。作成はログインユーザーのみ、改変は不可。
+      match /battleResults/{resultId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update, delete: if false;
+      }
+    }
+
+    // フィードバック（app_common_kit のフィードバック機能）。
+    // 作成: 自分の UID のみ。文字数上限あり。ステータス等は書き換えさせない。
+    // 上限は lib/models/feedback_limits.dart の FeedbackLimits と揃えること。
+    match /feedback/{id} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.status == 'open'
+        && !('githubIssueUrl' in request.resource.data && request.resource.data.githubIssueUrl != null);
+
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+
+      // 更新・削除はクライアントから不可（運営側が Admin SDK で行う）。
+      allow update, delete: if false;
+
+      match /replies/{replyId} {
+        allow read: if signedIn()
+          && get(/databases/$(database)/documents/feedback/$(id)).data.userId == request.auth.uid;
+        allow write: if false;
+      }
+    }
+
+    // それ以外はすべて拒否。
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
