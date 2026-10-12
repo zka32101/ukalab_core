@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.52.0] - 2026-10-12
+
+`app_common_kit` を v3.0.0 に上げ、キットから外れた画面専用の文言 51 項目を `UkalabStrings` として持つ。`package:ukalab_core/ui.dart` から使う。
+
+- 新しい `UkalabStrings`（ja・en・簡体字 zh・繁体字 zh-Hant・ko）。コイン・着せ替え・推し・合格報告・共有カード・下部タブの文言
+- 言語は `UkalabStrings.of(context)` が `KitStringsScope`（`KitStrings.languageCode`）から選ぶ。アプリ側の設定は変わらない
+- 画面のウィジェット（`WardrobeScreen`・`PassShareCard`・`showPassReport`・`showMockRecord`・`outfitLockedReason`・`coinEventLabel`）の `strings` 引数の型が `KitStrings` から `UkalabStrings` に変わる
+
 ## [0.51.0] - 2026-10-12
 
 `app_common_kit` を v2.0.0 に上げ、キットから外れたうかラボ専用の部品を受け取る。`package:ukalab_core/ui.dart` から使う。

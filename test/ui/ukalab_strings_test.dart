@@ -60,7 +60,7 @@ void main() {
       message: 'Great!',
     );
     await tester.pumpWidget(_wrap(
-      SizedBox(width: 400, height: 500, child: PassShareCard(data: custom, strings: KitStrings.en)),
+      SizedBox(width: 400, height: 500, child: PassShareCard(data: custom, strings: UkalabStrings.en)),
     ));
     expect(find.text('Great!'), findsOneWidget);
     expect(find.text('Jan 1, 2026'), findsOneWidget);
@@ -71,17 +71,17 @@ void main() {
     expect(KitStrings.forLocale(const Locale('fr')), same(KitStrings.ja));
     for (final t in CoinEventType.values) {
       expect(
-        KitStrings.en.coinEventLabels.containsKey(t.name),
+        UkalabStrings.en.coinEventLabels.containsKey(t.name),
         isTrue,
         reason: t.name,
       );
       expect(
-        KitStrings.ja.coinEventLabels.containsKey(t.name),
+        UkalabStrings.ja.coinEventLabels.containsKey(t.name),
         isTrue,
         reason: t.name,
       );
     }
-    expect(coinEventLabel(CoinEventType.streak, KitStrings.en), 'Study streak');
+    expect(coinEventLabel(CoinEventType.streak, UkalabStrings.en), 'Study streak');
     expect(coinEventLabel(CoinEventType.streak), '連続学習');
   });
 }

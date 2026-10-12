@@ -1,4 +1,3 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,9 +9,10 @@ import '../theme/ukalab_palette.dart';
 import 'outfit_models.dart';
 import 'outfit_provider.dart';
 import 'outfit_service.dart';
+import '../ukalab_strings.dart';
 
 /// 着られない理由の文言。
-String outfitLockedReason(OutfitAvailability a, {int price = 0, KitStrings strings = KitStrings.ja}) {
+String outfitLockedReason(OutfitAvailability a, {int price = 0, UkalabStrings strings = UkalabStrings.ja}) {
   switch (a) {
     case OutfitAvailability.available:
       return '';
@@ -47,11 +47,11 @@ class WardrobeScreen extends ConsumerWidget {
   final ExamPhase examPhase;
   final MascotStage stage;
   final CharacterPack pack;
-  /// null なら [KitStrings] の既定。
+  /// null なら [UkalabStrings] の既定。
   final String? title;
 
   /// null なら最も近い `KitStringsScope`（無ければ日本語）。
-  final KitStrings? strings;
+  final UkalabStrings? strings;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -59,7 +59,7 @@ class WardrobeScreen extends ConsumerWidget {
     final outfit = ref.watch(outfitProvider);
     final service = ref.read(outfitServiceProvider);
     final theme = Theme.of(context);
-    final s = strings ?? KitStrings.of(context);
+    final s = strings ?? UkalabStrings.of(context);
 
     Future<void> buy(Outfit o) async {
       final r = await ref.read(coinProvider.notifier).purchase(o.id);
@@ -140,7 +140,7 @@ class _OutfitTile extends StatelessWidget {
   final bool wearing;
   final VoidCallback onBuy;
   final VoidCallback onWear;
-  final KitStrings strings;
+  final UkalabStrings strings;
 
   @override
   Widget build(BuildContext context) {

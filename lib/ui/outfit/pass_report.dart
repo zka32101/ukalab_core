@@ -1,4 +1,3 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import '../theme/ukalab_palette.dart';
 import 'outfit_models.dart';
 import 'outfit_provider.dart';
 import 'share_card.dart';
+import '../ukalab_strings.dart';
 
 /// 合格報告の結果。
 enum PassReportResult {
@@ -40,10 +40,10 @@ Future<PassReportResult?> showPassReportDialog(
   String? scoreText,
   Future<void> Function(Uint8List png)? onShare,
   DateTime? now,
-  KitStrings? strings,
+  UkalabStrings? strings,
 }) async {
   // ダイアログは Navigator の上に積まれるので、呼び出し側の context から文言を取っておく。
-  final s = strings ?? KitStrings.of(context);
+  final s = strings ?? UkalabStrings.of(context);
   final choice = await showDialog<PassReportResult>(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -131,7 +131,7 @@ class _PassShareDialog extends StatefulWidget {
   final int coinAmount;
   final String? scoreText;
   final DateTime date;
-  final KitStrings strings;
+  final UkalabStrings strings;
   final Future<void> Function(Uint8List png)? onShare;
 
   @override

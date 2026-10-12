@@ -1,5 +1,5 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
+import '../ukalab_strings.dart';
 
 
 /// 下部タブの骨格。全アプリ共通で「ホーム／学ぶ／模擬／記録／設定」の5つ。
@@ -15,7 +15,7 @@ class UkalabShell extends StatefulWidget {
   /// ホーム・学ぶ・模擬・記録・設定の順。
   final List<Widget> pages;
   final int initialIndex;
-  /// null なら [KitStrings] の既定（日本語なら [defaultLabels]）。
+  /// null なら [UkalabStrings] の既定（日本語なら [defaultLabels]）。
   final List<String>? labels;
 
   static const defaultLabels = ['ホーム', '学ぶ', '模擬', '記録', '設定'];
@@ -43,7 +43,7 @@ class _UkalabShellState extends State<UkalabShell> {
 
   @override
   Widget build(BuildContext context) {
-    final labels = widget.labels ?? KitStrings.of(context).tabLabels;
+    final labels = widget.labels ?? UkalabStrings.of(context).tabLabels;
     return Scaffold(
       body: SafeArea(child: IndexedStack(index: _index, children: widget.pages)),
       bottomNavigationBar: NavigationBar(

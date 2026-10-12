@@ -43,6 +43,7 @@ export 'ui/stats/exam_stats_service.dart';
 export 'ui/stats/exam_stats_provider.dart';
 export 'ui/stats/fake_exam_stats_service.dart';
 export 'ui/stats/firebase_exam_stats_service.dart';
+export 'ui/ukalab_strings.dart';
 export 'ui/ui_kit/teach_mascot.dart';
 export 'ui/ui_kit/coin_breakdown.dart';
 export 'ui/ui_kit/readiness_progress.dart';

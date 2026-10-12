@@ -1,10 +1,10 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mascot_models.dart';
 import 'ukalab_characters.dart';
+import '../ukalab_strings.dart';
 
 /// 選んだ推し（端末内）。キーはうかラボ共通なので、同じ端末の別アプリでも同じ推しになる。
 /// （アプリごとにサンドボックスが別なら共有されない。その場合も各アプリ内では保存される）
@@ -45,7 +45,7 @@ class CharacterSelectScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedCharacterPackProvider);
     final theme = Theme.of(context);
-    final strings = KitStrings.of(context);
+    final strings = UkalabStrings.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(strings.oshiChoose)),
       body: ListView(

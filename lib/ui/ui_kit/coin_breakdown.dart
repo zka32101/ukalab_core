@@ -1,11 +1,11 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 
 import '../coin/coin_rules.dart';
 import '../coin/coin_service.dart';
+import '../ukalab_strings.dart';
 
 /// 付与の種別ごとの表示名。[strings] を渡すとその言語で返す（既定は日本語）。
-String coinEventLabel(CoinEventType t, [KitStrings strings = KitStrings.ja]) =>
+String coinEventLabel(CoinEventType t, [UkalabStrings strings = UkalabStrings.ja]) =>
     strings.coinEventLabels[t.name] ?? _jaLabel(t);
 
 String _jaLabel(CoinEventType t) {
@@ -41,14 +41,14 @@ class CoinBreakdownCard extends StatelessWidget {
   const CoinBreakdownCard({super.key, required this.grants, this.title});
 
   final List<CoinGrant> grants;
-  /// null なら [KitStrings] の既定の見出し。
+  /// null なら [UkalabStrings] の既定の見出し。
   final String? title;
 
   @override
   Widget build(BuildContext context) {
     if (grants.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
-    final strings = KitStrings.of(context);
+    final strings = UkalabStrings.of(context);
     final byType = <CoinEventType, (int, int)>{};
     for (final g in grants) {
       final cur = byType[g.event.type] ?? (0, 0);
