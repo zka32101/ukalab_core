@@ -84,4 +84,5 @@ const ukalabStringsZhHans = UkalabStrings(
   shareCardBrand: 'Qualab',
   shareCardPassed: '通过了！',
   shareDate: _shareDate,
+  close: '关闭',
 );

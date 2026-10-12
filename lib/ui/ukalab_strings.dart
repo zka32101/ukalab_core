@@ -63,6 +63,7 @@ class UkalabStrings {
     required this.shareCardBrand,
     required this.shareCardPassed,
     required this.shareDate,
+    required this.close,
   });
   final String coinTotal;
   final String coinBreakdownTitle;
@@ -122,6 +123,9 @@ class UkalabStrings {
   final String shareCardPassed;
   final String Function(DateTime date) shareDate;
 
+  /// ダイアログの閉じるボタン。
+  final String close;
+
   UkalabStrings copyWith({
     String? coinTotal,
     String? coinBreakdownTitle,
@@ -174,6 +178,7 @@ class UkalabStrings {
     String? shareCardBrand,
     String? shareCardPassed,
     String Function(DateTime date)? shareDate,
+    String? close,
   }) => UkalabStrings(
     coinTotal: coinTotal ?? this.coinTotal,
     coinBreakdownTitle: coinBreakdownTitle ?? this.coinBreakdownTitle,
@@ -226,6 +231,7 @@ class UkalabStrings {
     shareCardBrand: shareCardBrand ?? this.shareCardBrand,
     shareCardPassed: shareCardPassed ?? this.shareCardPassed,
     shareDate: shareDate ?? this.shareDate,
+    close: close ?? this.close,
   );
 
   static const ja = UkalabStrings(
@@ -298,6 +304,7 @@ class UkalabStrings {
     shareCardBrand: 'うかラボ',
     shareCardPassed: '合格しました！',
     shareDate: _jaShareDate,
+    close: '閉じる',
   );
 
   static const en = UkalabStrings(
@@ -380,6 +387,7 @@ class UkalabStrings {
     shareCardBrand: 'Qualab',
     shareCardPassed: 'I passed!',
     shareDate: _enShareDate,
+    close: 'Close',
   );
 
   /// 簡体字中国語（`zh`）。機械翻訳の下書き。公開前に母語話者の確認が要る。

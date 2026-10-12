@@ -57,7 +57,7 @@ void main() {
           s.lockedNotPassed, s.lockedNoExamDate, s.lockedNotReady,
           s.oshiMenuTooltip, s.oshiChoose, s.oshiPassReport, s.oshiDisplayNormal, s.oshiDisplaySmall,
           s.oshiDisplayHidden, s.oshiName, s.oshiHiddenNote, s.oshiYours, s.oshiTapHint,
-          s.mockRecordTitle, s.mockRecordNote, s.mockRecordMessage, s.shareCardBrand, s.shareCardPassed,
+          s.close, s.mockRecordTitle, s.mockRecordNote, s.mockRecordMessage, s.shareCardBrand, s.shareCardPassed,
           ...s.tabLabels,
         ];
         for (final t in texts) {

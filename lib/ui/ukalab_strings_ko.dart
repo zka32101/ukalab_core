@@ -84,4 +84,5 @@ const ukalabStringsKo = UkalabStrings(
   shareCardBrand: 'Qualab',
   shareCardPassed: '합격했어요!',
   shareDate: _shareDate,
+  close: '닫기',
 );

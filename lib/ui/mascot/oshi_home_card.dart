@@ -189,7 +189,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
     final s = UkalabStrings.of(context);
     final lines = MascotLines.forTone(
       pack.tone,
-      lang: s.languageCode,
+      lang: KitStrings.of(context).languageCode,
       custom: UkalabScope.mascotLinesOf(context),
     );
     final line = (situation == MascotSituation.greeting && widget.greeting != null)
