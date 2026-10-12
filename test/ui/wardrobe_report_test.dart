@@ -1,4 +1,3 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'package:ukalab_core/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,14 +108,14 @@ void main() {
       await tester.pumpWidget(UncontrolledProviderScope(
         container: c,
         child: const MaterialApp(
-          home: WardrobeScreen(cert: UkalabCert.bikeLicense, strings: KitStrings.en),
+          home: WardrobeScreen(cert: UkalabCert.bikeLicense, strings: UkalabStrings.en),
         ),
       ));
       await tester.pump();
       expect(find.text('Outfits & shop'), findsOneWidget);
       expect(find.text('Unlocked when you pass'), findsOneWidget);
       expect(find.text('合格したときに解放されます'), findsNothing);
-      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 300, strings: KitStrings.en), 'Buy for 300 coins');
+      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 300, strings: UkalabStrings.en), 'Buy for 300 coins');
       expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 300), '300コインで購入できます');
     });
 

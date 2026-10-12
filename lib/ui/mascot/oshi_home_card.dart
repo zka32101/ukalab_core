@@ -17,6 +17,7 @@ import 'mascot_lines.dart';
 import 'mascot_logic.dart';
 import 'mascot_models.dart';
 import 'mascot_widget.dart';
+import '../ukalab_strings.dart';
 
 /// ホームに置く「推し」カードの完成品。アプリは資格と成長段階を渡すだけで使える。
 ///
@@ -137,7 +138,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
     }
     final pack = ref.read(selectedCharacterPackProvider);
     // 積まれる画面・ダイアログは Scope の外になりうるので、このカードの文言を渡す。
-    final strings = KitStrings.of(context);
+    final strings = UkalabStrings.of(context);
     final now = widget.now ?? DateTime.now();
     final phase = MascotDayState(examDate: widget.examDate).examPhase(now);
     switch (value as _Action) {
@@ -185,10 +186,10 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
       outfit = ref.watch(equippedOutfitProvider);
     } catch (_) {}
 
-    final s = KitStrings.of(context);
+    final s = UkalabStrings.of(context);
     final lines = MascotLines.forTone(
       pack.tone,
-      lang: s.languageCode,
+      lang: KitStrings.of(context).languageCode,
       custom: UkalabScope.mascotLinesOf(context),
     );
     final line = (situation == MascotSituation.greeting && widget.greeting != null)

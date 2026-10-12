@@ -1,4 +1,3 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -8,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import '../mascot/mascot_models.dart';
 import '../mascot/mascot_widget.dart';
 import 'outfit_models.dart';
+import '../ukalab_strings.dart';
 
 /// 「推しと合格」共有カードの内容。**個人情報を入れる欄は作らない**
 /// （名前・メール・ユーザーIDなし）。推し・衣装・資格名・日付だけ。点数は任意。
@@ -31,10 +31,10 @@ class ShareCardData {
   /// 点数（任意。例: 「845点」）。出さないなら null。
   final String? scoreText;
 
-  /// 見出しの一言。null なら [KitStrings] の既定（合格しました！）。
+  /// 見出しの一言。null なら [UkalabStrings] の既定（合格しました！）。
   final String? message;
 
-  /// 日付（日本語表記）。言語に合わせるなら [KitStrings.shareDate] を使う。
+  /// 日付（日本語表記）。言語に合わせるなら [UkalabStrings.shareDate] を使う。
   String get dateText => '${date.year}年${date.month}月${date.day}日';
 }
 
@@ -46,13 +46,13 @@ class PassShareCard extends StatelessWidget {
   final CharacterPack pack;
 
   /// null なら最も近い `KitStringsScope`（無ければ日本語）。ダイアログ内では呼び出し側の文言を渡す。
-  final KitStrings? strings;
+  final UkalabStrings? strings;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final s = strings ?? KitStrings.of(context);
+    final s = strings ?? UkalabStrings.of(context);
     return AspectRatio(
       aspectRatio: 4 / 5,
       child: Container(

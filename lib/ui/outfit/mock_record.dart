@@ -1,4 +1,3 @@
-import 'package:app_common_kit/app_common_kit.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import '../theme/ukalab_palette.dart';
 import 'outfit_models.dart';
 import 'outfit_provider.dart';
 import 'share_card.dart';
+import '../ukalab_strings.dart';
 
 /// 模擬試験で合格点を超えたときの「学習の記録カード」を見せる。
 ///
@@ -25,10 +25,10 @@ Future<void> showMockRecordDialog(
   String? scoreText,
   Future<void> Function(Uint8List png)? onShare,
   DateTime? now,
-  KitStrings? strings,
+  UkalabStrings? strings,
 }) {
   // ダイアログは Navigator の上に積まれるので、呼び出し側の context から文言を取っておく。
-  final s = strings ?? KitStrings.of(context);
+  final s = strings ?? UkalabStrings.of(context);
   Outfit? outfit;
   try {
     outfit = ref.read(equippedOutfitProvider);
@@ -55,7 +55,7 @@ Future<void> showMockRecordDialog(
 class _MockRecordDialog extends StatefulWidget {
   const _MockRecordDialog({required this.data, required this.pack, required this.strings, this.onShare});
 
-  final KitStrings strings;
+  final UkalabStrings strings;
   final ShareCardData data;
   final CharacterPack pack;
   final Future<void> Function(Uint8List png)? onShare;
