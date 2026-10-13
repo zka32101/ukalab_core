@@ -4,23 +4,6 @@
 
 ## [Unreleased]
 
-## [0.67.0] - 2026-10-13
-
-推しの成長演出を追加（追加のみ。既存 API は変更しない）。アプリが渡す累計の学習量（回答数・学習日数）に応じて推しの反応が段階的に変わり、節目に到達したら一度だけ祝う。煽らない・休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
-
-### Added
-- 純 Dart（`ukalab_core.dart`）
-  - `OshiGrowthEngine`: `stageOf(progress)`（5 段階 `OshiGrowthStage`: newcomer / budding / growing / blooming / radiant。回答 10/100/300/1000 問・学習 7/30/100 日で上がる。進んでいる方で決まる）、`reaction(progress, seed:, salt:)`（表情の絵文字・ラベル・一言）、`newlyReached(progress, alreadyCelebrated:)`、`reached`、`headlineOf`、`celebrate(milestone)`
-  - `OshiGrowthProgress`（`totalAnswered` / `studyDays`。負値は 0）、`OshiGrowthMilestone`（`answered(10/50/100/300/1000)` / `days(7/30/100)`。ID は `answered_10` / `days_7`。`milestones:` で差し替え可）
-  - `OshiGrowthStrings`（ja・en、`copyWith`、`allTexts`。`UkalabStrings` は変えない）。責める・煽る語は禁止語リストでテスト
-- UI（`ui.dart`、`lib/ui/oshi_growth/`）
-  - `OshiGrowthBubble`: `OshiMessageBubble` と同じ見た目の吹き出し。表情＋ラベル＋一言、タップで別の一言
-  - `OshiGrowthCelebrationCard` / `showOshiGrowthDialog`: 節目の祝福（閉じるボタンだけ）。「動きを減らす」対応
-  - `OshiGrowthStore`（`InMemoryOshiGrowthStore` / `SharedPreferencesOshiGrowthStore(appId)`、キー `ukalab_oshi_growth_<appId>`）と `OshiGrowthService`（`check` / `checkHeadline`。保存に失敗したら記録せず次回また祝える。複数の節目を同時に迎えても祝福は 1 件）
-
-### Tests
-- `test/oshi_growth_test.dart`（段階の境界・節目の一度だけ・冪等・ストア・禁止語）、`test/oshi_growth_views_test.dart`（幅 320・文字 2 倍でオーバーフローなし、reduce motion、セマンティクス、ja・en）
-
 ## [0.66.0] - 2026-10-13
 
 app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)` が使える（kit PR #140）。
