@@ -2,6 +2,17 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.54.0] - 2026-10-13
+
+うかラボ5アプリの相互紹介を共通化する `package:ukalab_core/cross_promo.dart` を追加（`cross_promo_kit` v0.3.0）。追加のみ。
+
+- `UkalabCrossPromo.init()`: Firebase 初期化（失敗は握りつぶす）→ `CrossPromoService.init()`。二重呼び出し安全。`unawaited` で呼べる
+- `UkalabCrossPromoSection(currentAppId: ...)`: `currentCategory: 'うかラボ'` 固定の薄いラッパー。成人向けのため `isChildDirected` は付けない
+- `kUkalabCrossPromoCategory = 'うかラボ'`
+- 依存追加: `cross_promo_kit`（git, v0.3.0）・`firebase_core`・`firebase_remote_config`
+- `ui.dart` には含めない（Firebase 依存を持ち込まないため。使うアプリが明示的に import する）
+- アプリ側の作業は README「相互紹介」を参照
+
 ## [0.53.0] - 2026-10-12
 
 共通 Firebase（`ukalab-prod`／`ukalab-dev`）のルール・検査・手順を、`app_common_kit` の `firebase/` から `firebase/` へ移す（うかラボ専用のため）。コードの変更なし。
