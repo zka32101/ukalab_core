@@ -5,6 +5,8 @@ import 'package:ukalab_core/ui.dart';
 
 void main() {
   test('kit v3.1.0 のながらセッション API を core の依存経由で import できる', () {
+    // core の ui.dart と同時に import しても名前が衝突しないこと
+    expect(UkalabStrings, isNotNull);
     expect(NagaraSessionController, isNotNull);
     expect(NagaraSessionView, isNotNull);
     expect(NagaraStrings, isNotNull);
