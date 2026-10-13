@@ -3,7 +3,7 @@
 > app_common_kit v1.0.0 から、うかラボ専用の UI は ukalab_core に移りました。`import 'package:ukalab_core/ui.dart';` で使います。
 > 以下は、移した当時（app_common_kit v0.30）の README の該当節です。import の `app_common_kit` は、うかラボ専用の部品については `ukalab_core/ui.dart` に読み替えてください。
 
-> ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は app_common_kit v3.1.0 から。core は再エクスポートのみで、`package:app_common_kit/app_common_kit.dart` から import する（core の `ui.dart` と名前の衝突はないので hide/show は不要）。
+> ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は app_common_kit v3.1.0 から。core は再エクスポートのみで、`package:app_common_kit/app_common_kit.dart` から import する（`NagaraSessionView` など flutter_tts 依存のものは `package:app_common_kit/hands_free_tts.dart`。core の `ui.dart` と名前の衝突はないので hide/show は不要）。
 
 ## テーマ（v0.2）
 

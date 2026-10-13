@@ -9,7 +9,7 @@
 app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は kit v3.1.0 から提供され、core は再エクスポートのみ（ここでは何も実装しない）。
 
 ### Changed
-- `app_common_kit` のピンを v3.0.0 → v3.1.0 に（`pubspec.lock` も該当行のみ）。kit 側は追加のみで、core のコード変更は不要。core は kit を `export` していないため、アプリは従来どおり `package:app_common_kit/app_common_kit.dart` から import する（kit のバレルが新 API を含む）。名前衝突なし（core に同名の型なし）
+- `app_common_kit` のピンを v3.0.0 → v3.1.0 に（`pubspec.lock` も該当行のみ）。kit 側は追加のみで、core のコード変更は不要。core は kit を `export` していないため、アプリは従来どおり `package:app_common_kit/app_common_kit.dart` から import する（`NagaraSessionView` のみ flutter_tts 依存のため `package:app_common_kit/hands_free_tts.dart`）。名前衝突なし（core に同名の型なし）
 
 ### Added
 - `test/kit_nagara_reexport_test.dart`: core の依存経由で kit v3.1.0 のながらセッション API が import できることの確認
