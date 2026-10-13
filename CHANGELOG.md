@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [0.67.0] - 2026-10-13
+
+模擬試験の結果分析を追加（追加のみ。既存 API は変更しない）。
+
+### Added
+- `lib/engine/mock_exam_analysis_engine.dart`: `MockExamAnalysisEngine`（純粋ロジック）。`MockExamAnswer(topicId, correct)` のリストから、分野別の正答率・伸びしろのある分野（弱点）・次にやる分野（最大1〜3件）を出す。何も保存しない
+- `lib/engine/mock_exam_analysis_strings.dart`: `MockExamAnalysisStrings`（ja・en。「今日はここを少しだけ」調）
+- `lib/ui/mock_exam_analysis/`: `MockExamAnalysisCard` / `MockExamAnalysisScreen`（`ui.dart` から export）。分野名は `topicLabel` で渡す
+
+### Tests
+- エンジン（集計・弱点・次の分野・空/全部得意）、文言の禁止語、カード/画面（幅320・文字2倍でオーバーフローなし）
+
 ## [0.66.0] - 2026-10-13
 
 app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)` が使える（kit PR #140）。
@@ -625,5 +637,5 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 - `scoreMockExam`: 模擬試験の採点と合否判定（総合の合格ライン、科目別の足切り、「あと◯点」、足切りで不合格の判別）
 - `Srs`: 間隔反復（Leitner 6段階）
 - `PracticeSession`: 演習1回分（seed による再現可能な出題順、優先問題、解答記録）
-- `bin/validate_content`: 問題データ検証 CLI（問題があれば終了コード1）
+- `bin/validate_content`: 問題データ検証 CLI（問題があれば終了コード 1）
 - GitHub Actions CI（analyze・test・サンプルデータ検証）
