@@ -63,6 +63,10 @@ class UkalabStrings {
     required this.shareCardBrand,
     required this.shareCardPassed,
     required this.shareDate,
+    required this.medalTitle,
+    required this.medalNote,
+    required this.medalDisclaimer,
+    required this.medalSave,
     required this.close,
   });
   final String coinTotal;
@@ -122,6 +126,10 @@ class UkalabStrings {
   final String shareCardBrand;
   final String shareCardPassed;
   final String Function(DateTime date) shareDate;
+  final String medalTitle;
+  final String medalNote;
+  final String medalDisclaimer;
+  final String medalSave;
 
   /// ダイアログの閉じるボタン。
   final String close;
@@ -178,6 +186,10 @@ class UkalabStrings {
     String? shareCardBrand,
     String? shareCardPassed,
     String Function(DateTime date)? shareDate,
+    String? medalTitle,
+    String? medalNote,
+    String? medalDisclaimer,
+    String? medalSave,
     String? close,
   }) => UkalabStrings(
     coinTotal: coinTotal ?? this.coinTotal,
@@ -231,6 +243,10 @@ class UkalabStrings {
     shareCardBrand: shareCardBrand ?? this.shareCardBrand,
     shareCardPassed: shareCardPassed ?? this.shareCardPassed,
     shareDate: shareDate ?? this.shareDate,
+    medalTitle: medalTitle ?? this.medalTitle,
+    medalNote: medalNote ?? this.medalNote,
+    medalDisclaimer: medalDisclaimer ?? this.medalDisclaimer,
+    medalSave: medalSave ?? this.medalSave,
     close: close ?? this.close,
   );
 
@@ -304,6 +320,10 @@ class UkalabStrings {
     shareCardBrand: 'うかラボ',
     shareCardPassed: '合格しました！',
     shareDate: _jaShareDate,
+    medalTitle: '推しのメダルカード',
+    medalNote: '画像として保存・共有できます。名前などの個人情報は入りません。',
+    medalDisclaimer: '自己記録・非公式',
+    medalSave: '画像を保存',
     close: '閉じる',
   );
 
@@ -387,6 +407,10 @@ class UkalabStrings {
     shareCardBrand: 'Qualab',
     shareCardPassed: 'I passed!',
     shareDate: _enShareDate,
+    medalTitle: 'Oshi medal card',
+    medalNote: 'You can save or share it as an image. It contains no personal information such as your name.',
+    medalDisclaimer: 'Self-recorded / unofficial',
+    medalSave: 'Save image',
     close: 'Close',
   );
 

@@ -31,6 +31,8 @@ example/      架空のサンプル試験と問題（実在の試験の問題で
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
 
+v0.56.0 で `OshiMedalShareCard` / `showOshiMedalDialog`（推しの画像の隅にメダルを置いた、画像保存・SNS 共有用カード。個人情報は入らない）を追加。
+
 ```dart
 import 'package:app_common_kit/app_common_kit.dart'; // 全アプリ共通（KitStrings・設定画面など）
 import 'package:ukalab_core/ui.dart';              // うかラボ専用のUI

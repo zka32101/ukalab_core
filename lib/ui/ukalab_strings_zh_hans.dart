@@ -84,5 +84,9 @@ const ukalabStringsZhHans = UkalabStrings(
   shareCardBrand: 'Qualab',
   shareCardPassed: '通过了！',
   shareDate: _shareDate,
+  medalTitle: '推的奖牌卡片',
+  medalNote: '可以保存或分享为图片。不包含姓名等个人信息。',
+  medalDisclaimer: '个人记录・非官方',
+  medalSave: '保存图片',
   close: '关闭',
 );

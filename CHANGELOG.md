@@ -2,6 +2,16 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.56.0] - 2026-10-13
+
+推しの画像の隅にメダルを置き、画像保存・SNS 共有できるカードを追加。追加のみ（`UkalabStrings` に必須項目 `medalTitle`/`medalNote`/`medalDisclaimer`/`medalSave` を追加。独自に `UkalabStrings(...)` を組み立てているアプリは追記が要る）。
+
+### Added
+- `OshiMedal`（id・label・tier・kind・任意の `ImageProvider? image`）、`OshiMedalKind`、`OshiMedalCorner`、`OshiMedalView`
+- `OshiMedalShareCard`: 4:5 の共有カード。`MascotWidget(animate: false, joy)` の隅（既定は右下）にメダルを重ねる。画像が無ければコード描画（リボン+円+アイコン）。個人情報の欄なし（日付・うかラボ・「自己記録・非公式」のみ）
+- `showOshiMedalDialog(context, medal:, onShare:, onSave:)`: `captureShareCard`（pixelRatio 3）で PNG 化して渡す。null のボタンは出さない。画像化の前に precache。ネイティブプラグインは追加しない
+- 文言 5 言語（ja/en は推敲済み、zh/zh-Hant/ko は機械翻訳の下書き）
+
 ## [0.55.1] - 2026-10-13
 
 `subtopic-conflict` 検査の単位を選べるようにした。既定は従来どおり章（`topicId`）で、挙動は変わらない。
