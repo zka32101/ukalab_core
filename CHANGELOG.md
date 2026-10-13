@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.58.0] - 2026-10-13
+
+学習状況に応じて推しが短い一言を出す機能を追加。責めない・煽らない・罪悪感を与えない励ましだけ。追加のみ（`UkalabStrings`・`ExamPrepStrings` は変えない）。
+
+### Added
+- `OshiMessageEngine`（純 Dart、`ukalab_core.dart`）: `OshiMessageContext`（久しぶり・連続日数・今日の解答数/正答率・試験までの日数・苦手の有無。個人情報なし）から `OshiMessage{id, text, mood}` を選ぶ。seed（`seedFromDate`）で日替わり、`salt` で別の言い回し。同じ入力と seed なら同じ結果
+- `OshiMessageStrings`（ja・en。`copyWith` で一部上書き可）。「サボった」「遅れている」「〜しないと」「ダメ」などの語や残り日数での脅しを使わない（ja/en 全文言を禁止語リストでテスト）。試験までの日数は「あと◯日。自分のペースで大丈夫」程度の軽い言及のみ
+- `OshiMessageBubble`（`ui.dart`）: キャラ（`avatar`）か絵文字＋吹き出し。Semantics 付き、タップで別の一言、「動きを減らす」設定では切替の動きなし
+
 ## [0.57.0] - 2026-10-13
 
 「試験に向けて」系の画面（10分プラン・試験直前・当日チェックリスト・更新ログ・学習データ書き出し）を `ui.dart` に追加（otsu4 の `core_feature_views.dart` を共通化）。追加のみ（`UkalabStrings` は変えず、文言は新設の `ExamPrepStrings`）。
