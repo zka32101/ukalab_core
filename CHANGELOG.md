@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.62.0] - 2026-10-13
+
+試験日までの日数を、煽らず前向きに見せる「試験日カウントダウン」を追加。「あと◯日」を押し付けず「自分のペースで」「今日できること」を添え、試験日を過ぎたら静かに「おつかれさまでした」を出してカウントを消す。追加のみ（`UkalabStrings` は変えず、文言は新設の `ExamCountdownStrings`）。既存の `daysUntilExam`・`OshiMessageEngine`・`ExamPrepCard` は変更しない。
+
+### Added
+- `ExamCountdownEngine`（純 Dart、`ukalab_core.dart`）: 試験日（null 可）と基準日（`today`、テスト用に注入可）から `ExamCountdown{daysLeft, phase}` を作る。`ExamCountdownPhase` は none（未設定）/ farAway（100日超）/ approaching（31〜100日）/ close（8〜30日）/ finalDays（1〜7日。`final` は予約語のため）/ today / done（過去）。日数は既存 `daysUntilExam` の暦日差で、時刻・タイムゾーン・夏時間で 1 日ずれない
+- `ExamCountdownChip` / `ExamCountdownCard`（`ui.dart`）: ホームの AppBar 付近・`ExamPrepCard` 内に置けるチップと、今日できることの短い提案を添えるカード。`onTap` で試験日設定を開く想定。未設定は何も出さず、終了後は日数を消して「おつかれさまでした」のみ。Semantics 付き、「動きを減らす」設定では動きなし
+- `ExamCountdownStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める・煽る語）をテストで機械検証。final 期でも「いつもどおりで大丈夫」の調子
+
 ## [0.61.0] - 2026-10-13
 
 間違えた問題を見返して解き直せる「間違いノート」を追加。間違いを「伸びしろ」として扱い、解き直して正解になったら「克服」と祝う。責めない・煽らない・件数ランキングにしない。追加のみ（`UkalabStrings` は変えず、文言は新設の `MistakeNoteStrings`）。

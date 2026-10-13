@@ -31,6 +31,8 @@ example/      架空のサンプル試験と問題（実在の試験の問題で
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
 
+v0.62.0 で試験日カウントダウン（`ExamCountdownEngine` / `ExamCountdownChip` / `ExamCountdownCard`。「自分のペースで」「今日できること」を添え、試験日を過ぎたら静かに「おつかれさまでした」。[docs/ui.md](docs/ui.md#試験日カウントダウンexamcountdownengine--examcountdownchip--examcountdowncard)）を追加。
+
 v0.61.0 で間違いノート（`MistakeNoteEngine` / `MistakeNoteView`。間違いを「伸びしろ」として見返し、解き直して克服したら祝う。[docs/ui.md](docs/ui.md#間違いノートmistakenoteengine--mistakenoteview)）を追加。
 
 v0.60.0 で週間ふりかえりカード（`WeeklyRecapEngine` / `WeeklyRecapCard`。できたことだけを見せ、前週との比較はしない。[docs/ui.md](docs/ui.md#週間ふりかえりweeklyrecapengine--weeklyrecapcard)）を追加。

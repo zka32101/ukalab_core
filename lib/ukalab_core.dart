@@ -24,6 +24,8 @@ export 'content/story_mode_validator.dart';
 export 'content/teach_mascot_validator.dart';
 export 'content/term_validator.dart';
 export 'content/update_log_validator.dart';
+export 'engine/exam_countdown_engine.dart';
+export 'engine/exam_countdown_strings.dart';
 export 'engine/exam_date.dart';
 export 'engine/exam_eve.dart';
 export 'engine/journal_judge.dart';

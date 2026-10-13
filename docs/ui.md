@@ -356,7 +356,7 @@ OshiMessageBubble(situation: ctx, avatar: MascotWidget(/* ... */)) // avatar 省
 - 状況の優先順: 久しぶり（3日以上空き・今日未学習）> 間違いが多い（5問以上で正答率50%未満）> 連続3日以上 > 今日の達成 > 試験が近い（1〜120日。「あと◯日、自分のペースで大丈夫」と軽く触れるだけ）> 苦手あり > あいさつ
 - 同じ入力でも seed（日付）で言い回しが変わる。`salt` を変える（ウィジェットはタップ）と別の一言
 - 文言は `OshiMessageStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` とは別なので既存アプリは変更不要）。責める語・脅しは禁止語リストでテスト
-- 試験日カウントダウンは別機能。`examDaysLeft` は励ましの言及にしか使わない
+- 試験日カウントダウンは別機能（`ExamCountdownChip` / `ExamCountdownCard`）。`examDaysLeft` は励ましの言及にしか使わない
 
 ## 週間ふりかえり（`WeeklyRecapEngine` / `WeeklyRecapCard`）
 
@@ -377,6 +377,30 @@ WeeklyRecapCard(
 - 連続日数は「週の中で続いた最長の日数」（1日のときは行を出さない）。伸びた分野は、今週・前週とも3問以上で正答率が上がった分野（差は見せない）
 - 文言は `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
 - 共有カード（`WeeklyRecapShareCard`）は今回は含まない。同じ `WeeklyRecap` を受け取る別ウィジェットとして追加し、`OshiMedalShareCard` と同様に `RepaintBoundary` + `captureShareCard` で画像化する想定（個人情報の欄は作らない）
+
+## 試験日カウントダウン（`ExamCountdownEngine` / `ExamCountdownChip` / `ExamCountdownCard`）
+
+試験日までの日数を、煽らず前向きに見せる。「あと◯日」を押し付けず、「自分のペースで」「今日できること」を添える。試験日を過ぎたら日数を消し、静かに「おつかれさまでした」を出す。
+
+```dart
+final date = ref.watch(examDateProvider); // 受験日の保存は exam_date.dart（変更なし）
+
+// ホームの AppBar 付近や ExamPrepCard の近くに
+ExamCountdownChip(examDate: date, onTap: () => openExamDateSettings(context))
+
+// 今日できることの提案つき
+ExamCountdownCard(examDate: date, onTap: () => openExamDateSettings(context))
+
+// 純 Dart（ukalab_core.dart）
+final c = const ExamCountdownEngine().compute(date, today: DateTime.now());
+c.daysLeft; c.phase; // ExamCountdownPhase
+```
+
+- 段階: none（未設定）/ farAway（100日超）/ approaching（31〜100日）/ close（8〜30日）/ finalDays（1〜7日）/ today / done（過去）
+- 日数は年月日だけの暦日差（既存 `daysUntilExam`）。時刻・タイムゾーン・夏時間で 1 日ずれない。`today` を渡すとテストで基準日を固定できる
+- 未設定は Chip / Card とも何も描かない。done は日数を出さず「おつかれさまでした」のみ（いつまで出すかはアプリ側。不要なら `examDate` に null を渡す）
+- 文言は `ExamCountdownStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。final 期でも「いつもどおりで大丈夫」。運営での文言確認は別途必要
+- `OshiMessageEngine` の `examDaysLeft`（推しのひとこと）とは独立。併用してよい
 
 ## 間違いノート（`MistakeNoteEngine` / `MistakeNoteView`）
 
