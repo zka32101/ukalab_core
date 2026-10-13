@@ -84,5 +84,9 @@ const ukalabStringsKo = UkalabStrings(
   shareCardBrand: 'Qualab',
   shareCardPassed: '합격했어요!',
   shareDate: _shareDate,
+  medalTitle: '최애 메달 카드',
+  medalNote: '이미지로 저장하거나 공유할 수 있어요. 이름 등 개인 정보는 들어가지 않아요.',
+  medalDisclaimer: '자기 기록・비공식',
+  medalSave: '이미지 저장',
   close: '닫기',
 );

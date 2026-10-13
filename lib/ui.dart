@@ -16,6 +16,7 @@ export 'ui/mascot/ukalab_rooms.dart';
 export 'ui/outfit/mock_record.dart';
 export 'ui/outfit/outfit_models.dart';
 export 'ui/outfit/outfit_provider.dart';
+export 'ui/outfit/oshi_medal_share_card.dart';
 export 'ui/outfit/outfit_service.dart';
 export 'ui/outfit/pass_report.dart';
 export 'ui/outfit/readiness.dart';

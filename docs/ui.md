@@ -306,3 +306,23 @@ StoryModeWidget(
 - 色だけに頼らず、推奨の判断には✓アイコン、そうでない判断には△アイコンを付ける
 - 途中保存の仕組みは持たない（現状は短い章数の体験を想定）。長い章数のシナリオ（簿記3級の会社経営モードなど）向けの途中保存は、必要になった時点で追加する
 
+
+## 推しメダルカード（`OshiMedalShareCard` / `showOshiMedalDialog`）
+
+推しの画像の隅にメダル（実績・連続学習・模擬合格）を置いた 4:5 の共有カード。名前・メール・ID の欄は作らない（日付・「うかラボ」・「自己記録・非公式」の注記のみ）。
+
+```dart
+await showOshiMedalDialog(
+  context,
+  medal: const OshiMedal(id: 'streak7', label: '7日連続', tier: 2, kind: OshiMedalKind.streak),
+  pack: pack, stage: stage, outfit: outfit,
+  corner: OshiMedalCorner.bottomRight, // 既定。左上/右上/左下/右下
+  onShare: (png) async { /* アプリ側の共有処理 */ },
+  onSave: (png) async { /* アプリ側の保存処理 */ },
+);
+```
+
+- `OshiMedal.image` が無ければコード描画（リボン+円+アイコン）。画像アセットができたら `image: AssetImage(...)` を渡すだけで差し替わる（読み込み失敗時はコード描画に戻る）
+- PNG 化は `captureShareCard`（pixelRatio 3）。画像化の前に medal 画像を precache する
+- `onShare` / `onSave` が null のボタンは出ない。共有・保存の実処理（`share_plus` や ギャラリー保存など）はアプリ側。core にネイティブプラグインは足さない
+- カードだけ使う場合は `OshiMedalShareCard` を `RepaintBoundary` に入れ、`captureShareCard(key)` で画像化する

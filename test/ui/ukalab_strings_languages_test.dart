@@ -58,6 +58,7 @@ void main() {
           s.oshiMenuTooltip, s.oshiChoose, s.oshiPassReport, s.oshiDisplayNormal, s.oshiDisplaySmall,
           s.oshiDisplayHidden, s.oshiName, s.oshiHiddenNote, s.oshiYours, s.oshiTapHint,
           s.close, s.mockRecordTitle, s.mockRecordNote, s.mockRecordMessage, s.shareCardBrand, s.shareCardPassed,
+          s.medalTitle, s.medalNote, s.medalDisclaimer, s.medalSave,
           ...s.tabLabels,
         ];
         for (final t in texts) {
@@ -95,6 +96,7 @@ void main() {
         final s = e.value;
         final all = <String>[
           s.passEncourageBody, s.wardrobeNote, s.oshiTapHint, s.mockRecordNote,
+          s.medalTitle, s.medalNote, s.medalDisclaimer, s.medalSave,
           ...s.coinEventLabels.values, ...s.characterRoles.values, ...s.tabLabels,
           s.shareDate(DateTime(2026, 10, 9)),
         ];
