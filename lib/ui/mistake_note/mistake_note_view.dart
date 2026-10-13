@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../progress/mistake_note_engine.dart';
 import '../../progress/mistake_note_strings.dart';
-import '../../progress/progress_record.dart';
 import '../answer_feedback/answer_feedback_strings.dart';
 
 /// 間違いノートの絞り込み。
