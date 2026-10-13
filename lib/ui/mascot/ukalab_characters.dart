@@ -81,6 +81,17 @@ class UkalabCharacters {
         package: package,
       );
 
+  /// 特別ポーズ（合格の喜び）。`assets/mascot/<id>/<id>_special_pass.webp`。標準キャラは null。
+  static ImageProvider? specialPassImage(String id) => _special(id, 'pass');
+
+  /// 特別ポーズ（おじぎ。お礼・あいさつ用）。`assets/mascot/<id>/<id>_special_bow.webp`。標準キャラは null。
+  static ImageProvider? specialBowImage(String id) => _special(id, 'bow');
+
+  static ImageProvider? _special(String id, String kind) {
+    if (!imagePacks.any((p) => p.id == id)) return null;
+    return AssetImage('assets/mascot/$id/${id}_special_$kind.webp', package: package);
+  }
+
   /// 衣装の画像ファイル名（拡張子なし）。画像がなければ null。
   ///
   /// 通常衣装=normal・合格記念=pass・試験日=exam。準備完了は通常衣装の絵を使う。

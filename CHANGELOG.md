@@ -12,6 +12,15 @@
 - `WeeklyRecapCard`（`ui.dart`）: Semantics 付き、「動きを減らす」設定では出現の動きなし。`message` に `OshiMessageBubble` などを置ける。共有用 `WeeklyRecapShareCard` は後から同じ `WeeklyRecap` を受け取る形で足せる構成（今回は含めない）
 - `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・前週との比較語）をテストで機械検証
 
+## [Unreleased]
+
+### Added
+- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
+- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
+
+### Changed
+- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
+
 ## [0.59.0] - 2026-10-13
 
 学習の節目（連続学習・メダル・模試合格）で、推しの衣装や背景を「プレゼント」として解放し、祝うダイアログで知らせる機能を追加。煽らない・未達を理由に催促しない。追加のみ（`UkalabStrings` は変えず、文言は新設の `OshiGiftStrings`）。
