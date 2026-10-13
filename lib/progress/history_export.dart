@@ -133,3 +133,11 @@ String topicAccuracyCsv(List<TopicAccuracy> topics) {
   }
   return '${lines.join('\n')}\n';
 }
+
+/// 解答履歴から、日付ごと・分野ごとの CSV を続けて組む（個人情報・問題IDは含めない）。
+/// 画面の `HistoryExportView` が使う。
+String historyCsvText(List<ProgressRecord> records, List<Question> questions) {
+  final daily = dailySummaryCsv(summarizeByDay(records));
+  final topic = topicAccuracyCsv(summarizeByTopic(records, questions: questions));
+  return '$daily\n$topic';
+}
