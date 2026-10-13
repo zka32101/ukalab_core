@@ -49,6 +49,8 @@ export 'ui/stats/firebase_exam_stats_service.dart';
 export 'ui/ukalab_strings.dart';
 export 'ui/exam_prep/exam_prep_strings.dart';
 export 'ui/exam_prep/exam_prep_views.dart';
+export 'ui/mistake_note/mistake_note_store.dart';
+export 'ui/mistake_note/mistake_note_view.dart';
 export 'ui/oshi_gift/oshi_gift.dart';
 export 'ui/oshi_gift/oshi_gift_dialog.dart';
 export 'ui/oshi_gift/oshi_gift_service.dart';

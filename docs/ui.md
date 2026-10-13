@@ -378,6 +378,48 @@ WeeklyRecapCard(
 - 文言は `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
 - 共有カード（`WeeklyRecapShareCard`）は今回は含まない。同じ `WeeklyRecap` を受け取る別ウィジェットとして追加し、`OshiMedalShareCard` と同様に `RepaintBoundary` + `captureShareCard` で画像化する想定（個人情報の欄は作らない）
 
+## 間違いノート（`MistakeNoteEngine` / `MistakeNoteView`）
+
+間違えた問題をあとから見返して解き直せるノート。間違いは「伸びしろ」として扱い、解き直して連続で正解したら「克服」と祝う。件数の多い順などのランキング表示や、件数で圧をかける文言は出さない。
+
+```dart
+const engine = MistakeNoteEngine(); // overcomeStreak: 2（暫定。引数で変えられる）
+final store = SharedPreferencesMistakeNoteStore('myapp'); // キー ukalab_myapp_mistake_notes
+
+// 解答のたびに（または画面を開くときに）履歴から取り込む。同じ履歴を何度渡しても結果は同じ
+final before = await store.read();
+final after = engine.update(before, history); // history は ProgressRecord（cause・topicId は既存のもの）
+await store.write(after);
+final justOvercome = engine.newlyOvercome(before, after).toSet(); // 祝う対象
+
+MistakeNoteView(
+  entries: after,
+  questionBuilder: (context, entry) => Text(questionTextOf(entry.qid)), // 問題文はアプリ側（core は持たない）
+  onRetry: (entry) => openQuestionScreen(entry.qid),                    // 出題画面を開く
+  celebrateQids: justOvercome,
+  topicLabel: (id) => chapterNames[id] ?? id,
+)
+```
+
+- 克服 = 間違えたあとに連続 N 回（既定 2）正解。克服後にまた間違えたら「これから」に戻る。履歴が上限で切り捨てられても、保存済みのノートは残る
+- 項目は `MistakeNoteEntry{qid, firstMissedAt, lastMissedAt, missCount, overcome, lastCause?, topicId?}`。`lastCause` は既存の `WrongCause`（`WrongCauseSelector` / `attachCauseToLatest` で付いたもの）を再利用。保存するのは問題ID・日時・原因コード・分野ID・回数だけ
+- 並びは直近の間違い順。フィルタは「これから」「克服」。`missCount` は判定用で、画面には出さない
+- premium で出し分けたいときは、アプリ側で `MistakeNoteView` を包む（`canUsePremiumFeature` など）。core は制限しない
+- 文言は `MistakeNoteStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
+- Semantics 付き。「動きを減らす」設定では祝う表示の出現の動きなし
+
+### バックアップ・リセットへの登録
+
+```dart
+final parts = <DataPart>[
+  // ...既存の部品
+  mistakeNoteDataPart(store, onChanged: () => ref.invalidate(mistakeNotesProvider)), // 画面を開いたままでも反映したいとき
+];
+DataManagementSection(parts: parts)
+```
+
+バックアップ内のキーは `mistakeNotes`（いったん決めたら変えない）。壊れた値を読み込んだ場合は空になる。
+
 ## 推しメダルカード（`OshiMedalShareCard` / `showOshiMedalDialog`）
 
 推しの画像の隅にメダル（実績・連続学習・模擬合格）を置いた 4:5 の共有カード。名前・メール・ID の欄は作らない（日付・「うかラボ」・「自己記録・非公式」の注記のみ）。

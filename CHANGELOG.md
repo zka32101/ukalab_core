@@ -2,6 +2,17 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.61.0] - 2026-10-13
+
+間違えた問題を見返して解き直せる「間違いノート」を追加。間違いを「伸びしろ」として扱い、解き直して正解になったら「克服」と祝う。責めない・煽らない・件数ランキングにしない。追加のみ（`UkalabStrings` は変えず、文言は新設の `MistakeNoteStrings`）。
+
+### Added
+- `MistakeNoteEngine`（純 Dart、`ukalab_core.dart`）: 既存の `ProgressRecord`（原因 `WrongCause`・`topicId` を再利用）から `MistakeNoteEntry{qid, firstMissedAt, lastMissedAt, missCount, overcome, lastCause?, topicId?}` を作る。克服は「間違えたあと連続 N 回正解」（`overcomeStreak`、既定 2。暫定）。同じ入力なら同じ結果で、同じ履歴を再度取り込んでも変わらない（`update`）。`newlyOvercome` で新しい克服を取り出せる
+- `MistakeNoteStore` / `InMemoryMistakeNoteStore` / `SharedPreferencesMistakeNoteStore`（`ui.dart`。キー `ukalab_<アプリID>_mistake_notes`）: 問題ID・日時・原因コード・分野ID・回数のみ保存。壊れた保存値は空として読む
+- `mistakeNoteDataPart`: バックアップ・リセット（`DataPart`、キー `mistakeNotes`）への登録用
+- `MistakeNoteView`（`ui.dart`）: 「これから」「克服」のフィルタ、直近の間違い順、`questionBuilder`（問題文はアプリ側）、`onRetry`（解き直す）、`celebrateQids` で克服を祝う表示。Semantics 付き、「動きを減らす」設定では動きなし。premium の出し分けはアプリ側で包む（core は制限しない）
+- `MistakeNoteStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・件数で圧をかける語）をテストで機械検証
+
 ## [0.60.0] - 2026-10-13
 
 週に一度、「できたこと」だけを見せる週間ふりかえりを追加。責めない・煽らない・前週と比べて「少なかった」と見せない。追加のみ（`UkalabStrings` は変えず、文言は新設の `WeeklyRecapStrings`）。
