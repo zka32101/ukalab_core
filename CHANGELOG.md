@@ -2,6 +2,16 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [Unreleased]
+
+## [0.62.0] - 2026-10-13
+
+推しの小物（アクセサリー）画像と API を追加（#79）。追加のみ。
+
+### Added
+- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
+- `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
+
 ## [0.61.0] - 2026-10-13
 
 間違えた問題を見返して解き直せる「間違いノート」を追加。間違いを「伸びしろ」として扱い、解き直して正解になったら「克服」と祝う。責めない・煽らない・件数ランキングにしない。追加のみ（`UkalabStrings` は変えず、文言は新設の `MistakeNoteStrings`）。
@@ -13,6 +23,19 @@
 - `MistakeNoteView`（`ui.dart`）: 「これから」「克服」のフィルタ、直近の間違い順、`questionBuilder`（問題文はアプリ側）、`onRetry`（解き直す）、`celebrateQids` で克服を祝う表示。Semantics 付き、「動きを減らす」設定では動きなし。premium の出し分けはアプリ側で包む（core は制限しない）
 - `MistakeNoteStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・件数で圧をかける語）をテストで機械検証
 
+### Added / Changed（マスコット素材。#76・#77。v0.61.0 タグに含まれていたが記載漏れだったため追記）
+
+#### Added
+- `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
+- `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
+- 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る
+- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
+- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
+
+#### Changed
+- `MascotScene.streak` の絵を新素材 `states/<id>_streak.webp`（全Lv共通）に置き換え、旧 `scenes/<id>_lv<1-5>_streak.webp` を削除。`sceneFile(id, streak)` は `<id>_streak` を返す（API・enumは不変）。`UkalabCharacters.sceneDir` を追加
+- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
+
 ## [0.60.0] - 2026-10-13
 
 週に一度、「できたこと」だけを見せる週間ふりかえりを追加。責めない・煽らない・前週と比べて「少なかった」と見せない。追加のみ（`UkalabStrings` は変えず、文言は新設の `WeeklyRecapStrings`）。
@@ -22,21 +45,6 @@
 - `weeklyRecapDaysFromRecords`: 既存の `ProgressRecord` 履歴から `WeeklyRecapDay` を作るアダプタ（問題ID・原因・回答時間は引き継がない）
 - `WeeklyRecapCard`（`ui.dart`）: Semantics 付き、「動きを減らす」設定では出現の動きなし。`message` に `OshiMessageBubble` などを置ける。共有用 `WeeklyRecapShareCard` は後から同じ `WeeklyRecap` を受け取る形で足せる構成（今回は含めない）
 - `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・前週との比較語）をテストで機械検証
-
-## [Unreleased]
-
-### Added
-- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
-- `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
-- `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
-- `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
-- 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る
-- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
-- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
-
-### Changed
-- `MascotScene.streak` の絵を新素材 `states/<id>_streak.webp`（全Lv共通）に置き換え、旧 `scenes/<id>_lv<1-5>_streak.webp` を削除。`sceneFile(id, streak)` は `<id>_streak` を返す（API・enumは不変）。`UkalabCharacters.sceneDir` を追加
-- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
 
 ## [0.59.0] - 2026-10-13
 
