@@ -137,6 +137,8 @@ items[record.qid] = Srs.review(items[record.qid], qid: record.qid, correct: reco
 
 保存（端末内・Firestore）はこのパッケージの範囲外。型は JSON に往復できる。
 
+間違いノートの問題を「今日の復習」として出したいときは、`ReviewSchedulerEngine` と `TodayReviewCard`（v0.68.0）を使う。連携方法は [docs/review_scheduler.md](docs/review_scheduler.md)。
+
 ### 無料枠とプレミアムの線引き
 
 ```dart
