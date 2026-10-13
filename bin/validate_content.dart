@@ -193,6 +193,7 @@ Future<void> main(List<String> args) async {
     ));
   }
   issues.addAll(validateCompareTargets(questions, [for (final t in terms) t.termId]));
+  issues.addAll(validateAnswerFeedbackTags(questions, terms: terms));
   if (terms.isNotEmpty) {
     issues.addAll(validateTerms(terms, exam: exam, questions: questions));
   }

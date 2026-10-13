@@ -2,6 +2,22 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.55.0] - 2026-10-13
+
+解答後フィードバック（誤答の原因ラベル・違いの比較表示・今週の弱点）の共通部品を、単機能エントリ
+`package:ukalab_core/answer_feedback.dart` として追加（企画: 追加差別化機能 §1・§2）。追加のみ。
+
+### Added
+- `WrongCauseSelector`: 誤答直後に原因ラベルを自分で選ぶ UI（任意・再タップで取り消し、`includeCalculation: false` で「計算ミス」を除外）
+- `AnswerFeedbackPanel`: 解答後に置くだけの統合ウィジェット。不正解時に 原因選択・違いの比較表示（`compareWith` があるとき）・原因別の対策を出す。正解時は何も出さない
+- `ComparisonCard`: `ComparisonView`（違いの比較表示）の画面
+- `WeakSummaryCard` / `canShowWeakSummary`: 今週の弱点トップ3・原因別の内訳・自分の先週との推移。premium 判定は呼び出し側
+- `AnswerFeedbackStrings`: 上記の文言（ja・en・zh・zh-Hant・ko。ja・en 以外は機械翻訳の下書き）
+- `buildWeakSummary` / `WeakSummary`（純 Dart）: 弱点まとめの元データ
+- `attachCauseToLatest`: 解答の記録に、後から選んだ原因ラベルを付ける
+- `validateAnswerFeedbackTags`: `subtopic-conflict`・`compare-self`・`compare-no-view` を検査。`validate_content` に組み込み済み
+- README に統合例と「論点タグ・比較対象タグを付ける手順」
+
 ## [0.54.0] - 2026-10-13
 
 うかラボ5アプリの相互紹介を共通化する `package:ukalab_core/cross_promo.dart` を追加（`cross_promo_kit` v0.3.0）。追加のみ。

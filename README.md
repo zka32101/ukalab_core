@@ -20,6 +20,7 @@ lib/
   question/   Question（選択式。出典区分・配点・無効フラグ）
   term/       Term（専門用語の解説カード。決定50）
   content/    問題データ・用語データの検証（配信前の品質ゲート）
+  progress/   解答記録・弱点・推移（weak_summary など）
   engine/     scoreMockExam（採点・合否）, Srs（間隔反復）, PracticeSession（演習）
 bin/
   validate_content.dart   問題データ検証 CLI
@@ -120,6 +121,47 @@ final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全�
 ```
 
 `KeyValueStore` はアプリ側で SharedPreferences などを使って実装する。premium だけが対象で、noads のみの人は無料と同じ扱い。
+
+### 解答後フィードバック（`answer_feedback.dart`）
+
+誤答の原因ラベル・違いの比較表示・今週の弱点を、アプリ側の追加コードを最小にして出す部品。
+`ui.dart` とは別の単機能エントリ（Flutter が要る）。ロジックは `ukalab_core.dart`（純 Dart）にもある。
+
+- `AnswerFeedbackPanel`: 解答後に置く統合ウィジェット。**不正解のときだけ** (1) 原因ラベルの選択（任意）
+  (2) 問題に `compareWith` があれば違いの比較表示 (3) 選んだ原因に応じた対策の一言 を出す。正解なら何も出ない
+- `WrongCauseSelector`: 原因ラベル4つ（知識不足／ひっかけ／計算ミス／読み違い）の選択だけ。`includeCalculation: false` で「計算ミス」を除く
+- `WeakSummaryCard`: 今週の弱点トップ3・原因別の内訳・自分の先週との推移（他人とは比べない）。
+  premium 機能（`PremiumFeature.weakDrill`）なので、出すかどうかは呼び出し側が `canShowWeakSummary(isPremium: ...)` で決める
+- 文言は `AnswerFeedbackStrings`（ja・en・zh・zh-Hant・ko、`KitStringsScope` の言語に従う。ja・en 以外は機械翻訳の下書き）
+
+アプリ側の統合（解答後の画面。履歴の保存と `attachCauseToLatest` で原因を反映するだけ）:
+
+```dart
+import 'package:ukalab_core/answer_feedback.dart';
+
+// 1. 解答後に置く（selectedIndex は Question.choices の元の並びでの番号）
+if (_answered) AnswerFeedbackPanel(question: q, selectedIndex: _selectedOriginal, terms: widget.terms,
+    onCause: (c) => ref.read(historyProvider.notifier).setCause(q.qid, c)),
+// 2. 履歴ストアに1メソッド足す: state = attachCauseToLatest(state, qid, cause); 保存
+// 3. 弱点画面（premium のみ）
+if (canShowWeakSummary(isPremium: isPremium)) WeakSummaryCard(records: history, questions: questions, chapterLabel: chapterName)
+```
+
+計算を使わない資格は `includeCalculation: false`（パネル・カード両方）。
+
+#### 問題データへ論点タグ・比較対象タグを付ける手順
+
+1. 章: すべての問題に `topicId`（必須）。細目を使うなら `subtopicId`（任意）。
+   同じ `subtopicId` は1つの章にだけ付ける（別の章に付けると `subtopic-conflict`）
+2. 用語データ（`--terms`）で、その問題の答えにあたる用語の `relatedQuestionIds` に問題の `qid` を入れる
+3. 紛らわしい相手の用語の `termId` を、問題の `compareWith`（配列）に入れる。
+   答えの用語自身は入れない（`compare-self`）。空・重複・用語データに無いIDは `compare-empty` / `compare-duplicate` / `compare-unknown`
+4. 比較表示は「答えの用語＋相手の用語」で2つ以上そろったときだけ出る。そろわないタグは `compare-no-view`
+5. `dart run ukalab_core:validate_content exam.json --terms terms.jsonl questions.jsonl` で検査する
+   （`--terms` が無いと用語を使う検査はできず、`compareWith` は未定義扱いになる）
+
+例（問題の1行）: `{"qid":"q-012","topicId":"ch2","subtopicId":"ch2-a","compareWith":["term-recall"], ...}`
+（答えの用語 `term-precision` 側に `"relatedQuestionIds":["q-012"]`）
 
 ### 相互紹介（`cross_promo.dart`）
 
