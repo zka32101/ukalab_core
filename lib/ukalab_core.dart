@@ -52,6 +52,8 @@ export 'experience/nn_builder.dart';
 export 'experience/pace_runner.dart';
 export 'experience/predict_run.dart';
 export 'experience/route_planner.dart';
+export 'oshi/oshi_gift_engine.dart';
+export 'oshi/oshi_gift_strings.dart';
 export 'oshi/oshi_message_engine.dart';
 export 'oshi/oshi_message_strings.dart';
 export 'experience/story_mode.dart';

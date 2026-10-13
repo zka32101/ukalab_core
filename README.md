@@ -31,6 +31,8 @@ example/      架空のサンプル試験と問題（実在の試験の問題で
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
 
+v0.59.0 で衣装・背景のプレゼント（`OshiGiftEngine` / `showOshiGiftDialog`。連続学習・メダル・模試合格で解放し、祝うだけ。[docs/ui.md](docs/ui.md#衣装背景のプレゼントoshigiftengine--showoshigiftdialog)）を追加。
+
 v0.58.0 で推しの一言（`OshiMessageEngine` / `OshiMessageBubble`。責めない励ましのみ。[docs/ui.md](docs/ui.md#推しの一言oshimessageengine--oshimessagebubble)）を追加。
 
 v0.57.0 で「試験に向けて」系の画面（`ExamPrepCard`・`ExamDayChecklistView`・`UpdateLogView`・`HistoryExportView`・`ExamPrepSettingsTiles`。[docs/ui.md](docs/ui.md#試験に向けて10分プラン試験直前チェックリスト更新ログ書き出し)）を追加。
