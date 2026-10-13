@@ -13,6 +13,7 @@ export 'ui/mascot/standard_character.dart';
 export 'ui/mascot/ukalab_characters.dart';
 export 'ui/mascot/ukalab_props.dart';
 export 'ui/mascot/ukalab_rooms.dart';
+export 'ui/mascot/ukalab_medals.dart';
 export 'ui/outfit/mock_record.dart';
 export 'ui/outfit/outfit_models.dart';
 export 'ui/outfit/outfit_provider.dart';

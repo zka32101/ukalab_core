@@ -2,6 +2,15 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [Unreleased]
+
+### Added
+- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
+- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
+
+### Changed
+- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
+
 ## [0.59.0] - 2026-10-13
 
 学習の節目（連続学習・メダル・模試合格）で、推しの衣装や背景を「プレゼント」として解放し、祝うダイアログで知らせる機能を追加。煽らない・未達を理由に催促しない。追加のみ（`UkalabStrings` は変えず、文言は新設の `OshiGiftStrings`）。
