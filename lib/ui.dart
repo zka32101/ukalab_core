@@ -89,3 +89,5 @@ export 'ui/study_notes/question_memo_store.dart';
 export 'ui/study_notes/study_notes_setup.dart';
 export 'ui/data_management/data_management.dart';
 export 'ui/home/home_sections.dart';
+export 'ui/mock_exam_analysis/mock_exam_analysis_card.dart';
+export 'ui/mock_exam_analysis/mock_exam_analysis_screen.dart';

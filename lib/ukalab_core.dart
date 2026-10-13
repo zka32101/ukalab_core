@@ -58,6 +58,8 @@ export 'oshi/oshi_gift_engine.dart';
 export 'oshi/oshi_gift_strings.dart';
 export 'oshi/oshi_message_engine.dart';
 export 'oshi/oshi_message_strings.dart';
+export 'engine/mock_exam_analysis_engine.dart';
+export 'engine/mock_exam_analysis_strings.dart';
 export 'oshi/weekly_recap_engine.dart';
 export 'oshi/weekly_recap_strings.dart';
 export 'experience/story_mode.dart';
