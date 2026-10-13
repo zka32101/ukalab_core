@@ -37,6 +37,8 @@ v0.61.0 で間違いノート（`MistakeNoteEngine` / `MistakeNoteView`。間違
 
 v0.60.0 で週間ふりかえりカード（`WeeklyRecapEngine` / `WeeklyRecapCard`。できたことだけを見せ、前週との比較はしない。[docs/ui.md](docs/ui.md#週間ふりかえりweeklyrecapengine--weeklyrecapcard)）を追加。
 
+v0.64.0 で app_common_kit を v3.1.0 に追従。ながらセッション（`NagaraSessionController` / `NagaraSessionView` など）は kit v3.1.0 から提供され、core は再エクスポートのみ（実装なし。`package:app_common_kit/app_common_kit.dart` から使う）。
+
 v0.59.0 で衣装・背景のプレゼント（`OshiGiftEngine` / `showOshiGiftDialog`。連続学習・メダル・模試合格で解放し、祝うだけ。[docs/ui.md](docs/ui.md#衣装背景のプレゼントoshigiftengine--showoshigiftdialog)）を追加。
 
 v0.58.0 で推しの一言（`OshiMessageEngine` / `OshiMessageBubble`。責めない励ましのみ。[docs/ui.md](docs/ui.md#推しの一言oshimessageengine--oshimessagebubble)）を追加。
