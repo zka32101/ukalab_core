@@ -35,7 +35,7 @@ v0.67.0 で模擬試験の結果分析（`MockExamAnalysisEngine` / `MockExamAna
 
 v0.66.0 で app_common_kit を v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)`（正答を含む全解答を返す。未回答・スキップでは呼ばない）が使える。あわせて kit v3.2.0（同意管理 `ConsentController`）・v3.3.0（保護者ゲート `ParentalGateDialog`。別の入口 `package:app_common_kit/parental_gate.dart`）・v3.4.0（診断情報つき不具合報告 `DiagnosticsCollector`）を取り込む。いずれも追加のみで core のコード変更なし。
 
-v0.67.0 で今日の復習（`ReviewSchedulerEngine` / `TodayReviewCard`。間違いノートの問題を 1/3/7/14/30 日の間隔で「忘れる頃に」提示。たまっても大丈夫という調子で、期限超過を赤字にしない。出題画面は各アプリの既存クイズに接続。[docs/review_scheduler.md](docs/review_scheduler.md)）を追加。既存の `Srs`（全問題向けの Leitner 方式）とは別の部品で、併用できる。
+v0.68.0 で今日の復習（`ReviewSchedulerEngine` / `TodayReviewCard`。間違いノートの問題を 1/3/7/14/30 日の間隔で「忘れる頃に」提示。たまっても大丈夫という調子で、期限超過を赤字にしない。出題画面は各アプリの既存クイズに接続。[docs/review_scheduler.md](docs/review_scheduler.md)）を追加。既存の `Srs`（全問題向けの Leitner 方式）とは別の部品で、併用できる。
 
 v0.65.0 でホーム分類用の部品（`HomeSectionHeader` / `HomeMenuTile` / `HomeMenuGrid` / `HomeSection`。折りたたみ・2 列グリッド・バッジ。[docs/ui.md](docs/ui.md#ホーム画面の分類homesection--homemenutile--homemenugrid)）を追加。
 
@@ -135,7 +135,7 @@ items[record.qid] = Srs.review(items[record.qid], qid: record.qid, correct: reco
 
 保存（端末内・Firestore）はこのパッケージの範囲外。型は JSON に往復できる。
 
-間違いノートの問題を「今日の復習」として出したいときは、`ReviewSchedulerEngine` と `TodayReviewCard`（v0.67.0）を使う。連携方法は [docs/review_scheduler.md](docs/review_scheduler.md)。
+間違いノートの問題を「今日の復習」として出したいときは、`ReviewSchedulerEngine` と `TodayReviewCard`（v0.68.0）を使う。連携方法は [docs/review_scheduler.md](docs/review_scheduler.md)。
 
 ### 無料枠とプレミアムの線引き
 
