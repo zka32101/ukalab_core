@@ -358,6 +358,26 @@ OshiMessageBubble(situation: ctx, avatar: MascotWidget(/* ... */)) // avatar 省
 - 文言は `OshiMessageStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` とは別なので既存アプリは変更不要）。責める語・脅しは禁止語リストでテスト
 - 試験日カウントダウンは別機能。`examDaysLeft` は励ましの言及にしか使わない
 
+## 週間ふりかえり（`WeeklyRecapEngine` / `WeeklyRecapCard`）
+
+週に一度、「できたこと」だけを見せる。解いた問題数・学習した日・続いた日・メダル・よく解いた分野/伸びた分野。前週との比較や「少なかった」の表現は出さない。解いていない週は「今週はひと休み」と穏やかに表示する。
+
+```dart
+final days = weeklyRecapDaysFromRecords(history); // ProgressRecord から（問題IDは引き継がない）
+final recap = const WeeklyRecapEngine(weekStartsOn: DateTime.monday) // 日曜始まりなら DateTime.sunday
+    .build(days, weekOf: DateTime.now(), medalsEarned: 2);
+
+WeeklyRecapCard(
+  recap: recap,
+  topicLabel: (id) => chapterNames[id] ?? id,
+  message: OshiMessageBubble(situation: ctx), // 任意。推しのひとこと
+)
+```
+
+- 連続日数は「週の中で続いた最長の日数」（1日のときは行を出さない）。伸びた分野は、今週・前週とも3問以上で正答率が上がった分野（差は見せない）
+- 文言は `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
+- 共有カード（`WeeklyRecapShareCard`）は今回は含まない。同じ `WeeklyRecap` を受け取る別ウィジェットとして追加し、`OshiMedalShareCard` と同様に `RepaintBoundary` + `captureShareCard` で画像化する想定（個人情報の欄は作らない）
+
 ## 推しメダルカード（`OshiMedalShareCard` / `showOshiMedalDialog`）
 
 推しの画像の隅にメダル（実績・連続学習・模擬合格）を置いた 4:5 の共有カード。名前・メール・ID の欄は作らない（日付・「うかラボ」・「自己記録・非公式」の注記のみ）。
