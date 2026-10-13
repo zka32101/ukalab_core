@@ -101,9 +101,9 @@ class ReviewItem {
 class ReviewSchedulerEngine {
   const ReviewSchedulerEngine({
     this.intervals = const [1, 3, 7, 14, 30],
-  }) : assert(intervals.length > 0);
+  });
 
-  /// 段ごとの間隔（日）。
+  /// 段ごとの間隔（日）。1 件以上が必要（const 式の中で長さを検査できないため、ここでは検査しない）。
   final List<int> intervals;
 
   int get lastStage => intervals.length - 1;
