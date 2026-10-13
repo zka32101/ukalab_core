@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+## [0.65.0] - 2026-10-13
+
+app_common_kit を v3.1.0 に続けて v3.4.0 に追従する。core のコード変更はない。
+アプリがキットの新しい部品を使うには、core も同じ kit のタグに揃える必要がある（pub は kit のタグが食い違うと解決できない）。
+
+### Changed
+- `app_common_kit` のピンを v3.1.0 → v3.4.0 に。kit 側は追加のみ（v3.2.0 同意管理 `ConsentController`、v3.3.0 保護者ゲート `package:app_common_kit/parental_gate.dart`、v3.4.0 診断情報つきの不具合報告 `DiagnosticsCollector`）。core は kit を `export` していないので、アプリが `package:app_common_kit/app_common_kit.dart` から import する
+
+### 移行
+- アプリは `ukalab_core` を `v0.65.0`、`app_common_kit` を `v3.4.0` に上げる
+
 ## [0.64.0] - 2026-10-13
 
 app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は kit v3.1.0 から提供され、core は再エクスポートのみ（ここでは何も実装しない）。
