@@ -31,6 +31,8 @@ example/      架空のサンプル試験と問題（実在の試験の問題で
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
 
+v0.67.0 で推しの成長演出（`OshiGrowthEngine` / `OshiGrowthBubble` / `showOshiGrowthDialog`。累計の回答数・学習日数で推しの反応が変わり、節目を一度だけ祝う。煽らず、休んでも責めない。[docs/ui.md](docs/ui.md#推しの成長演出oshigrowthengine--oshigrowthbubble--showoshigrowthdialog)）を追加。
+
 v0.66.0 で app_common_kit を v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)`（正答を含む全解答を返す。未回答・スキップでは呼ばない）が使える。あわせて kit v3.2.0（同意管理 `ConsentController`）・v3.3.0（保護者ゲート `ParentalGateDialog`。別の入口 `package:app_common_kit/parental_gate.dart`）・v3.4.0（診断情報つき不具合報告 `DiagnosticsCollector`）を取り込む。いずれも追加のみで core のコード変更なし。
 
 v0.65.0 でホーム分類用の部品（`HomeSectionHeader` / `HomeMenuTile` / `HomeMenuGrid` / `HomeSection`。折りたたみ・2 列グリッド・バッジ。[docs/ui.md](docs/ui.md#ホーム画面の分類homesection--homemenutile--homemenugrid)）を追加。
