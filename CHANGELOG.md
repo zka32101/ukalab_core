@@ -2,6 +2,16 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.60.0] - 2026-10-13
+
+週に一度、「できたこと」だけを見せる週間ふりかえりを追加。責めない・煽らない・前週と比べて「少なかった」と見せない。追加のみ（`UkalabStrings` は変えず、文言は新設の `WeeklyRecapStrings`）。
+
+### Added
+- `WeeklyRecapEngine`（純 Dart、`ukalab_core.dart`）: 日別記録 `WeeklyRecapDay{date, answered, correct, topicId?}`（個人情報・問題IDなし）と週の起点（`weekStartsOn`、既定は月曜）から `WeeklyRecap{answered, correct, studyDays, streakDays, topTopics, improvedTopics, medalsEarned}` を作る。連続日数は週内の最長。0件の週は `isEmpty`（穏やかな表示用）
+- `weeklyRecapDaysFromRecords`: 既存の `ProgressRecord` 履歴から `WeeklyRecapDay` を作るアダプタ（問題ID・原因・回答時間は引き継がない）
+- `WeeklyRecapCard`（`ui.dart`）: Semantics 付き、「動きを減らす」設定では出現の動きなし。`message` に `OshiMessageBubble` などを置ける。共有用 `WeeklyRecapShareCard` は後から同じ `WeeklyRecap` を受け取る形で足せる構成（今回は含めない）
+- `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・前週との比較語）をテストで機械検証
+
 ## [Unreleased]
 
 ### Added
