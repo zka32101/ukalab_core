@@ -5,6 +5,9 @@
 
 > ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は app_common_kit v3.1.0 から。core は再エクスポートのみで、`package:app_common_kit/app_common_kit.dart` から import する（`NagaraSessionView` など flutter_tts 依存のものは `package:app_common_kit/hands_free_tts.dart`。core の `ui.dart` と名前の衝突はないので hide/show は不要）。
 
+> kit v3.5.0 追従（core v0.66.0）: ながらセッションの `NagaraSessionController(onAnswered:)` / `NagaraSessionView(onAnswered:)` が使える。`onAnswered(question, chosen, correct)` は正答を含む全てのタップ回答を返す（呼び出し順は解答確定 → `onAnswered` → 誤答なら `onWrongAnswer`。1 問につき最大 1 回。未回答 `onUnanswered`・スキップでは呼ばない）。通常の解答と同じ記録経路（履歴・間隔反復・デイリーミッション）に載せると、間違いノートの「克服」や週間ふりかえりに正答も反映される。
+> 同時に取り込んだ kit の追加: v3.2.0 同意管理 `ConsentController`、v3.3.0 保護者ゲート `ParentalGateDialog`（`package:app_common_kit/parental_gate.dart`）、v3.4.0 診断情報つき不具合報告 `DiagnosticsCollector`。
+
 ## テーマ（v0.2）
 
 分野（と資格）を渡すだけで、共通デザイン仕様 v0.4 の ThemeData が作れる。色の直書きはしない。
