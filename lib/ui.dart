@@ -7,6 +7,7 @@ export 'ui/mascot/character_selection.dart';
 export 'ui/mascot/mascot_lines.dart';
 export 'ui/mascot/mascot_logic.dart';
 export 'ui/mascot/mascot_models.dart';
+export 'ui/mascot/mascot_state_view.dart';
 export 'ui/mascot/mascot_widget.dart';
 export 'ui/mascot/oshi_home_card.dart';
 export 'ui/mascot/standard_character.dart';
