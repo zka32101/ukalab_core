@@ -307,6 +307,37 @@ StoryModeWidget(
 - 途中保存の仕組みは持たない（現状は短い章数の体験を想定）。長い章数のシナリオ（簿記3級の会社経営モードなど）向けの途中保存は、必要になった時点で追加する
 
 
+## 衣装・背景のプレゼント（`OshiGiftEngine` / `showOshiGiftDialog`）
+
+学習の節目（連続日数・メダル獲得・模試合格）で、推しの衣装や背景を解放して祝う。未達を理由にした催促はしない（解放された分だけを知らせる）。
+
+```dart
+const gifts = [
+  OshiGift(id: 'bg_streak7', kind: OshiGiftKind.background,
+      condition: OshiGiftCondition.streakDays(7), name: '夕焼けの背景'),
+  OshiGift(id: 'outfit_medal', kind: OshiGiftKind.outfit,
+      condition: OshiGiftCondition.medal('streak7'), name: 'お祝いの衣装',
+      image: AssetImage('assets/gift/outfit_medal.png')), // image は任意
+  OshiGift(id: 'outfit_mock', kind: OshiGiftKind.outfit,
+      condition: OshiGiftCondition.mockPass(), name: '合格の衣装'),
+];
+
+final svc = OshiGiftService(store: SharedPreferencesOshiGiftStore('myapp'));
+await svc.load();
+final fresh = await svc.check(
+  OshiGiftProgress(streakDays: 7, earnedMedalIds: {'streak7'}, mockPassed: false), // 個人情報は入れない
+  gifts,
+);
+for (final g in fresh) {
+  await showOshiGiftDialog(context, gift: g, pack: pack, stage: stage);
+}
+```
+
+- 判定だけなら純 Dart の `OshiGiftEngine().newlyUnlocked(progress:, gifts:, alreadyUnlocked:)`（既解放は除外・冪等）
+- 解放済みIDは `OshiGiftStore` に保存（`SharedPreferencesOshiGiftStore(appId)`、キー `ukalab_oshi_gift_<appId>`）。衣装の着用そのものは既存の `OutfitService` / 着せ替えとアプリ側で結びつける
+- `image` が無ければ、衣装は仮アイコン、背景はコード描画のグラデーション。画像ができたら `image` を渡すだけで差し替わる（読み込み失敗時は描画に戻る）
+- 文言は `OshiGiftStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
+
 ## 推しの一言（`OshiMessageEngine` / `OshiMessageBubble`）
 
 学習状況に応じて推しが短い一言を出す。責めない・煽らない・罪悪感を与えない（久しぶり→「おかえり。今日は1問からでいいよ」、連続→「いい調子。無理せず続けよう」、間違いが多い日→「間違えた所が伸びしろだよ」）。

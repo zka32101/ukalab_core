@@ -2,6 +2,16 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.59.0] - 2026-10-13
+
+学習の節目（連続学習・メダル・模試合格）で、推しの衣装や背景を「プレゼント」として解放し、祝うダイアログで知らせる機能を追加。煽らない・未達を理由に催促しない。追加のみ（`UkalabStrings` は変えず、文言は新設の `OshiGiftStrings`）。
+
+### Added
+- `OshiGiftEngine`（純 Dart、`ukalab_core.dart`）: `OshiGiftProgress`（連続日数・獲得済みメダルID集合・模試合格の有無。個人情報なし）と、アプリが渡す定義リスト（`OshiGiftSpec` / UI 側の `OshiGift`: id・`OshiGiftKind`[outfit/background]・`OshiGiftCondition`[`streakDays`/`medal`/`mockPass`]・表示名・任意の `ImageProvider`）から、新たに解放されたものだけを返す。既解放IDは除外、同じ入力なら同じ結果
+- `OshiGiftStore`（`InMemoryOshiGiftStore` / `SharedPreferencesOshiGiftStore(appId)`、キー `ukalab_oshi_gift_<appId>`。`OutfitStore` と同じ流儀）と `OshiGiftService`（`load` / `check` / `isUnlocked`）
+- `showOshiGiftDialog` / `OshiGiftCard`（`ui.dart`）: 画像未指定なら衣装は仮アイコン、背景はコード描画のグラデーション（`image: AssetImage(...)` を渡すだけで差し替わる）。Semantics 付き、「動きを減らす」設定では出現の動きなし
+- `OshiGiftStrings`（ja・en。`copyWith` で上書き可）。祝う調子のみ。禁止語リストでテスト
+
 ## [0.58.0] - 2026-10-13
 
 学習状況に応じて推しが短い一言を出す機能を追加。責めない・煽らない・罪悪感を与えない励ましだけ。追加のみ（`UkalabStrings`・`ExamPrepStrings` は変えない）。
