@@ -15,7 +15,7 @@ Widget _wrap(Widget child,
           textScaler: TextScaler.linear(scale),
           disableAnimations: reduce,
         ),
-        child: Scaffold(body: SingleChildScrollView(child: child)),
+        child: Scaffold(body: SingleChildScrollView(child: Align(alignment: Alignment.topLeft, child: SizedBox(width: width, child: child)))),
       ),
     );
 

@@ -414,9 +414,11 @@ class _HomeSectionState extends State<HomeSection> {
         header,
         if (!widget.collapsible)
           body
+        else if (reduce)
+          (expanded ? body : const SizedBox.shrink())
         else
           AnimatedSize(
-            duration: reduce ? Duration.zero : const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 200),
             alignment: Alignment.topCenter,
             child: expanded ? body : const SizedBox(width: double.infinity),
           ),
