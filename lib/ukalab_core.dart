@@ -56,6 +56,8 @@ export 'experience/predict_run.dart';
 export 'experience/route_planner.dart';
 export 'oshi/oshi_gift_engine.dart';
 export 'oshi/oshi_gift_strings.dart';
+export 'oshi/oshi_growth_engine.dart';
+export 'oshi/oshi_growth_strings.dart';
 export 'oshi/oshi_message_engine.dart';
 export 'oshi/oshi_message_strings.dart';
 export 'oshi/weekly_recap_engine.dart';
