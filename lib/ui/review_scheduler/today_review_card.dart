@@ -37,6 +37,7 @@ class TodayReviewCard extends StatelessWidget {
           children: [
             Semantics(
               header: true,
+              container: true,
               child: Text(s.title, style: theme.textTheme.titleMedium),
             ),
             const SizedBox(height: 4),
@@ -55,6 +56,7 @@ class TodayReviewCard extends StatelessWidget {
               const SizedBox(height: 12),
               Semantics(
                 button: true,
+                container: true,
                 excludeSemantics: true,
                 label: s.start,
                 hint: s.startHint,
