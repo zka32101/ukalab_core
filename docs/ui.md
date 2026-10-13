@@ -410,6 +410,23 @@ WeeklyRecapCard(
 - 文言は `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
 - 共有カード（`WeeklyRecapShareCard`）は今回は含まない。同じ `WeeklyRecap` を受け取る別ウィジェットとして追加し、`OshiMedalShareCard` と同様に `RepaintBoundary` + `captureShareCard` で画像化する想定（個人情報の欄は作らない）
 
+## 模擬試験の結果分析（`MockExamAnalysisEngine` / `MockExamAnalysisCard`）
+
+模擬試験（または任意の回答履歴）から、分野別の様子・伸びしろのある分野・「今日はここを少しだけ」（次にやる分野、最大3件）を見せる。点数で責めず、赤などの警告色・順位は使わない。アプリは分野名と回答リストを渡すだけ。
+
+```dart
+final analysis = const MockExamAnalysisEngine().analyze([
+  for (final q in answered) MockExamAnswer(topicId: q.chapterId, correct: q.isCorrect),
+]);
+
+MockExamAnalysisCard(analysis: analysis, topicLabel: (id) => chapterNames[id] ?? id);
+// 画面ごと: MockExamAnalysisScreen(answers: [...], topicLabel: ...)
+```
+
+- `MockExamAnalysisEngine({minSamples = 2, weakThreshold = 0.7, masteredThreshold = 0.9, nextCount = 3})`。弱点は `minSamples` 問以上解いて正答率が `weakThreshold` 未満の分野。次にやる分野は正答率の低い順（同率は解答数の多い順→ID順）で、`masteredThreshold` 以上の分野は入れない（全部安定なら空→カードは穏やかな文言）
+- エンジンは何も保存しない純粋ロジック。履歴を残したいアプリは、自分で保存した回答リストを渡す（`DataPart` への登録は不要）
+- 文言は `MockExamAnalysisStrings`（ja・en。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
+
 ## 試験日カウントダウン（`ExamCountdownEngine` / `ExamCountdownChip` / `ExamCountdownCard`）
 
 試験日までの日数を、煽らず前向きに見せる。「あと◯日」を押し付けず、「自分のペースで」「今日できること」を添える。試験日を過ぎたら日数を消し、静かに「おつかれさまでした」を出す。
