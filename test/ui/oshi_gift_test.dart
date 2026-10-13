@@ -141,7 +141,7 @@ void main() {
     expect(st.titleOutfit, OshiGiftStrings.ja.titleOutfit);
   });
 
-  Widget host(Widget Function(BuildContext) onTap, {bool reduce = false, Widget? wrap}) =>
+  Widget host(void Function(BuildContext) onTap, {bool reduce = false, Widget? wrap}) =>
       MaterialApp(
         home: MediaQuery(
           data: MediaQueryData(disableAnimations: reduce),

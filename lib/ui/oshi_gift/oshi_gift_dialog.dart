@@ -1,7 +1,6 @@
 import 'package:app_common_kit/app_common_kit.dart' show KitStrings;
 import 'package:flutter/material.dart';
 
-import '../../oshi/oshi_gift_engine.dart';
 import '../../oshi/oshi_gift_strings.dart';
 import '../mascot/mascot_models.dart';
 import '../mascot/mascot_widget.dart';
