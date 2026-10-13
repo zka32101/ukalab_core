@@ -2,6 +2,18 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.57.0] - 2026-10-13
+
+「試験に向けて」系の画面（10分プラン・試験直前・当日チェックリスト・更新ログ・学習データ書き出し）を `ui.dart` に追加（otsu4 の `core_feature_views.dart` を共通化）。追加のみ（`UkalabStrings` は変えず、文言は新設の `ExamPrepStrings`）。
+
+### Added
+- `ExamPrepCard`: 10分プラン・試験直前モード・当日チェックリストの入口。問題・履歴・試験日・premium 判定・練習画面の起動はすべて引数/コールバックで受ける
+- `ExamDayChecklistView`: 当日チェックリスト。`items` を渡さなければ一般項目（すべて「公式で要確認」）。チェック状態は `initialProgress` / `onChanged` でアプリが保存する
+- `defaultExamDayChecklist` / `defaultChecklistIds`: 一般のチェック項目（会場/オンラインで切り替え）
+- `UpdateLogView`、`HistoryExportView`（CSV 表示とコピー）、`ExamPrepSettingsTiles`（設定タブの入口）
+- `ExamPrepStrings`: 上記の文言（ja・en は推敲済み、zh/zh-Hant/ko は機械翻訳の下書き）。責める表現・他人との比較は使わない（全言語をテストで検査）
+- `historyCsvText`（純 Dart、`ukalab_core.dart`）: 日別と分野別の CSV を続けて返す。**アプリ側に同名の関数があると、両方を import するファイルで曖昧になる。移行時にアプリ側を消す**
+
 ## [0.56.0] - 2026-10-13
 
 推しの画像の隅にメダルを置き、画像保存・SNS 共有できるカードを追加。追加のみ（`UkalabStrings` に必須項目 `medalTitle`/`medalNote`/`medalDisclaimer`/`medalSave` を追加。独自に `UkalabStrings(...)` を組み立てているアプリは追記が要る）。

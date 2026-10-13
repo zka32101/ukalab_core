@@ -326,3 +326,42 @@ await showOshiMedalDialog(
 - PNG 化は `captureShareCard`（pixelRatio 3）。画像化の前に medal 画像を precache する
 - `onShare` / `onSave` が null のボタンは出ない。共有・保存の実処理（`share_plus` や ギャラリー保存など）はアプリ側。core にネイティブプラグインは足さない
 - カードだけ使う場合は `OshiMedalShareCard` を `RepaintBoundary` に入れ、`captureShareCard(key)` で画像化する
+
+
+## 試験に向けて（10分プラン・試験直前・チェックリスト・更新ログ・書き出し）
+
+otsu4 の「追加差別化機能」画面を共通化したもの。アプリ非依存で、データの取得・保存・premium 判定・画面遷移は引数とコールバックで渡す。文言は `ExamPrepStrings`（`KitStringsScope` の言語に従う。ja・en 以外は機械翻訳の下書き）。励ます表現のみで、責める表現・他人との比較は使わない。
+
+```dart
+// ホーム: 入口カード（試験直前の行は、試験日が3日以内のときだけ出る）
+ExamPrepCard(
+  questions: () => allQuestions,
+  records: () => history,
+  examDate: examDate,                       // 未設定は null
+  tenMinUnlocked: isPremium,                // premium 判定は呼び出し側
+  examEveUnlocked: isPremium,
+  onStartPractice: (context, title, pool, emptyMessage) => Navigator.of(context).push(/* 自前の練習画面 */),
+  onOpenChecklist: (context) => Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (_) => ExamDayChecklistView(
+      examId: 'myexam',
+      items: myChecklist,                   // 省略すると一般項目（すべて「公式で要確認」）
+      initialProgress: ChecklistProgress(savedIds),
+      onChanged: (p) => save(p.checkedIds), // 保存先はアプリ側
+    ),
+  )),
+)
+
+// 設定: 更新ログ・書き出しの入口
+ExamPrepSettingsTiles(
+  exportUnlocked: isPremium,
+  onOpenUpdateLog: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+    builder: (_) => UpdateLogView(entriesFuture: loadMyUpdateLog()))), // recentUpdates(parseUpdateLogJsonl(text).entries, now, examId: ...)
+  onOpenExport: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+    builder: (_) => HistoryExportView(records: history, questions: allQuestions))),
+)
+```
+
+- `ExamPrepCard`: 10分プランは `buildTimeBoxedPlan`、試験直前は `buildExamEveSet` / `examEveStatus`。試験直前の期間なら10分プランの先頭に直前セットを入れる。未解放の行をタップしたときは `onLockedTap`（省略時は「プレミアムで使えます」のスナックバー）
+- `ExamDayChecklistView`: 項目は `ChecklistItem`。`officialConfirmed: false` の項目には「公式で要確認」（`note` があれば併記）を出す。`defaultExamDayChecklist(examId:, venue:)` で一般項目だけを取り出して、足し引きしてから `items` に渡してもよい
+- `HistoryExportView`: CSV は `historyCsvText`（氏名・ID・端末情報・問題文を含めない）。保存・共有のプラグインは足さず、表示とコピーのみ
+- 次の一手（`next_step`）の画面は含まない
