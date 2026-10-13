@@ -121,6 +121,38 @@ final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全�
 
 `KeyValueStore` はアプリ側で SharedPreferences などを使って実装する。premium だけが対象で、noads のみの人は無料と同じ扱い。
 
+### 相互紹介（`cross_promo.dart`）
+
+うかラボ5アプリの「他のアプリもチェック！」。`cross_promo_kit` を `うかラボ` カテゴリに固定した薄いラッパー。
+`ui.dart` には含めない（Firebase 依存を持ち込まないため。使うアプリが明示的に import する）。
+
+各アプリの作業:
+
+1. `pubspec.yaml` の `ukalab_core` の `ref` を、この機能を含むタグへ更新する
+2. `main.dart` で起動時に1回（起動は止めない。Firebase 初期化は中で行う。失敗しても例外にならない）
+
+   ```dart
+   import 'package:ukalab_core/cross_promo.dart';
+
+   unawaited(UkalabCrossPromo.init());
+   ```
+
+3. 設定画面に置く（掲載が0件なら何も表示しない。うかラボは大人向けなので保護者ゲートは付けない）
+
+   ```dart
+   UkalabCrossPromoSection(currentAppId: '<本番の applicationId>')
+   ```
+
+   子ども向け設定で広告を配信するアプリ（漢検など）は、`isChildDirected: true, beforeOpenStore: (context) => requireParentalGate(context)` を足す（ゲート未指定だとデバッグで assert）。
+
+   `currentAppId` は本番の applicationId と完全一致させる（自アプリの除外に使う）。
+
+ユーザー作業（コードでは済まない）:
+
+- Firebase プロジェクトを作り、各アプリに `google-services.json`（Android）/ `GoogleService-Info.plist`（iOS）を置く
+- Play の Data Safety を更新する（Firebase 利用に伴う収集の申告）
+- 掲載リストは、公開を確認してから `cross_promo_kit/docs/cross_promo_apps.json` に載せ、検証して Remote Config（`cross_promo_apps`）へ投入する（手順は cross_promo_kit の `docs/ROLLOUT.md`）
+
 ## アイコン生成（tools/icon_gen）
 
 共通テンプレート（上段「うかラボ」／中央にシンボル／下部に試験名。組織ロゴ・✓バッジなし）で、データから量産する。

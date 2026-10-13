@@ -1,6 +1,6 @@
 name: ukalab_core
 description: "うかラボ（成人向け検定アプリ）の共通エンジンとUI。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッションと、推し・衣装・コイン・テーマ・学習ラボのUI。"
-version: 0.53.0
+version: 0.54.0
 publish_to: 'none'
 
 environment:
@@ -19,6 +19,14 @@ dependencies:
   flutter_riverpod: ^2.6.1
   shared_preferences: ^2.3.0
   cloud_firestore: ">=5.0.0 <7.0.0"
+  # 相互紹介（lib/cross_promo.dart）。firebase_core は cloud_firestore と同じ世代に収まる範囲、
+  # firebase_remote_config は cross_promo_kit の許容レンジ（>=4.0.0 <7.0.0）に合わせる。
+  firebase_core: ">=3.0.0 <5.0.0"
+  firebase_remote_config: ">=4.0.0 <7.0.0"
+  cross_promo_kit:
+    git:
+      url: https://github.com/zka32101/cross_promo_kit
+      ref: v0.3.0
 
 dev_dependencies:
   flutter_test:
