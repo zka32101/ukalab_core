@@ -72,13 +72,15 @@ void main() {
   });
 
   testWidgets('isChildDirected: true でゲート未指定なら assert', (tester) async {
-    await tester.pumpWidget(_host(
-      const UkalabCrossPromoSection(
+    // const だとコンパイル時に評価されて analyze が落ちるので、実行時に作る。
+    final childDirected = true;
+    expect(
+      () => UkalabCrossPromoSection(
         currentAppId: 'com.example.gkentei',
-        isChildDirected: true,
+        isChildDirected: childDirected,
       ),
-    ));
-    expect(tester.takeException(), isA<AssertionError>());
+      throwsAssertionError,
+    );
   });
 
   test('init() は Firebase 未設定のテスト環境でも例外なく完了し、二重呼び出しも安全', () async {
