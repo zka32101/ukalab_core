@@ -642,5 +642,5 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 - `scoreMockExam`: 模擬試験の採点と合否判定（総合の合格ライン、科目別の足切り、「あと◯点」、足切りで不合格の判別）
 - `Srs`: 間隔反復（Leitner 6段階）
 - `PracticeSession`: 演習1回分（seed による再現可能な出題順、優先問題、解答記録）
-- `bin/validate_content`: 問題データ検証 CLI（問題があれば終了コード 1）
+- `bin/validate_content`: 問題データ検証 CLI（問題があれば終了コード1）
 - GitHub Actions CI（analyze・test・サンプルデータ検証）
