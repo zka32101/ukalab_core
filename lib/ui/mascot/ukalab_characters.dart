@@ -7,7 +7,7 @@ import 'mascot_models.dart';
 /// うかラボ共通の推し（AI画像の4体）。標準キャラ「うか」は [CharacterPack.standard]。
 ///
 /// 画像は本パッケージの `assets/mascot/<id>/`。衣装は `outfits/<資格id>_<normal|pass|exam>.webp`。
-/// 場面別ポーズは `scenes/<id>_lv<1-5>_<eve|back|streak>.webp`、案内役ポーズは `guide/<id>_guide_<point|think|teach>.webp`。
+/// 場面別ポーズは `scenes/<id>_lv<1-5>_<eve|back>.webp`（連続は `states/<id>_streak.webp`）、案内役ポーズは `guide/<id>_guide_<point|think|teach>.webp`。
 /// 衣装の画像があるのは、いまは漢字検定・バイク免許・G検定・簿記3級・危険物乙4・生成AIパスポート（ない資格は私服のまま）。
 class UkalabCharacters {
   const UkalabCharacters._();
@@ -77,9 +77,9 @@ class UkalabCharacters {
   }
 
   static ImageProvider levelImage(String id, MascotStage stage, MascotExpression e) => AssetImage(
-        'assets/mascot/$id/${id}_lv${stage.level}_${e == MascotExpression.joy ? 'joy' : 'normal'}.webp',
-        package: package,
-      );
+    'assets/mascot/$id/${id}_lv${stage.level}_${e == MascotExpression.joy ? 'joy' : 'normal'}.webp',
+    package: package,
+  );
 
   /// 特別ポーズ（合格の喜び）。`assets/mascot/<id>/<id>_special_pass.webp`。標準キャラは null。
   static ImageProvider? specialPassImage(String id) => _special(id, 'pass');
@@ -126,7 +126,7 @@ class UkalabCharacters {
       case MascotScene.welcomeBack:
         return '${id}_lv${stage.level}_back';
       case MascotScene.streak:
-        return '${id}_lv${stage.level}_streak';
+        return '${id}_streak'; // 新素材（全Lv共通）。画像は states/
       case MascotScene.guidePoint:
         return '${id}_guide_point';
       case MascotScene.guideThink:
@@ -142,8 +142,23 @@ class UkalabCharacters {
     if (scene.isGuide) {
       return AssetImage('assets/mascot/$id/guide/${sceneFile(id, scene)}.webp', package: package);
     }
+    if (scene == MascotScene.streak) return stateImage(id, MascotState.streak);
     return AssetImage('assets/mascot/$id/scenes/${sceneFile(id, scene, stage)}.webp', package: package);
   }
+
+  /// 場面別ポーズの画像があるフォルダ（`guide` / `scenes` / `states`）。
+  static String sceneDir(MascotScene scene) =>
+      scene.isGuide ? 'guide' : (scene == MascotScene.streak ? 'states' : 'scenes');
+
+  static bool _hasImages(String id) => imagePacks.any((p) => p.id == id);
+
+  /// 表情・しぐさのポーズ画像（`poses/<id>_<pose>.webp`）。標準キャラ・未知の id は null。
+  static ImageProvider? poseImage(String id, MascotPose pose) =>
+      _hasImages(id) ? AssetImage('assets/mascot/$id/poses/${id}_${pose.name}.webp', package: package) : null;
+
+  /// 共通画面用の状態ポーズ画像（`states/<id>_<state>.webp`）。標準キャラ・未知の id は null。
+  static ImageProvider? stateImage(String id, MascotState state) =>
+      _hasImages(id) ? AssetImage('assets/mascot/$id/states/${id}_${state.name}.webp', package: package) : null;
 
   static ImageProvider? _kaiImage(MascotStage s, MascotExpression e) => levelImage('kai', s, e);
   static ImageProvider? _mioImage(MascotStage s, MascotExpression e) => levelImage('mio', s, e);

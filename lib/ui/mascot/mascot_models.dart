@@ -41,6 +41,42 @@ enum MascotScene {
   bool get isGuide => index >= MascotScene.guidePoint.index;
 }
 
+/// 表情・しぐさのポーズ（レベルに関係なく使える）。画像は `assets/mascot/<id>/poses/<id>_<name>.webp`。
+enum MascotPose {
+  /// 考えている
+  thinking,
+
+  /// 応援
+  cheer,
+
+  /// ヒントを出す
+  hint,
+
+  /// ひと休み
+  rest,
+
+  /// がんばる（気合い）
+  fight,
+}
+
+/// 共通画面用の状態ポーズ。画像は `assets/mascot/<id>/states/<id>_<name>.webp`。
+enum MascotState {
+  /// まだ何もない（空の一覧など）
+  empty,
+
+  /// うまくいかなかった（エラー）
+  error,
+
+  /// 読み込み中
+  loading,
+
+  /// ようこそ（はじめて・おかえり）
+  welcome,
+
+  /// 連続学習（[MascotScene.streak] もこの絵を使う）
+  streak,
+}
+
 /// 試験日が近いときの装い（日程連動。無料）。
 enum ExamPhase {
   /// 試験日を設定していない／まだ遠い
@@ -66,22 +102,13 @@ enum MascotTone { gentle, cool, cheerful, relaxed }
 enum MascotDisplay { normal, small, hidden }
 
 /// 画像パックの画像を返す関数。null ならコード描画に戻す。
-typedef MascotImageBuilder = ImageProvider? Function(
-  MascotStage stage,
-  MascotExpression expression,
-);
+typedef MascotImageBuilder = ImageProvider? Function(MascotStage stage, MascotExpression expression);
 
 /// 衣装を着た姿の画像を返す関数。null なら通常の画像（[MascotImageBuilder]）に戻す。
-typedef MascotOutfitImageBuilder = ImageProvider? Function(
-  Outfit outfit,
-  MascotStage stage,
-);
+typedef MascotOutfitImageBuilder = ImageProvider? Function(Outfit outfit, MascotStage stage);
 
 /// 場面別のポーズ画像を返す関数。null なら通常の画像（[MascotImageBuilder]）に戻す。
-typedef MascotSceneImageBuilder = ImageProvider? Function(
-  MascotScene scene,
-  MascotStage stage,
-);
+typedef MascotSceneImageBuilder = ImageProvider? Function(MascotScene scene, MascotStage stage);
 
 /// キャラクターパック（データ）。ロジックは共通で、見た目とセリフの口調だけが違う。
 ///
@@ -121,9 +148,5 @@ class CharacterPack {
   bool get isBuiltIn => imageBuilder == null;
 
   /// 標準キャラ「フラスコの助手」（仮名「うか」）。
-  static const CharacterPack standard = CharacterPack(
-    id: 'standard',
-    name: 'うか',
-    tone: MascotTone.gentle,
-  );
+  static const CharacterPack standard = CharacterPack(id: 'standard', name: 'うか', tone: MascotTone.gentle);
 }

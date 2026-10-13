@@ -97,7 +97,7 @@ void main() {
 
     final streak = await imageFor(UkalabOshiCard(
       cert: UkalabCert.boki3, stage: MascotStage.lv1, appId: 's3', streakDays: 4, now: now));
-    expect((streak as AssetImage).assetName, contains('kai_lv1_streak.webp'));
+    expect((streak as AssetImage).assetName, contains('states/kai_streak.webp'));
 
     final plain = await imageFor(UkalabOshiCard(
       cert: UkalabCert.boki3, stage: MascotStage.lv1, appId: 's4', now: now));
@@ -109,6 +109,6 @@ void main() {
     expect((lv2 as AssetImage).assetName, contains('kai_lv2_back.webp'));
     final lv5 = await imageFor(UkalabOshiCard(
       cert: UkalabCert.boki3, stage: MascotStage.lv5, appId: 's6', streakDays: 5, now: now));
-    expect((lv5 as AssetImage).assetName, contains('kai_lv5_streak.webp'));
+    expect((lv5 as AssetImage).assetName, contains('states/kai_streak.webp'));
   });
 }

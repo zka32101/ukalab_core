@@ -5,10 +5,14 @@
 ## [Unreleased]
 
 ### Added
+- `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
+- `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
+- 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る
 - 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
 - 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
 
 ### Changed
+- `MascotScene.streak` の絵を新素材 `states/<id>_streak.webp`（全Lv共通）に置き換え、旧 `scenes/<id>_lv<1-5>_streak.webp` を削除。`sceneFile(id, streak)` は `<id>_streak` を返す（API・enumは不変）。`UkalabCharacters.sceneDir` を追加
 - 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
 
 ## [0.59.0] - 2026-10-13

@@ -27,7 +27,7 @@ void main() {
   test('場面別ポーズ: 全キャラ×全Lv×前日・おかえり・連続、および案内役の画像がある', () {
     for (final p in UkalabCharacters.imagePacks) {
       for (final sc in MascotScene.values) {
-        final dir = sc.isGuide ? 'guide' : 'scenes';
+        final dir = UkalabCharacters.sceneDir(sc);
         // 前日・おかえり・連続は Lv1〜5 の全段階に画像がある。案内役は Lv1 の絵を全段階で返す
         for (final s in MascotStage.values) {
           final f = UkalabCharacters.sceneFile(p.id, sc, s);
