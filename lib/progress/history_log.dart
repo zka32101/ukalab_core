@@ -34,6 +34,33 @@ ProgressRecord historyRecordFor(
       ms: ms,
     );
 
+/// 解答後に利用者が選んだ原因ラベルを、その問題の最新の誤答の記録に付ける
+/// （解答の記録は解答の直後に作り、原因は後から選ぶため）。
+/// [cause] が null なら外す。該当する誤答の記録が無ければ元のまま。元のリストは変えない。
+List<ProgressRecord> attachCauseToLatest(
+  List<ProgressRecord> records,
+  String qid,
+  WrongCause? cause,
+) {
+  for (var i = records.length - 1; i >= 0; i--) {
+    final r = records[i];
+    if (r.qid != qid || r.correct) continue;
+    final next = [...records];
+    next[i] = ProgressRecord(
+      qid: r.qid,
+      subjectId: r.subjectId,
+      correct: r.correct,
+      at: r.at,
+      topicId: r.topicId,
+      subtopicId: r.subtopicId,
+      ms: r.ms,
+      cause: cause,
+    );
+    return next;
+  }
+  return records;
+}
+
 /// 履歴を保存用の JSON 文字列にする。
 String encodeHistory(List<ProgressRecord> records) =>
     jsonEncode([for (final r in records) r.toJson()]);
