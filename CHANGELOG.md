@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [0.65.0] - 2026-10-13
+
+ホーム画面を「わかりやすく分類分け」するための共通 UI 部品を追加（追加のみ。既存 API は変更しない）。文言は持たず、見出し・ラベルはアプリが渡す（`UkalabStrings` / `HomeStrings` は不要なので追加しない）。
+
+### Added
+- `lib/ui/home/home_sections.dart`（`ui.dart` から export）
+  - `HomeSectionHeader`: タイトル・補足・leading（アイコン/絵文字）・trailing。`Semantics(header: true)`
+  - `HomeMenuTile` / `HomeMenuBadge`（`dot` / `count`（99+）/ `label`（NEW 等）/ `premium`）: 1 列版、最小タップ領域 48dp
+  - `HomeMenuItem` / `HomeMenuGrid`: 2 列コンパクトグリッド。幅 360 未満または文字倍率 1.3 超で 1 列にフォールバック
+  - `HomeSection`: 見出し + 子。`collapsible` / `initiallyExpanded`。開閉の保存はアプリ側（`expandedListenable` / `onExpandedChanged`）、core は永続化しない。「動きを減らす」では開閉アニメーションなし
+- 色・角丸は ColorScheme から取得（ダーク対応）。`test/home_sections_test.dart`
+
 ## [0.64.0] - 2026-10-13
 
 app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。ながらセッション（`NagaraSessionController` / `NagaraSessionView` / `AwaitableSpeechBackend` / `HandsFreeSettings` の `thinkSeconds`・`betweenSeconds`・`autoAdvance` / `KitStrings.nagara`）は kit v3.1.0 から提供され、core は再エクスポートのみ（ここでは何も実装しない）。
