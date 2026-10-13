@@ -2,6 +2,14 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
+## [0.55.1] - 2026-10-13
+
+`subtopic-conflict` 検査の単位を選べるようにした。既定は従来どおり章（`topicId`）で、挙動は変わらない。
+
+### Added
+- `SubtopicScope`（`topic` / `subject`）と `validateAnswerFeedbackTags(subtopicScope:)`
+- `validate_content --subtopic-scope=topic|subject`: `subject` にすると、同じ細目IDが複数の `subjectId` に付くときだけ衝突とする（`topicId` が概念単位の試験向け）
+
 ## [0.55.0] - 2026-10-13
 
 解答後フィードバック（誤答の原因ラベル・違いの比較表示・今週の弱点）の共通部品を、単機能エントリ

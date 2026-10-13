@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ukalab_core/ukalab_core.dart';
 
-Question _q(String qid, {String topic = 'ch1', String? sub, List<String>? compare}) =>
+Question _q(String qid, {String subject = 'math', String topic = 'ch1', String? sub, List<String>? compare}) =>
     Question.fromJson({
       'qid': qid,
       'examId': 'sample',
-      'subjectId': 'math',
+      'subjectId': subject,
       'topicId': topic,
       if (sub != null) 'subtopicId': sub,
       'prompt': '問題',
@@ -55,6 +55,28 @@ void main() {
       ]);
       expect(_codes(issues), ['subtopic-conflict', 'subtopic-conflict']);
       expect(issues.map((i) => i.qid), ['q1', 'q2']);
+    });
+
+    test('subtopicScope.subject: topicId が違っても同じ科目なら衝突しない', () {
+      final qs = [
+        _q('q1', subject: 's1', topic: 'concept-a', sub: 's1-x'),
+        _q('q2', subject: 's1', topic: 'concept-b', sub: 's1-x'),
+      ];
+      expect(_codes(validateAnswerFeedbackTags(qs)),
+          ['subtopic-conflict', 'subtopic-conflict']);
+      expect(
+        validateAnswerFeedbackTags(qs, subtopicScope: SubtopicScope.subject),
+        isEmpty,
+      );
+    });
+
+    test('subtopicScope.subject: 同じ細目IDが複数の科目にあると subtopic-conflict', () {
+      final issues = validateAnswerFeedbackTags([
+        _q('q1', subject: 's1', topic: 'c1', sub: 'x'),
+        _q('q2', subject: 's2', topic: 'c1', sub: 'x'),
+      ], subtopicScope: SubtopicScope.subject);
+      expect(_codes(issues), ['subtopic-conflict', 'subtopic-conflict']);
+      expect(issues.first.message, contains('科目'));
     });
 
     test('比較対象が答えの用語自身だと compare-self', () {
