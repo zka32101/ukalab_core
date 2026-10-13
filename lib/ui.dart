@@ -53,6 +53,8 @@ export 'ui/exam_prep/exam_prep_views.dart';
 export 'ui/exam_countdown/exam_countdown_views.dart';
 export 'ui/mistake_note/mistake_note_store.dart';
 export 'ui/mistake_note/mistake_note_view.dart';
+export 'ui/review_scheduler/review_scheduler_store.dart';
+export 'ui/review_scheduler/today_review_card.dart';
 export 'ui/oshi_gift/oshi_gift.dart';
 export 'ui/oshi_gift/oshi_gift_dialog.dart';
 export 'ui/oshi_gift/oshi_gift_service.dart';
