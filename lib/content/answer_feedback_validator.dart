@@ -3,6 +3,16 @@ import '../question/question.dart';
 import '../term/term.dart';
 import 'question_validator.dart';
 
+/// `subtopic-conflict` 検査で「細目IDは1つの何に属するか」の単位。
+enum SubtopicScope {
+  /// 同じ細目IDは1つの `topicId` にだけ付く（既定。従来の挙動）
+  topic,
+
+  /// 同じ細目IDは1つの `subjectId` にだけ付く。
+  /// `topicId` が概念単位で、章を `subjectId` で表す試験向け（細目IDは `<subjectId>-<細目>` など）
+  subject,
+}
+
 /// 論点タグ（章 `topicId`＋細目 `subtopicId`）と比較対象タグ（`compareWith`）の検査。
 ///
 /// 次は既存の検査が受け持つ（ここでは重ねない）。
@@ -11,7 +21,8 @@ import 'question_validator.dart';
 /// - 用語の `relatedQuestionIds` が存在しない qid を指す: [validateTerms]
 ///
 /// ここで見つけるもの:
-/// - `subtopic-conflict`: 同じ細目IDが複数の章に付いている（細目は1つの章に属する）
+/// - `subtopic-conflict`: 同じ細目IDが複数の章に付いている（細目は1つの章に属する）。
+///   [subtopicScope] を [SubtopicScope.subject] にすると、章の代わりに `subjectId` 単位で検査する
 /// - `compare-self`: 比較対象が、その問題の答えの用語（`relatedQuestionIds` にその問題を持つ用語）自身
 /// - `compare-no-view`: 比較対象はあるが、違いの比較表示が作れない（答えの用語が無く、
 ///   有効な比較対象が2つに満たない等）。解答後に何も出ないタグになるので直す
@@ -20,14 +31,18 @@ import 'question_validator.dart';
 List<ContentIssue> validateAnswerFeedbackTags(
   List<Question> questions, {
   List<Term> terms = const [],
+  SubtopicScope subtopicScope = SubtopicScope.topic,
 }) {
+  String unitOf(Question q) =>
+      subtopicScope == SubtopicScope.subject ? q.subjectId : q.topicId;
+  final unitName = subtopicScope == SubtopicScope.subject ? '科目' : '章';
   final issues = <ContentIssue>[];
 
   final chaptersBySubtopic = <String, Set<String>>{};
   for (final q in questions) {
     final sub = q.subtopicId;
     if (sub != null) {
-      chaptersBySubtopic.putIfAbsent(sub, () => <String>{}).add(q.topicId);
+      chaptersBySubtopic.putIfAbsent(sub, () => <String>{}).add(unitOf(q));
     }
   }
   for (final q in questions) {
@@ -39,7 +54,7 @@ List<ContentIssue> validateAnswerFeedbackTags(
       issues.add(ContentIssue(
         q.qid,
         'subtopic-conflict',
-        '細目 "$sub" が複数の章（${list.join('、')}）に付いています',
+        '細目 "$sub" が複数の$unitName（${list.join('、')}）に付いています',
       ));
     }
   }

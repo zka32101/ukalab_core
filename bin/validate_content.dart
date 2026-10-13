@@ -6,6 +6,7 @@ import 'package:ukalab_core/ukalab_core.dart';
 /// 問題データ・用語データの配信前チェック。
 ///
 /// 使い方: `dart run ukalab_core:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--reading reading.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... [--update-log update_log.jsonl]... [--next-steps next_steps.jsonl]... [--checklist checklist.jsonl]... questions.jsonl...`
+/// `--subtopic-scope=subject` で、細目IDの衝突検査（subtopic-conflict）の単位を章（topicId、既定）から科目（subjectId）に変える。
 /// 問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
@@ -25,6 +26,7 @@ Future<void> main(List<String> args) async {
       '[--update-log update_log.jsonl]... '
       '[--next-steps next_steps.jsonl]... '
       '[--checklist checklist.jsonl]... '
+      '[--subtopic-scope=topic|subject] '
       '<questions.jsonl>...',
     );
     exit(64);
@@ -58,9 +60,20 @@ Future<void> main(List<String> args) async {
   final updateLogPaths = <String>[];
   final nextStepPaths = <String>[];
   final checklistPaths = <String>[];
+  var subtopicScope = SubtopicScope.topic;
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
-    if (rest[i] == '--terms') {
+    if (rest[i].startsWith('--subtopic-scope=')) {
+      final v = rest[i].substring('--subtopic-scope='.length);
+      if (v == 'topic') {
+        subtopicScope = SubtopicScope.topic;
+      } else if (v == 'subject') {
+        subtopicScope = SubtopicScope.subject;
+      } else {
+        stderr.writeln('--subtopic-scope は topic か subject を指定してください: $v');
+        exit(64);
+      }
+    } else if (rest[i] == '--terms') {
       if (i + 1 >= rest.length) {
         stderr.writeln('--terms の後にファイルパスが必要です');
         exit(64);
@@ -193,7 +206,11 @@ Future<void> main(List<String> args) async {
     ));
   }
   issues.addAll(validateCompareTargets(questions, [for (final t in terms) t.termId]));
-  issues.addAll(validateAnswerFeedbackTags(questions, terms: terms));
+  issues.addAll(validateAnswerFeedbackTags(
+    questions,
+    terms: terms,
+    subtopicScope: subtopicScope,
+  ));
   if (terms.isNotEmpty) {
     issues.addAll(validateTerms(terms, exam: exam, questions: questions));
   }

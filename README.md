@@ -152,7 +152,9 @@ if (canShowWeakSummary(isPremium: isPremium)) WeakSummaryCard(records: history, 
 #### 問題データへ論点タグ・比較対象タグを付ける手順
 
 1. 章: すべての問題に `topicId`（必須）。細目を使うなら `subtopicId`（任意）。
-   同じ `subtopicId` は1つの章にだけ付ける（別の章に付けると `subtopic-conflict`）
+   同じ `subtopicId` は1つの章にだけ付ける（別の章に付けると `subtopic-conflict`）。
+   `topicId` が概念単位で章を `subjectId` で表す試験（細目IDが `<subjectId>-<細目>`）は、
+   `validate_content` に `--subtopic-scope=subject` を付けると衝突の単位が科目になる（既定は `topic`）
 2. 用語データ（`--terms`）で、その問題の答えにあたる用語の `relatedQuestionIds` に問題の `qid` を入れる
 3. 紛らわしい相手の用語の `termId` を、問題の `compareWith`（配列）に入れる。
    答えの用語自身は入れない（`compare-self`）。空・重複・用語データに無いIDは `compare-empty` / `compare-duplicate` / `compare-unknown`
