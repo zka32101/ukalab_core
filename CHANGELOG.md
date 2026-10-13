@@ -4,6 +4,25 @@
 
 ## [Unreleased]
 
+## [0.67.0] - 2026-10-13
+
+復習の自動出題（間隔反復の強化）を追加（追加のみ。既存 API は変更しない）。
+
+### Added
+- `lib/progress/review_scheduler_engine.dart`（`ukalab_core.dart` から export）
+  - `ReviewSchedulerEngine`: 間違いノート（`MistakeNoteEntry`）の「これから」の問題を、間隔 1/3/7/14/30 日（`intervals` で変更可）の簡易ボックス方式で「今日の復習」にする純 Dart ロジック。正解で次の段、不正解で1段戻る、最後の段の正解で卒業。`sync` / `review` / `applyResult` / `due(max:)` / `dueCount` / `isDue`。日付は暦日、同じ入力なら同じ結果（冪等・決定的）
+  - `ReviewItem`: 問題ID・段・次回の日・最終復習・卒業・分野ID（JSON 往復。壊れた入力は null）
+- `lib/progress/review_scheduler_strings.dart`: `ReviewSchedulerStrings`（ja・en。`copyWith` 可。禁止語リストでテスト）
+- `lib/ui/review_scheduler/`（`ui.dart` から export）
+  - `TodayReviewCard`: ホーム用カード。件数と「やってみる」（`onStart` コールバック注入）。0 件は静かな「おやすみ」表示。警告色・赤字は使わない。幅 320・文字 2 倍で確認
+  - `ReviewSchedulerStore` / `InMemoryReviewSchedulerStore` / `SharedPreferencesReviewSchedulerStore`（キー `ukalab_<アプリID>_review_schedule`）/ `reviewSchedulerDataPart`（バックアップ内のキー `reviewSchedule`）
+
+### Notes
+- 既存の `Srs`（`lib/engine/srs.dart`。箱0=すぐ再出題の Leitner 方式、全問題の履歴向け）・`review_priority.dart`・`MistakeNoteEngine` は変更しない。重複を避けるため、新エンジンは `MistakeNoteEntry` を入力にして「間違いノートの復習日程」だけを持つ。連携方法は docs/review_scheduler.md
+
+### Tests
+- `test/review_scheduler_test.dart`（エンジン・JSON・ストア・DataPart・文言）、`test/ui/today_review_card_test.dart`（表示・0 件・色・幅 320 かつ文字 2 倍・Semantics）
+
 ## [0.66.0] - 2026-10-13
 
 app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)` が使える（kit PR #140）。
