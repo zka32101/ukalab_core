@@ -74,6 +74,8 @@ export 'progress/mistake_note_engine.dart';
 export 'progress/mistake_note_strings.dart';
 export 'progress/progress_record.dart';
 export 'progress/review_priority.dart';
+export 'progress/review_scheduler_engine.dart';
+export 'progress/review_scheduler_strings.dart';
 export 'progress/weak_summary.dart';
 export 'progress/weak_topics.dart';
 export 'progress/weak_trend.dart';
