@@ -343,6 +343,33 @@ for (final g in fresh) {
 - `image` が無ければ、衣装は仮アイコン、背景はコード描画のグラデーション。画像ができたら `image` を渡すだけで差し替わる（読み込み失敗時は描画に戻る）
 - 文言は `OshiGiftStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
 
+## 推しの成長演出（`OshiGrowthEngine` / `OshiGrowthBubble` / `showOshiGrowthDialog`）
+
+アプリが渡す累計の学習量（回答数・学習日数）で、推しの反応（表情の絵文字・ラベル・一言）が段階的に変わる。10/50/100/300/1000 問・7/30/100 日などの節目に到達したら、一度だけ祝う。次の節目までの残りを数えて促さず、休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
+
+```dart
+final progress = OshiGrowthProgress(totalAnswered: 120, studyDays: 12); // 個人情報は入れない
+
+// 常時表示: 推しの今の反応（OshiMessageBubble と同じ吹き出し。タップで別の一言）
+OshiGrowthBubble(progress: progress, avatar: MascotWidget(/* ... */)) // avatar 省略時は絵文字
+
+// 節目の祝福: 起動時・学習後などに 1 回
+final svc = OshiGrowthService(store: SharedPreferencesOshiGrowthStore('myapp'));
+await svc.load();
+final m = await svc.checkHeadline(progress); // 新しく到達した節目のうち見せる 1 件（無ければ null）
+if (m != null && context.mounted) {
+  await showOshiGrowthDialog(context, milestone: m);
+}
+```
+
+- 段階（`OshiGrowthStage`）: newcomer → budding（10問/7日）→ growing（100問/30日）→ blooming（300問/100日）→ radiant（1000問）。回答数と学習日数の進んでいる方で決まる
+- 節目の既定: 回答 10/50/100/300/1000 問、学習 7/30/100 日（ID は `answered_10` / `days_7`。保存に使うので変えない）。`OshiGrowthEngine(milestones: [...])` で差し替え可
+- 久しぶりに開いて複数の節目を一度に迎えても、記録は全て済ませ、祝福は最も大きい 1 件だけ（`headlineOf`）。`svc.check(progress)` なら到達した全件を返す
+- 既出判定は注入式の `OshiGrowthStore`（`InMemoryOshiGrowthStore` / `SharedPreferencesOshiGrowthStore(appId)`、キー `ukalab_oshi_growth_<appId>`）。保存に失敗したときは記録せず例外を伝え、次回また祝える
+- 判定だけなら純 Dart の `OshiGrowthEngine().newlyReached(progress, alreadyCelebrated:)`（冪等）、反応だけなら `reaction(progress, seed: OshiGrowthEngine.seedFromDate(DateTime.now()))`
+- 文言は `OshiGrowthStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。運営での文言確認は別途必要
+- 推しの一言（`OshiMessageEngine`）は「今日の状況」への声かけ、こちらは「これまでの積み重ね」への反応。両方を並べてもよいが、同時に出すと賑やかなので、ホームではどちらか一方か、成長演出は祝福ダイアログ中心にするのがおすすめ
+
 ## 推しの一言（`OshiMessageEngine` / `OshiMessageBubble`）
 
 学習状況に応じて推しが短い一言を出す。責めない・煽らない・罪悪感を与えない（久しぶり→「おかえり。今日は1問からでいいよ」、連続→「いい調子。無理せず続けよう」、間違いが多い日→「間違えた所が伸びしろだよ」）。

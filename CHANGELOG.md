@@ -4,6 +4,42 @@
 
 ## [Unreleased]
 
+## [0.69.0] - 2026-10-13
+
+推しの成長演出を追加（追加のみ。既存 API は変更しない）。アプリが渡す累計の学習量（回答数・学習日数）に応じて推しの反応が段階的に変わり、節目に到達したら一度だけ祝う。煽らない・休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
+
+### Added
+- 純 Dart（`ukalab_core.dart`）
+  - `OshiGrowthEngine`: `stageOf(progress)`（5 段階 `OshiGrowthStage`: newcomer / budding / growing / blooming / radiant。回答 10/100/300/1000 問・学習 7/30/100 日で上がる。進んでいる方で決まる）、`reaction(progress, seed:, salt:)`（表情の絵文字・ラベル・一言）、`newlyReached(progress, alreadyCelebrated:)`、`reached`、`headlineOf`、`celebrate(milestone)`
+  - `OshiGrowthProgress`（`totalAnswered` / `studyDays`。負値は 0）、`OshiGrowthMilestone`（`answered(10/50/100/300/1000)` / `days(7/30/100)`。ID は `answered_10` / `days_7`。`milestones:` で差し替え可）
+  - `OshiGrowthStrings`（ja・en、`copyWith`、`allTexts`。`UkalabStrings` は変えない）。責める・煽る語は禁止語リストでテスト
+- UI（`ui.dart`、`lib/ui/oshi_growth/`）
+  - `OshiGrowthBubble`: `OshiMessageBubble` と同じ見た目の吹き出し。表情＋ラベル＋一言、タップで別の一言
+  - `OshiGrowthCelebrationCard` / `showOshiGrowthDialog`: 節目の祝福（閉じるボタンだけ）。「動きを減らす」対応
+  - `OshiGrowthStore`（`InMemoryOshiGrowthStore` / `SharedPreferencesOshiGrowthStore(appId)`、キー `ukalab_oshi_growth_<appId>`）と `OshiGrowthService`（`check` / `checkHeadline`。保存に失敗したら記録せず次回また祝える。複数の節目を同時に迎えても祝福は 1 件）
+
+### Tests
+- `test/oshi_growth_test.dart`（段階の境界・節目の一度だけ・冪等・ストア・禁止語）、`test/oshi_growth_views_test.dart`（幅 320・文字 2 倍でオーバーフローなし、reduce motion、セマンティクス、ja・en）
+
+## [0.68.0] - 2026-10-13
+
+復習の自動出題（間隔反復の強化）を追加（追加のみ。既存 API は変更しない）。
+
+### Added
+- `lib/progress/review_scheduler_engine.dart`（`ukalab_core.dart` から export）
+  - `ReviewSchedulerEngine`: 間違いノート（`MistakeNoteEntry`）の「これから」の問題を、間隔 1/3/7/14/30 日（`intervals` で変更可）の簡易ボックス方式で「今日の復習」にする純 Dart ロジック。正解で次の段、不正解で1段戻る、最後の段の正解で卒業。`sync` / `review` / `applyResult` / `due(max:)` / `dueCount` / `isDue`。日付は暦日、同じ入力なら同じ結果（冪等・決定的）
+  - `ReviewItem`: 問題ID・段・次回の日・最終復習・卒業・分野ID（JSON 往復。壊れた入力は null）
+- `lib/progress/review_scheduler_strings.dart`: `ReviewSchedulerStrings`（ja・en。`copyWith` 可。禁止語リストでテスト）
+- `lib/ui/review_scheduler/`（`ui.dart` から export）
+  - `TodayReviewCard`: ホーム用カード。件数と「やってみる」（`onStart` コールバック注入）。0 件は静かな「おやすみ」表示。警告色・赤字は使わない。幅 320・文字 2 倍で確認
+  - `ReviewSchedulerStore` / `InMemoryReviewSchedulerStore` / `SharedPreferencesReviewSchedulerStore`（キー `ukalab_<アプリID>_review_schedule`）/ `reviewSchedulerDataPart`（バックアップ内のキー `reviewSchedule`）
+
+### Notes
+- 既存の `Srs`（`lib/engine/srs.dart`。箱0=すぐ再出題の Leitner 方式、全問題の履歴向け）・`review_priority.dart`・`MistakeNoteEngine` は変更しない。重複を避けるため、新エンジンは `MistakeNoteEntry` を入力にして「間違いノートの復習日程」だけを持つ。連携方法は docs/review_scheduler.md
+
+### Tests
+- `test/review_scheduler_test.dart`（エンジン・JSON・ストア・DataPart・文言）、`test/ui/today_review_card_test.dart`（表示・0 件・色・幅 320 かつ文字 2 倍・Semantics）
+
 ## [0.67.0] - 2026-10-13
 
 模擬試験の結果分析を追加（追加のみ。既存 API は変更しない）。
@@ -30,25 +66,6 @@ app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `on
 
 ### Tests
 - `test/kit_nagara_reexport_test.dart`: `onAnswered(question, chosen, correct)` をコントローラ生成時に引数として渡せること（型を含む）を確認
-
-## [0.68.0] - 2026-10-13
-
-復習の自動出題（間隔反復の強化）を追加（追加のみ。既存 API は変更しない）。
-
-### Added
-- `lib/progress/review_scheduler_engine.dart`（`ukalab_core.dart` から export）
-  - `ReviewSchedulerEngine`: 間違いノート（`MistakeNoteEntry`）の「これから」の問題を、間隔 1/3/7/14/30 日（`intervals` で変更可）の簡易ボックス方式で「今日の復習」にする純 Dart ロジック。正解で次の段、不正解で1段戻る、最後の段の正解で卒業。`sync` / `review` / `applyResult` / `due(max:)` / `dueCount` / `isDue`。日付は暦日、同じ入力なら同じ結果（冪等・決定的）
-  - `ReviewItem`: 問題ID・段・次回の日・最終復習・卒業・分野ID（JSON 往復。壊れた入力は null）
-- `lib/progress/review_scheduler_strings.dart`: `ReviewSchedulerStrings`（ja・en。`copyWith` 可。禁止語リストでテスト）
-- `lib/ui/review_scheduler/`（`ui.dart` から export）
-  - `TodayReviewCard`: ホーム用カード。件数と「やってみる」（`onStart` コールバック注入）。0 件は静かな「おやすみ」表示。警告色・赤字は使わない。幅 320・文字 2 倍で確認
-  - `ReviewSchedulerStore` / `InMemoryReviewSchedulerStore` / `SharedPreferencesReviewSchedulerStore`（キー `ukalab_<アプリID>_review_schedule`）/ `reviewSchedulerDataPart`（バックアップ内のキー `reviewSchedule`）
-
-### Notes
-- 既存の `Srs`（`lib/engine/srs.dart`。箱0=すぐ再出題の Leitner 方式、全問題の履歴向け）・`review_priority.dart`・`MistakeNoteEngine` は変更しない。重複を避けるため、新エンジンは `MistakeNoteEntry` を入力にして「間違いノートの復習日程」だけを持つ。連携方法は docs/review_scheduler.md
-
-### Tests
-- `test/review_scheduler_test.dart`（エンジン・JSON・ストア・DataPart・文言）、`test/ui/today_review_card_test.dart`（表示・0 件・色・幅 320 かつ文字 2 倍・Semantics）
 
 ## [0.65.0] - 2026-10-13
 
