@@ -205,6 +205,11 @@ if (canShowWeakSummary(isPremium: isPremium)) WeakSummaryCard(records: history, 
 - Play の Data Safety を更新する（Firebase 利用に伴う収集の申告）
 - 掲載リストは、公開を確認してから `cross_promo_kit/docs/cross_promo_apps.json` に載せ、検証して Remote Config（`cross_promo_apps`）へ投入する（手順は cross_promo_kit の `docs/ROLLOUT.md`）
 
+## キャラ・メダル画像（`assets/mascot/`）
+
+- 推し4体の Lv1〜5・特別ポーズ（`<id>_special_pass` / `<id>_special_bow`）、合格メダル（`medals/<certId>_medal.webp`、`UkalabMedals.image(certId)`）。いずれも webp・長辺512。
+- AI生成素材: Leonardo.Ai Phoenix/Nano Banana, 規約版・プランは公開前に確認
+
 ## アイコン生成（tools/icon_gen）
 
 共通テンプレート（上段「うかラボ」／中央にシンボル／下部に試験名。組織ロゴ・✓バッジなし）で、データから量産する。

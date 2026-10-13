@@ -37,6 +37,7 @@ flutter:
   assets:
     - assets/mascot/rooms/
     - assets/mascot/props/
+    - assets/mascot/medals/
     - assets/mascot/kai/
     - assets/mascot/kai/outfits/
     - assets/mascot/kai/scenes/
