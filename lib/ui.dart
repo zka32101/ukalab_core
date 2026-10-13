@@ -11,6 +11,7 @@ export 'ui/mascot/mascot_state_view.dart';
 export 'ui/mascot/mascot_widget.dart';
 export 'ui/mascot/oshi_home_card.dart';
 export 'ui/mascot/standard_character.dart';
+export 'ui/mascot/ukalab_accessories.dart';
 export 'ui/mascot/ukalab_characters.dart';
 export 'ui/mascot/ukalab_props.dart';
 export 'ui/mascot/ukalab_rooms.dart';
