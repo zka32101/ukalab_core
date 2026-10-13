@@ -1,4 +1,4 @@
-# 今日の復習（`ReviewSchedulerEngine` / `TodayReviewCard`、v0.67.0）
+# 今日の復習（`ReviewSchedulerEngine` / `TodayReviewCard`、v0.68.0）
 
 間違いノートの問題を、忘れる頃に「今日の復習」として出す。たまっても大丈夫という調子で、件数や期限超過で圧をかけない（赤字・警告色なし）。出題画面は持たず、各アプリの既存クイズにコールバックで接続する。
 
