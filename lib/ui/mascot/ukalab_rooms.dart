@@ -4,6 +4,7 @@ import '../outfit/outfit_models.dart';
 import '../theme/ukalab_palette.dart';
 import 'mascot_models.dart';
 import 'mascot_widget.dart';
+import 'ukalab_accessories.dart';
 import 'ukalab_characters.dart';
 
 /// 推しの部屋（分野色別の背景。キャラは含まない）。
@@ -85,6 +86,7 @@ class UkalabOshiRoom extends StatelessWidget {
     this.line,
     this.characterHeight = 0.88,
     this.portrait = false,
+    this.accessory,
   });
 
   /// 資格から部屋を決める。
@@ -99,6 +101,7 @@ class UkalabOshiRoom extends StatelessWidget {
     String? line,
     double characterHeight = 0.88,
     bool portrait = false,
+    UkalabAccessory? accessory,
   }) : this(
           key: key,
           pack: pack,
@@ -110,6 +113,7 @@ class UkalabOshiRoom extends StatelessWidget {
           line: line,
           characterHeight: characterHeight,
           portrait: portrait,
+          accessory: accessory,
         );
 
   final CharacterPack pack;
@@ -128,6 +132,18 @@ class UkalabOshiRoom extends StatelessWidget {
   /// true なら縦長の背景（壁紙向け）。
   final bool portrait;
 
+  /// 持たせる小物（ショップで買ったもの）。衣装を着ていないときだけ、小物を持った絵で表示する。
+  /// その小物の画像が無いキャラ・標準キャラでは無視（いつもの絵）。null（既定）なら従来どおり。
+  final UkalabAccessory? accessory;
+
+  Widget? _accessoryImage(double h) {
+    final a = accessory;
+    if (a == null || outfit != null) return null;
+    final img = UkalabAccessories.image(pack.id, a);
+    if (img == null) return null;
+    return Image(image: img, height: h, fit: BoxFit.contain, excludeFromSemantics: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -141,7 +157,8 @@ class UkalabOshiRoom extends StatelessWidget {
               Image(image: UkalabRooms.image(room, portrait: portrait), fit: BoxFit.cover, excludeFromSemantics: true),
               Align(
                 alignment: const Alignment(0, 0.92),
-                child: MascotWidget(
+                child: _accessoryImage(h) ??
+                    MascotWidget(
                   pack: pack,
                   stage: stage,
                   expression: expression,

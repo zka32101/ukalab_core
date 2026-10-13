@@ -15,6 +15,8 @@
 ## [Unreleased]
 
 ### Added
+- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
+- `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
 - `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
 - `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
 - 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る

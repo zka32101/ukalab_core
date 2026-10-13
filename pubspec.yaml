@@ -44,24 +44,28 @@ flutter:
     - assets/mascot/kai/guide/
     - assets/mascot/kai/poses/
     - assets/mascot/kai/states/
+    - assets/mascot/kai/items/
     - assets/mascot/mio/
     - assets/mascot/mio/outfits/
     - assets/mascot/mio/scenes/
     - assets/mascot/mio/guide/
     - assets/mascot/mio/poses/
     - assets/mascot/mio/states/
+    - assets/mascot/mio/items/
     - assets/mascot/moka/
     - assets/mascot/moka/outfits/
     - assets/mascot/moka/scenes/
     - assets/mascot/moka/guide/
     - assets/mascot/moka/poses/
     - assets/mascot/moka/states/
+    - assets/mascot/moka/items/
     - assets/mascot/mike/
     - assets/mascot/mike/outfits/
     - assets/mascot/mike/scenes/
     - assets/mascot/mike/guide/
     - assets/mascot/mike/poses/
     - assets/mascot/mike/states/
+    - assets/mascot/mike/items/
 
 executables:
   validate_content:
