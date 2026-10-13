@@ -51,6 +51,36 @@ void main() {
     expect(find.byType(Card), findsNothing);
   });
 
+  testWidgets('beforeOpenStore が false を返すとストアを開かない', (tester) async {
+    var gateCalls = 0;
+    var opened = 0;
+    await tester.pumpWidget(_host(ukalabCrossPromoSectionForTest(
+      currentAppId: 'com.example.gkentei',
+      rawJson: _list,
+      isChildDirected: true,
+      beforeOpenStore: (_) async {
+        gateCalls++;
+        return false;
+      },
+      onOpenStore: (_) => opened++,
+    )));
+    await tester.tap(find.text('簿記コレ'));
+    await tester.pump();
+    expect(gateCalls, 1);
+    expect(opened, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('isChildDirected: true でゲート未指定なら assert', (tester) async {
+    await tester.pumpWidget(_host(
+      const UkalabCrossPromoSection(
+        currentAppId: 'com.example.gkentei',
+        isChildDirected: true,
+      ),
+    ));
+    expect(tester.takeException(), isA<AssertionError>());
+  });
+
   test('init() は Firebase 未設定のテスト環境でも例外なく完了し、二重呼び出しも安全', () async {
     await UkalabCrossPromo.init();
     await UkalabCrossPromo.init();

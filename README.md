@@ -143,6 +143,8 @@ final topics = limits.weakTopicLimit(isPremium: hasPremium); // null なら全�
    UkalabCrossPromoSection(currentAppId: '<本番の applicationId>')
    ```
 
+   子ども向け設定で広告を配信するアプリ（漢検など）は、`isChildDirected: true, beforeOpenStore: (context) => requireParentalGate(context)` を足す（ゲート未指定だとデバッグで assert）。
+
    `currentAppId` は本番の applicationId と完全一致させる（自アプリの除外に使う）。
 
 ユーザー作業（コードでは済まない）:

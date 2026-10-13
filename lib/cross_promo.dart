@@ -50,10 +50,22 @@ class UkalabCrossPromoSection extends StatelessWidget {
   const UkalabCrossPromoSection({
     super.key,
     required this.currentAppId,
+    this.isChildDirected = false,
+    this.beforeOpenStore,
     this.onOpenStore,
-  });
+  }) : assert(
+          !isChildDirected || beforeOpenStore != null,
+          'isChildDirected: true の場合は beforeOpenStore（保護者ゲート）が必須です。',
+        );
 
   final String currentAppId;
+
+  /// 子ども向け設定で広告を配信するアプリ用。true のとき [beforeOpenStore] が必須（kit の assert）。
+  /// 既定は false（大人向け・ゲートなし）。
+  final bool isChildDirected;
+
+  /// ストアを開く直前のゲート（保護者ゲートなど）。`false` を返すと開かない。
+  final Future<bool> Function(BuildContext context)? beforeOpenStore;
 
   /// ストアを開く直前に呼ばれる任意のフック（タップ計測用）。
   final void Function(PromotedApp app)? onOpenStore;
@@ -62,6 +74,8 @@ class UkalabCrossPromoSection extends StatelessWidget {
   Widget build(BuildContext context) => CrossPromoSection(
         currentAppId: currentAppId,
         currentCategory: kUkalabCrossPromoCategory,
+        isChildDirected: isChildDirected,
+        beforeOpenStore: beforeOpenStore,
         onOpenStore: onOpenStore,
       );
 }

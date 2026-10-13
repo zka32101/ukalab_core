@@ -14,10 +14,16 @@ import '../cross_promo.dart';
 Widget ukalabCrossPromoSectionForTest({
   required String currentAppId,
   required String rawJson,
+  bool isChildDirected = false,
+  Future<bool> Function(BuildContext context)? beforeOpenStore,
+  void Function(PromotedApp app)? onOpenStore,
 }) =>
     CrossPromoSection(
       currentAppId: currentAppId,
       currentCategory: kUkalabCrossPromoCategory,
+      isChildDirected: isChildDirected,
+      beforeOpenStore: beforeOpenStore,
+      onOpenStore: onOpenStore,
       appsOverride: CrossPromoService.parseApps(
         rawJson,
         currentAppId: currentAppId,
