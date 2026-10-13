@@ -4,7 +4,22 @@
 
 ## [Unreleased]
 
-## [0.67.0] - 2026-10-13
+## [0.66.0] - 2026-10-13
+
+app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)` が使える（kit PR #140）。
+
+### Changed
+- `app_common_kit` のピンを v3.1.0 → v3.5.0 に（`pubspec.lock` も該当行のみ）。kit v3.1.0→v3.5.0 は追加のみ（破壊的変更・新しい required 引数・依存パッケージの追加なし）で、core のコード変更は不要。core に同名の型はなく名前衝突なし
+- kit v3.5.0: ながらセッションに `onAnswered(question, chosen, correct)`（`NagaraSessionController` / `NagaraSessionView`）。正答を含む全てのタップ回答を返す。呼び出し順は解答確定 → `onAnswered` → （誤答なら）`onWrongAnswer`、1 問につき最大 1 回。未回答・スキップでは呼ばない。既存の `onWrongAnswer` / `onUnanswered` / `onFinished` の意味は変わらない
+- 取り込んだ kit v3.2.0〜v3.4.0（いずれも追加のみ）:
+  - v3.2.0: 同意管理 `ConsentController`（未回答は「同意なし」。`ConsentBinder` / `showConsentPrompt` / `showConsentSettings` / `SettingsScreen(consent:)`）
+  - v3.3.0: 保護者ゲート `ParentalGateDialog` / `requireParentalGate`（別の入口 `package:app_common_kit/parental_gate.dart`、`app_common_kit.dart` からは出さない）
+  - v3.4.0: 診断情報つき不具合報告（`DiagnosticsCollector` / `DiagnosticLog` / `FeedbackFormPage(collectDiagnostics:)`、`scrubText`）。診断情報を Issue に載せるには、各アプリが `functions/src/feedback-issue.ts` を更新して配備する必要がある（core は functions を持たない）
+
+### Tests
+- `test/kit_nagara_reexport_test.dart`: `onAnswered(question, chosen, correct)` をコントローラ生成時に引数として渡せること（型を含む）を確認
+
+## [0.68.0] - 2026-10-13
 
 復習の自動出題（間隔反復の強化）を追加（追加のみ。既存 API は変更しない）。
 
@@ -22,21 +37,6 @@
 
 ### Tests
 - `test/review_scheduler_test.dart`（エンジン・JSON・ストア・DataPart・文言）、`test/ui/today_review_card_test.dart`（表示・0 件・色・幅 320 かつ文字 2 倍・Semantics）
-
-## [0.66.0] - 2026-10-13
-
-app_common_kit を v3.1.0 → v3.5.0 に追従。ながらセッションの `onAnswered(question, chosen, correct)` が使える（kit PR #140）。
-
-### Changed
-- `app_common_kit` のピンを v3.1.0 → v3.5.0 に（`pubspec.lock` も該当行のみ）。kit v3.1.0→v3.5.0 は追加のみ（破壊的変更・新しい required 引数・依存パッケージの追加なし）で、core のコード変更は不要。core に同名の型はなく名前衝突なし
-- kit v3.5.0: ながらセッションに `onAnswered(question, chosen, correct)`（`NagaraSessionController` / `NagaraSessionView`）。正答を含む全てのタップ回答を返す。呼び出し順は解答確定 → `onAnswered` → （誤答なら）`onWrongAnswer`、1 問につき最大 1 回。未回答・スキップでは呼ばない。既存の `onWrongAnswer` / `onUnanswered` / `onFinished` の意味は変わらない
-- 取り込んだ kit v3.2.0〜v3.4.0（いずれも追加のみ）:
-  - v3.2.0: 同意管理 `ConsentController`（未回答は「同意なし」。`ConsentBinder` / `showConsentPrompt` / `showConsentSettings` / `SettingsScreen(consent:)`）
-  - v3.3.0: 保護者ゲート `ParentalGateDialog` / `requireParentalGate`（別の入口 `package:app_common_kit/parental_gate.dart`、`app_common_kit.dart` からは出さない）
-  - v3.4.0: 診断情報つき不具合報告（`DiagnosticsCollector` / `DiagnosticLog` / `FeedbackFormPage(collectDiagnostics:)`、`scrubText`）。診断情報を Issue に載せるには、各アプリが `functions/src/feedback-issue.ts` を更新して配備する必要がある（core は functions を持たない）
-
-### Tests
-- `test/kit_nagara_reexport_test.dart`: `onAnswered(question, chosen, correct)` をコントローラ生成時に引数として渡せること（型を含む）を確認
 
 ## [0.65.0] - 2026-10-13
 
