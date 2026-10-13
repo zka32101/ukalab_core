@@ -307,6 +307,26 @@ StoryModeWidget(
 - 途中保存の仕組みは持たない（現状は短い章数の体験を想定）。長い章数のシナリオ（簿記3級の会社経営モードなど）向けの途中保存は、必要になった時点で追加する
 
 
+## 推しの一言（`OshiMessageEngine` / `OshiMessageBubble`）
+
+学習状況に応じて推しが短い一言を出す。責めない・煽らない・罪悪感を与えない（久しぶり→「おかえり。今日は1問からでいいよ」、連続→「いい調子。無理せず続けよう」、間違いが多い日→「間違えた所が伸びしろだよ」）。
+
+```dart
+const ctx = OshiMessageContext(
+  daysSinceLastStudy: 5, streakDays: 0, todayAnswered: 0,
+  todayCorrectRate: null, examDaysLeft: 40, hasWeakTopics: true, // 個人情報は入れない
+);
+final msg = const OshiMessageEngine().pick(ctx, seed: OshiMessageEngine.seedFromDate(DateTime.now()));
+// msg.id / msg.text / msg.mood
+
+OshiMessageBubble(situation: ctx, avatar: MascotWidget(/* ... */)) // avatar 省略時は絵文字
+```
+
+- 状況の優先順: 久しぶり（3日以上空き・今日未学習）> 間違いが多い（5問以上で正答率50%未満）> 連続3日以上 > 今日の達成 > 試験が近い（1〜120日。「あと◯日、自分のペースで大丈夫」と軽く触れるだけ）> 苦手あり > あいさつ
+- 同じ入力でも seed（日付）で言い回しが変わる。`salt` を変える（ウィジェットはタップ）と別の一言
+- 文言は `OshiMessageStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` とは別なので既存アプリは変更不要）。責める語・脅しは禁止語リストでテスト
+- 試験日カウントダウンは別機能。`examDaysLeft` は励ましの言及にしか使わない
+
 ## 推しメダルカード（`OshiMedalShareCard` / `showOshiMedalDialog`）
 
 推しの画像の隅にメダル（実績・連続学習・模擬合格）を置いた 4:5 の共有カード。名前・メール・ID の欄は作らない（日付・「うかラボ」・「自己記録・非公式」の注記のみ）。
