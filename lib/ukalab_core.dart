@@ -66,6 +66,8 @@ export 'policy/premium_features.dart';
 export 'policy/usage_quota.dart';
 export 'progress/history_export.dart';
 export 'progress/history_log.dart';
+export 'progress/mistake_note_engine.dart';
+export 'progress/mistake_note_strings.dart';
 export 'progress/progress_record.dart';
 export 'progress/review_priority.dart';
 export 'progress/weak_summary.dart';
