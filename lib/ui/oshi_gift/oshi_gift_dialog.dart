@@ -66,7 +66,6 @@ class OshiGiftCard extends StatelessWidget {
       stage: stage,
       outfit: outfit,
       size: previewSize,
-      reduce: reduce,
     );
     return Semantics(
       container: true,
@@ -104,7 +103,6 @@ class _Preview extends StatelessWidget {
     required this.stage,
     required this.outfit,
     required this.size,
-    required this.reduce,
   });
 
   final OshiGift gift;
@@ -112,7 +110,6 @@ class _Preview extends StatelessWidget {
   final MascotStage stage;
   final Outfit? outfit;
   final double size;
-  final bool reduce;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +163,7 @@ class _Preview extends StatelessWidget {
         stage: stage,
         outfit: outfit,
         size: size * 0.6,
-        animate: !reduce,
+        animate: false, // 背景の見本は静止（ダイアログ内で動き続けない）
       ),
     );
   }
