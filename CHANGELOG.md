@@ -2,7 +2,9 @@
 
 破壊的変更は major を上げ、移行手順を記載する。タグは不変（付け替えない）。
 
-## [0.62.0] - 2026-10-13
+## [Unreleased]
+
+## [0.63.0] - 2026-10-13
 
 試験日までの日数を、煽らず前向きに見せる「試験日カウントダウン」を追加。「あと◯日」を押し付けず「自分のペースで」「今日できること」を添え、試験日を過ぎたら静かに「おつかれさまでした」を出してカウントを消す。追加のみ（`UkalabStrings` は変えず、文言は新設の `ExamCountdownStrings`）。既存の `daysUntilExam`・`OshiMessageEngine`・`ExamPrepCard` は変更しない。
 
@@ -10,6 +12,14 @@
 - `ExamCountdownEngine`（純 Dart、`ukalab_core.dart`）: 試験日（null 可）と基準日（`today`、テスト用に注入可）から `ExamCountdown{daysLeft, phase}` を作る。`ExamCountdownPhase` は none（未設定）/ farAway（100日超）/ approaching（31〜100日）/ close（8〜30日）/ finalDays（1〜7日。`final` は予約語のため）/ today / done（過去）。日数は既存 `daysUntilExam` の暦日差で、時刻・タイムゾーン・夏時間で 1 日ずれない
 - `ExamCountdownChip` / `ExamCountdownCard`（`ui.dart`）: ホームの AppBar 付近・`ExamPrepCard` 内に置けるチップと、今日できることの短い提案を添えるカード。`onTap` で試験日設定を開く想定。未設定は何も出さず、終了後は日数を消して「おつかれさまでした」のみ。Semantics 付き、「動きを減らす」設定では動きなし
 - `ExamCountdownStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める・煽る語）をテストで機械検証。final 期でも「いつもどおりで大丈夫」の調子
+
+## [0.62.0] - 2026-10-13
+
+推しの小物（アクセサリー）画像と API を追加（#79）。追加のみ。
+
+### Added
+- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
+- `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
 
 ## [0.61.0] - 2026-10-13
 
@@ -22,6 +32,19 @@
 - `MistakeNoteView`（`ui.dart`）: 「これから」「克服」のフィルタ、直近の間違い順、`questionBuilder`（問題文はアプリ側）、`onRetry`（解き直す）、`celebrateQids` で克服を祝う表示。Semantics 付き、「動きを減らす」設定では動きなし。premium の出し分けはアプリ側で包む（core は制限しない）
 - `MistakeNoteStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・件数で圧をかける語）をテストで機械検証
 
+### Added / Changed（マスコット素材。#76・#77。v0.61.0 タグに含まれていたが記載漏れだったため追記）
+
+#### Added
+- `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
+- `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
+- 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る
+- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
+- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
+
+#### Changed
+- `MascotScene.streak` の絵を新素材 `states/<id>_streak.webp`（全Lv共通）に置き換え、旧 `scenes/<id>_lv<1-5>_streak.webp` を削除。`sceneFile(id, streak)` は `<id>_streak` を返す（API・enumは不変）。`UkalabCharacters.sceneDir` を追加
+- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
+
 ## [0.60.0] - 2026-10-13
 
 週に一度、「できたこと」だけを見せる週間ふりかえりを追加。責めない・煽らない・前週と比べて「少なかった」と見せない。追加のみ（`UkalabStrings` は変えず、文言は新設の `WeeklyRecapStrings`）。
@@ -31,21 +54,6 @@
 - `weeklyRecapDaysFromRecords`: 既存の `ProgressRecord` 履歴から `WeeklyRecapDay` を作るアダプタ（問題ID・原因・回答時間は引き継がない）
 - `WeeklyRecapCard`（`ui.dart`）: Semantics 付き、「動きを減らす」設定では出現の動きなし。`message` に `OshiMessageBubble` などを置ける。共有用 `WeeklyRecapShareCard` は後から同じ `WeeklyRecap` を受け取る形で足せる構成（今回は含めない）
 - `WeeklyRecapStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・前週との比較語）をテストで機械検証
-
-## [Unreleased]
-
-### Added
-- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
-- `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
-- `MascotPose`（thinking/cheer/hint/rest/fight）と `UkalabCharacters.poseImage`（`assets/mascot/<id>/poses/`）
-- `MascotState`（empty/error/loading/welcome/streak）と `UkalabCharacters.stateImage`（`assets/mascot/<id>/states/`）
-- 共通画面の小さな widget `MascotStateView`（`.empty` / `.error` / `.loading` / `.welcome`）と `MascotPoseImage`。標準キャラはコード描画に戻る
-- 合格メダル画像17枚（`assets/mascot/medals/<certId>_medal.webp`）と `UkalabMedals.image(certId)`（`OshiMedal.image` に渡す）
-- 特別ポーズ「おじぎ」`<id>_special_bow.webp` と `UkalabCharacters.specialBowImage` / `specialPassImage`
-
-### Changed
-- `MascotScene.streak` の絵を新素材 `states/<id>_streak.webp`（全Lv共通）に置き換え、旧 `scenes/<id>_lv<1-5>_streak.webp` を削除。`sceneFile(id, streak)` は `<id>_streak` を返す（API・enumは不変）。`UkalabCharacters.sceneDir` を追加
-- 推し4体の Lv1〜5（normal/joy）と `special_pass` を新しい webp（長辺512）に差し替え（ファイル名・APIは同じ）
 
 ## [0.59.0] - 2026-10-13
 
