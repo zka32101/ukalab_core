@@ -31,6 +31,8 @@ example/      架空のサンプル試験と問題（実在の試験の問題で
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
 
+v0.65.0 でホーム分類用の部品（`HomeSectionHeader` / `HomeMenuTile` / `HomeMenuGrid` / `HomeSection`。折りたたみ・2 列グリッド・バッジ。[docs/ui.md](docs/ui.md#ホーム画面の分類homesection--homemenutile--homemenugrid)）を追加。
+
 v0.63.0 で試験日カウントダウン（`ExamCountdownEngine` / `ExamCountdownChip` / `ExamCountdownCard`。「自分のペースで」「今日できること」を添え、試験日を過ぎたら静かに「おつかれさまでした」。[docs/ui.md](docs/ui.md#試験日カウントダウンexamcountdownengine--examcountdownchip--examcountdowncard)）を追加。
 
 v0.61.0 で間違いノート（`MistakeNoteEngine` / `MistakeNoteView`。間違いを「伸びしろ」として見返し、解き直して克服したら祝う。[docs/ui.md](docs/ui.md#間違いノートmistakenoteengine--mistakenoteview)）を追加。

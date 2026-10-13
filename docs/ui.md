@@ -504,3 +504,45 @@ ExamPrepSettingsTiles(
 - `ExamDayChecklistView`: 項目は `ChecklistItem`。`officialConfirmed: false` の項目には「公式で要確認」（`note` があれば併記）を出す。`defaultExamDayChecklist(examId:, venue:)` で一般項目だけを取り出して、足し引きしてから `items` に渡してもよい
 - `HistoryExportView`: CSV は `historyCsvText`（氏名・ID・端末情報・問題文を含めない）。保存・共有のプラグインは足さず、表示とコピーのみ
 - 次の一手（`next_step`）の画面は含まない
+
+## ホーム画面の分類（`HomeSection` / `HomeMenuTile` / `HomeMenuGrid`）
+
+見出しの無い縦一列を、分類ごとに見出し付きでまとめるための部品（`ui.dart`）。文言は持たない（見出し・ラベルはアプリが渡す）。色・角丸は `ColorScheme` から取るのでアプリのテーマに馴染み、ダーク対応。
+
+### 標準の並び（全アプリ共通）
+
+① 今日やること ② 記録 ③ 試験に向けて ④ 道具 ⑤ 体験ラボ（G検定・生成AIのみ）⑥ 設定・その他。推しカードと推しの一言は画面最上部にそのまま置く。
+
+```dart
+ListView(children: [
+  const OshiHomeCard(/* 推しカード・一言は最上部 */),
+  HomeSection(
+    title: '今日やること',
+    leading: const Icon(Icons.today),
+    child: Column(children: [
+      HomeMenuTile(icon: Icons.play_arrow, title: '今日の一問', badge: const HomeMenuBadge.dot(), onTap: openDaily),
+    ]),
+  ),
+  HomeSection(
+    title: '記録',
+    child: HomeMenuGrid(items: [
+      HomeMenuItem(icon: Icons.bar_chart, title: '成績', onTap: openStats),
+      HomeMenuItem(icon: Icons.book, title: '間違いノート', badge: HomeMenuBadge.count(3), onTap: openNotes),
+    ]),
+  ),
+  // 数が多いグループは畳む。開閉の保存はアプリ側（core は永続化しない）
+  HomeSection(
+    title: '体験ラボ',
+    collapsible: true,
+    initiallyExpanded: false,
+    expandedListenable: labExpanded, // 任意。ValueNotifier<bool>
+    onExpandedChanged: (v) => prefs.setBool('lab_expanded', v), // 任意
+    child: HomeMenuGrid(items: labItems),
+  ),
+]);
+```
+
+- `HomeMenuTile`: 1 列、最小高さ 48dp。バッジは `HomeMenuBadge.dot()` / `.count(n)`（99+、0 以下は非表示）/ `.label('NEW')` / `.premium()`
+- `HomeMenuGrid`: 2 列。幅 360 未満・文字倍率 1.3 超で 1 列に自動フォールバック（`minWidthForTwoColumns` / `maxTextScaleForTwoColumns` で調整可）
+- `HomeSection`: `collapsible: false`（既定）なら常に表示。折りたたみは「動きを減らす」設定でアニメーションなし
+- 実機での見た目の確認と各アプリへの適用は別途
