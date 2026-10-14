@@ -13,7 +13,8 @@ core の Question モデル（lib/question/question.dart）に合わせてある
 
 判定の目安（しきい値は暫定。docs/question_quality_viewpoints.md 参照）:
   期待値より --margin ポイント超、または片側 p < --alpha なら「要確認」。
-終了コードは常に 0（CI を止めない。人間が読んで判断する用途）。
+終了コードは既定で常に 0（CI を止めない。人間が読んで判断する用途）。
+--strict を付けたときだけ、警告があれば 1。--annotate で GitHub Actions の ::warning:: も出す。
 """
 import argparse
 import json
@@ -146,6 +147,10 @@ def report(title, qs, a):
     small = len(qs) < a.min_n
     if flag:
         print("- 判定: 要確認" + ("（問題数が少なく参考値）" if small else "（是正対象の候補）"))
+        if not small and a.annotate:
+            print(f"::warning title=選択肢の長さ::{title} 最長が正解 {pct(longest['excl_rate']).strip()}"
+                  f"（期待 {pct(longest['excl_exp']).strip()}、p={longest['p']:.4f}）。"
+                  "docs/question_quality_viewpoints.md を参照")
     else:
         print("- 判定: 目安の範囲内")
     return flag and not small
@@ -162,6 +167,8 @@ def main(argv=None):
     ap.add_argument("--margin", type=float, default=10.0, help="期待値からの乖離のしきい値(pt)。暫定")
     ap.add_argument("--alpha", type=float, default=0.01, help="片側二項検定のしきい値。暫定")
     ap.add_argument("--min-n", type=int, default=20, help="これ未満の群は参考値扱い")
+    ap.add_argument("--annotate", action="store_true", help="GitHub Actions の ::warning:: を出す")
+    ap.add_argument("--strict", action="store_true", help="警告があれば終了コード 1")
     a = ap.parse_args(argv)
 
     qs, skipped = load(a.files, a)
@@ -170,14 +177,14 @@ def main(argv=None):
         return 0
     if skipped:
         print("除外: " + ", ".join(f"{k} {v}" for k, v in skipped.items()))
-    report("全体", qs, a)
+    warned = report("全体", qs, a)
     by = defaultdict(list)
     for q in qs:
         by[q["cat"]].append(q)
     if len(by) > 1:
         for cat in sorted(by):
-            report(f"{a.category_key}={cat}", by[cat], a)
-    return 0
+            warned = report(f"{a.category_key}={cat}", by[cat], a) or warned
+    return 1 if (a.strict and warned) else 0
 
 
 if __name__ == "__main__":
