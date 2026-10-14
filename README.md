@@ -24,6 +24,9 @@ lib/
   engine/     scoreMockExam（採点・合否）, Srs（間隔反復）, PracticeSession（演習）
 bin/
   validate_content.dart   問題データ検証 CLI
+tools/
+  icon_gen/                アイコン生成
+  question_quality/        問題の質の集計スクリプト（選択肢の長さの手がかり）
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
 ```
 
@@ -81,6 +84,8 @@ dart run ukalab_core:validate_content exam.json questions.jsonl
 ```
 
 検査する項目: 出典の説明が必須／`licensed` は `license` 必須／`statute` は `lawVersion` 必須／qid の重複／選択肢の個数／同じ文面の選択肢（正解の一意性）／`answerIndex` の範囲／解説・`contentVer` の有無／試験定義との整合（examId・subjectId・levelId）。問題が1件でもあれば終了コード 1。
+
+形式の検査では見えない問題の質の観点（選択肢の長さの手がかり＝最長の選択肢が正解になりがち、など）は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md) にまとめている。
 
 ### 用語データを検証する（配信前・CI、決定50）
 
