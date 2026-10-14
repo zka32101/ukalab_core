@@ -4,7 +4,28 @@
 
 ## [Unreleased]
 
-- tools/docs/CI のみ（Dart の公開 API・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
+- tools/docs/CI のみ（Dart の公開 API ・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
+
+## [0.71.1] - 2026-10-14
+
+文字を大きくした・幅の狭い端末（320dp・280dp、文字 200〜300%）で、文字が切れる・はみ出す箇所を直す。公開 API（コンストラクタ・シグネチャ）の変更なし。
+
+### Fixed
+- `HomeSectionHeader` / `HomeSection`: 右側の `trailing` を幅の半分までにして折り返す（題名を押しつぶさない・はみ出さない）
+- `HomeMenuTile` / `HomeMenuGrid`: `HomeMenuBadge.label` の長い文言が行を押し出していたのを、バッジ幅に上限（80dp）を付けて折り返すように
+- `WeakSummaryCard`: 回数・推移の文言（右側）が長いときに章名を押しつぶして溢れていたのを、幅に上限を付けて折り返すように
+- `MistakeNoteView`: 見出し・説明・お祝い・絞り込みの部分を高さの半分までにして超えた分はスクロール（文字が大きいと一覧の場所が無くなり溢れていた）
+- `showOshiMedalDialog` / `showOshiGiftDialog`: `AlertDialog(scrollable: true)` にして、題名・ボタンまで含めてスクロールできるように
+- `OshiMedalShareCard` / `PassShareCard`: 共有する「画像」なので文字倍率を固定（端末の文字サイズで 4:5 の枠からはみ出す・極端に縮むのを防ぐ。標準倍率の見た目は変わらない）
+- `GlossaryListView`: 用語の「ひとこと」を 1 行 → 2 行まで表示。分野チップの行の高さを文字倍率に合わせ、チップが上下に切れないように
+- `MlLabWidget` / `NnBuilderWidget`: クラス凡例を `Row` → `Wrap`（大きい文字で溢れていた）。`LegendMark` のラベルは `Flexible`
+- `HyperParamSlider` / `ConfusionMatrixLabWidget` / `PredictRunWidget`: 数値表示の固定幅を文字倍率に合わせて広げる（桁が縦に折れていた）
+
+### Tests
+- `test/ui/text_overflow_test.dart` を追加（幅 320/280 × 文字倍率 1/2/3、長い文言で、共通 UI 部品の描画エラーを検査）
+
+### 移行
+- 不要（自動で反映）。`app_common_kit` のピンは v3.10.0 のまま（kit 側の同種の修正は kit v3.10.1）。
 
 ## [0.71.0] - 2026-10-14
 
@@ -29,13 +50,13 @@ app_common_kit を v3.5.0 → v3.9.0 に追従する。core のコード変更�
 
 ## [0.69.0] - 2026-10-13
 
-推しの成長演出を追加（追加のみ。既存 API は変更しない）。アプリが渡す累計の学習量（回答数・学習日数）に応じて推しの反応が段階的に変わり、節目に到達したら一度だけ祝う。煽らない・休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
+推しの成長演出を追加（追加のみ。既存 API は変更しない）。アプリが渡す累計の学習量（回答数・学習日数）に応じて推しの反応が段階的に変わり、節目に到達したら一度だけ祝う。あおらない・休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
 
 ### Added
 - 純 Dart（`ukalab_core.dart`）
   - `OshiGrowthEngine`: `stageOf(progress)`（5 段階 `OshiGrowthStage`: newcomer / budding / growing / blooming / radiant。回答 10/100/300/1000 問・学習 7/30/100 日で上がる。進んでいる方で決まる）、`reaction(progress, seed:, salt:)`（表情の絵文字・ラベル・一言）、`newlyReached(progress, alreadyCelebrated:)`、`reached`、`headlineOf`、`celebrate(milestone)`
   - `OshiGrowthProgress`（`totalAnswered` / `studyDays`。負値は 0）、`OshiGrowthMilestone`（`answered(10/50/100/300/1000)` / `days(7/30/100)`。ID は `answered_10` / `days_7`。`milestones:` で差し替え可）
-  - `OshiGrowthStrings`（ja・en、`copyWith`、`allTexts`。`UkalabStrings` は変えない）。責める・煽る語は禁止語リストでテスト
+  - `OshiGrowthStrings`（ja・en、`copyWith`、`allTexts`。`UkalabStrings` は変えない）。責める・あおる語は禁止語リストでテスト
 - UI（`ui.dart`、`lib/ui/oshi_growth/`）
   - `OshiGrowthBubble`: `OshiMessageBubble` と同じ見た目の吹き出し。表情＋ラベル＋一言、タップで別の一言
   - `OshiGrowthCelebrationCard` / `showOshiGrowthDialog`: 節目の祝福（閉じるボタンだけ）。「動きを減らす」対応
@@ -55,10 +76,10 @@ app_common_kit を v3.5.0 → v3.9.0 に追従する。core のコード変更�
 - `lib/progress/review_scheduler_strings.dart`: `ReviewSchedulerStrings`（ja・en。`copyWith` 可。禁止語リストでテスト）
 - `lib/ui/review_scheduler/`（`ui.dart` から export）
   - `TodayReviewCard`: ホーム用カード。件数と「やってみる」（`onStart` コールバック注入）。0 件は静かな「おやすみ」表示。警告色・赤字は使わない。幅 320・文字 2 倍で確認
-  - `ReviewSchedulerStore` / `InMemoryReviewSchedulerStore` / `SharedPreferencesReviewSchedulerStore`（キー `ukalab_<アプリID>_review_schedule`）/ `reviewSchedulerDataPart`（バックアップ内のキー `reviewSchedule`）
+  - `ReviewSchedulerStore` / `InMemoryReviewSchedulerStore` / `SharedPreferencesReviewSchedulerStore`（キー `ukalab_<アプリ ID>_review_schedule`）/ `reviewSchedulerDataPart`（バックアップ内のキー `reviewSchedule`）
 
 ### Notes
-- 既存の `Srs`（`lib/engine/srs.dart`。箱0=すぐ再出題の Leitner 方式、全問題の履歴向け）・`review_priority.dart`・`MistakeNoteEngine` は変更しない。重複を避けるため、新エンジンは `MistakeNoteEntry` を入力にして「間違いノートの復習日程」だけを持つ。連携方法は docs/review_scheduler.md
+- 既存の `Srs`（`lib/engine/srs.dart`。ㄆ0=すぐ再出題の Leitner 方式、全問題の履歴向け）・`review_priority.dart`・`MistakeNoteEngine` は変更しない。重複を避けるため、新エンジンは `MistakeNoteEntry` を入力にして「間違いノートの復習日程」だけを持つ。連携方法は docs/review_scheduler.md
 
 ### Tests
 - `test/review_scheduler_test.dart`（エンジン・JSON・ストア・DataPart・文言）、`test/ui/today_review_card_test.dart`（表示・0 件・色・幅 320 かつ文字 2 倍・Semantics）
@@ -126,7 +147,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 推しの小物（アクセサリー）画像と API を追加（#79）。追加のみ。
 
 ### Added
-- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ3種・計12枚）
+- 小物 `UkalabAccessory`（helmet/hachimaki/calculator/notebookPc/goggles/drone）と `UkalabAccessories`（`image(id, a)`・`availableFor`・`shopItems(id)` で `ShopCategory.accessory` の品目・`fromShopId`）。画像は `assets/mascot/<id>/items/`（各キャラ 3 種・計 12 枚）
 - `UkalabOshiRoom(accessory:)`（任意）: 衣装なしのとき小物を持った推しの絵で表示。未指定なら従来どおり
 
 ## [0.61.0] - 2026-10-13
@@ -135,7 +156,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 
 ### Added
 - `MistakeNoteEngine`（純 Dart、`ukalab_core.dart`）: 既存の `ProgressRecord`（原因 `WrongCause`・`topicId` を再利用）から `MistakeNoteEntry{qid, firstMissedAt, lastMissedAt, missCount, overcome, lastCause?, topicId?}` を作る。克服は「間違えたあと連続 N 回正解」（`overcomeStreak`、既定 2。暫定）。同じ入力なら同じ結果で、同じ履歴を再度取り込んでも変わらない（`update`）。`newlyOvercome` で新しい克服を取り出せる
-- `MistakeNoteStore` / `InMemoryMistakeNoteStore` / `SharedPreferencesMistakeNoteStore`（`ui.dart`。キー `ukalab_<アプリID>_mistake_notes`）: 問題ID・日時・原因コード・分野ID・回数のみ保存。壊れた保存値は空として読む
+- `MistakeNoteStore` / `InMemoryMistakeNoteStore` / `SharedPreferencesMistakeNoteStore`（`ui.dart`。キー `ukalab_<アプリ ID>_mistake_notes`）: 問題ID・日時・原因コード・分野ID・回数のみ保存。壊れた保存値は空として読む
 - `mistakeNoteDataPart`: バックアップ・リセット（`DataPart`、キー `mistakeNotes`）への登録用
 - `MistakeNoteView`（`ui.dart`）: 「これから」「克服」のフィルタ、直近の間違い順、`questionBuilder`（問題文はアプリ側）、`onRetry`（解き直す）、`celebrateQids` で克服を祝う表示。Semantics 付き、「動きを減らす」設定では動きなし。premium の出し分けはアプリ側で包む（core は制限しない）
 - `MistakeNoteStrings`（ja・en。`copyWith` で上書き可）。禁止語（責める語・件数で圧をかける語）をテストで機械検証
@@ -191,7 +212,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 - `ExamDayChecklistView`: 当日チェックリスト。`items` を渡さなければ一般項目（すべて「公式で要確認」）。チェック状態は `initialProgress` / `onChanged` でアプリが保存する
 - `defaultExamDayChecklist` / `defaultChecklistIds`: 一般のチェック項目（会場/オンラインで切り替え）
 - `UpdateLogView`、`HistoryExportView`（CSV 表示とコピー）、`ExamPrepSettingsTiles`（設定タブの入口）
-- `ExamPrepStrings`: 上記の文言（ja・en は推敲済み、zh/zh-Hant/ko は機械翻訳の下書き）。責める表現・他人との比較は使わない（全言語をテストで検査）
+- `ExamPrepStrings`: 上記の文言（ja・en は推敦済み、zh/zh-Hant/ko は機械翻訳の下書き）。責める表現・他人との比較は使わない（全言語をテストで検査）
 - `historyCsvText`（純 Dart、`ukalab_core.dart`）: 日別と分野別の CSV を続けて返す。**アプリ側に同名の関数があると、両方を import するファイルで曖昧になる。移行時にアプリ側を消す**
 
 ## [0.56.0] - 2026-10-13
@@ -202,7 +223,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 - `OshiMedal`（id・label・tier・kind・任意の `ImageProvider? image`）、`OshiMedalKind`、`OshiMedalCorner`、`OshiMedalView`
 - `OshiMedalShareCard`: 4:5 の共有カード。`MascotWidget(animate: false, joy)` の隅（既定は右下）にメダルを重ねる。画像が無ければコード描画（リボン+円+アイコン）。個人情報の欄なし（日付・うかラボ・「自己記録・非公式」のみ）
 - `showOshiMedalDialog(context, medal:, onShare:, onSave:)`: `captureShareCard`（pixelRatio 3）で PNG 化して渡す。null のボタンは出さない。画像化の前に precache。ネイティブプラグインは追加しない
-- 文言 5 言語（ja/en は推敲済み、zh/zh-Hant/ko は機械翻訳の下書き）
+- 文言 5 言語（ja/en は推敦済み、zh/zh-Hant/ko は機械翻訳の下書き）
 
 ## [0.55.1] - 2026-10-13
 
@@ -210,7 +231,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 
 ### Added
 - `SubtopicScope`（`topic` / `subject`）と `validateAnswerFeedbackTags(subtopicScope:)`
-- `validate_content --subtopic-scope=topic|subject`: `subject` にすると、同じ細目IDが複数の `subjectId` に付くときだけ衝突とする（`topicId` が概念単位の試験向け）
+- `validate_content --subtopic-scope=topic|subject`: `subject` にすると、同じ細目ドが複数の `subjectId` に付くときだけ衝突とする（`topicId` が概念単位の試験向け）
 
 ## [0.55.0] - 2026-10-13
 
@@ -369,7 +390,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 バックアップの読み込みで、共通化前の旧形式を読めるようにする。追加のみ。
 
 ### Changed
-- `restoreLearningDataBackup` / `DataManagementSection` の読み込み: `parts` を持たない旧形式（`version` と並んで項目がトップレベルに並ぶ形）も、項目を部品のidとして読む。共通化前に書き出したバックアップを、そのまま読み込める
+- `restoreLearningDataBackup` / `DataManagementSection` の読み込み: `parts` を持たない旧形式（`version` と並んで項目がトップレベルに並ぶ形）も、項目を部品の id として読む。共通化前に書き出したバックアップを、そのまま読み込める
 
 ## [0.35.0] - 2026-10-10
 
@@ -618,10 +639,10 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 
 ## [0.10.0] - 2026-10-04
 
-簿記3級の精算表・財務諸表の穴埋め向け。追加のみで、既存 API に破壊的変更はない。
+簿記3級の精算表・財務諦表の穴埋め向け。追加のみで、既存 API に破壊的変更はない。
 
 ### Added
-- `QuestionType.worksheet`: 表埋め問題タイプ（精算表・財務諸表などのセル単位の金額入力）。
+- `QuestionType.worksheet`: 表埋め問題タイプ（精算表・財務諦表などのセル単位の金額入力）。
   `WorksheetColumn`（残高試算表・修正記入・損益計算書・貸借対照表の借方/貸方、計8列）・
   `WorksheetCell`（勘定科目・列・金額）・`WorksheetAnswer`（`givenCells`＝問題文で与える値、
   `blankCells`＝採点対象の正解セル）
@@ -636,7 +657,7 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
   （`WorksheetJudgeResult.isCorrect`）。type不一致・セッション終了後は `StateError`
 
 ### Notes
-- 財務諸表（貸借対照表・損益計算書）は精算表と列構成・科目の表示名が異なる場合がある
+- 財務諦表（貸借対照表・損益計算書）は精算表と列構成・科目の表示名が異なる場合がある
   （例: 「売上」→ 損益計算書では「売上高」）。今回は `WorksheetColumn` を共用する設計とし、
   差異が問題になった場合は専用の列挙値を別途検討する
 
@@ -673,7 +694,7 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 ### Added
 - `QuestionType.journal`: 仕訳問題タイプ。`JournalSide`（debit/credit）・`JournalLine`（side・account・amount）・`JournalAnswer`（複合仕訳＝行の配列）
 - `judgeJournal`: 仕訳の正解とユーザー入力を比較し、行ごとに `correct` / `wrongAccount`（科目違い）/ `wrongAmount`（金額違い）/ `sideSwapped`（貸借逆）/ `missing`（不足）/ `extra`（余分）を判定。入力中の貸借合計一致（`balanced`）も返す
-- `validateQuestions`: journal型の検証を追加（行が空でない、金額1以上、勘定科目が空でない、借方合計＝貸方合計）。choice型の検証（選択肢数・正解の一意性など）は従来どおり type が choice の問題にのみ適用
+- `validateQuestions`: journal型の検証を追加（行が空でない、金額1以上、勘定科目が空でない、借方合計＝貸方合計）。choice型の検証（選択肢数・正解の一意性など）は従来どおり type が choice の問題にのみ適用される
 - `scoreMockExam`: journal型の問題を採点できるよう `answers` の値の型を `int?` から `Object?` に広げた（choice型は `int`、journal型は `List<JournalLine>` を渡す）。既存の `Map<String, int?>` の呼び出しはそのまま動く
 
 ### Notes
@@ -695,6 +716,6 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 - `validateQuestions` / `parseQuestionsJsonl`: 配信前の品質ゲート（出典必須、ID重複、選択肢数、正解の一意性、statute→lawVersion、licensed→license、試験定義との整合）
 - `scoreMockExam`: 模擬試験の採点と合否判定（総合の合格ライン、科目別の足切り、「あと◯点」、足切りで不合格の判別）
 - `Srs`: 間隔反復（Leitner 6段階）
-- `PracticeSession`: 演習1回分（seed による再現可能な出題順、優先問題、解答記録）
+- `PracticeSession`: 演習 1 回分（seed による再現可能な出題順、優先問題、解答記録）
 - `bin/validate_content`: 問題データ検証 CLI（問題があれば終了コード 1）
 - GitHub Actions CI（analyze・test・サンプルデータ検証）
