@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+## [0.70.0] - 2026-10-14
+
+app_common_kit を v3.5.0 → v3.9.0 に追従する。core のコード変更はない。
+アプリがキットの新しい部品を使うには、core も同じ kit のタグに揃える必要がある（pub は kit のタグが食い違うと解決できない）。
+
+### Changed
+- `app_common_kit` のピンを v3.5.0 → v3.9.0 に。kit 側は追加のみ（v3.6.0 更新内容の表示 `WhatsNew`、v3.7.0 機能フラグ `FeatureFlags`、v3.8.0 アプリ内の文字サイズ `AppTextScale`、v3.9.0 バックアップ/復元 `BackupService`）。core は kit を `export` していないので、アプリが `package:app_common_kit/app_common_kit.dart` から import する
+
+### 移行
+- アプリは `ukalab_core` を `v0.70.0`、`app_common_kit` を `v3.9.0` に上げる
+
 ## [0.69.0] - 2026-10-13
 
 推しの成長演出を追加（追加のみ。既存 API は変更しない）。アプリが渡す累計の学習量（回答数・学習日数）に応じて推しの反応が段階的に変わり、節目に到達したら一度だけ祝う。煽らない・休んでも責めない（学習日数は連続ではなく合計。累計は減らないので段階も下がらない）。
