@@ -6,6 +6,16 @@
 
 - tools/docs/CI のみ（Dart の公開 API・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
 
+## [0.71.2] - 2026-10-14
+
+app_common_kit を v3.10.0 → v3.10.1 に追従する。core のコード変更はない。
+
+### Changed
+- `app_common_kit` のピンを v3.10.0 → v3.10.1 に。kit 側は文字を大きくした・幅の狭い端末での文字切れ・はみ出しの修正のみ（ダイアログのスクロール化、購入欄・ながらセッション・`HandsFreeQuestionLayout` の折り返しとスクロール。公開 API の変更なし）
+
+### 移行
+- アプリは `ukalab_core` を `v0.71.2`、`app_common_kit` を `v3.10.1` に上げる
+
 ## [0.71.1] - 2026-10-14
 
 文字を大きくした・幅の狭い端末（320dp・280dp、文字 200〜300%）で、文字が切れる・はみ出す箇所を直す。公開 API（コンストラクタ・シグネチャ）の変更なし。
