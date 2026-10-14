@@ -75,6 +75,16 @@ import 'package:ukalab_core/ui.dart';              // うかラボ専用のUI
 final exam = ExamConfig.fromJson(jsonDecode(text) as Map<String, dynamic>);
 ```
 
+### 問題を作る・追加する（新規アプリの立ち上げを含む）
+
+選択式の問題は、**正解だけ詳しく書かない**。誤答にも正解と同程度の具体性・長さを持たせる（そうしないと「最も長い選択肢」を選ぶだけで当たる問題になる）。
+
+- 作成・追加の直後に `python3 tools/question_quality/choice_length_bias.py questions.jsonl` で自己点検する。
+- 新規アプリでは、**問題の初回バッチを作った時点で必ず集計**する。本数が増えてから直すと全問の書換えになる（危険物乙4は約1,200問の書換えが必要になった）。
+- 判定の目安（暫定）: 最長が正解の割合が期待値より 10 ポイント超、または p < 0.01 なら見直す。
+
+詳細・是正方針・しきい値は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md) を参照。
+
 ### 問題データを検証する（配信前・CI）
 
 問題は JSON Lines（1行1問）。[example/sample_questions.jsonl](example/sample_questions.jsonl) を参照。
