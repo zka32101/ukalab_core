@@ -390,7 +390,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 バックアップの読み込みで、共通化前の旧形式を読めるようにする。追加のみ。
 
 ### Changed
-- `restoreLearningDataBackup` / `DataManagementSection` の読み込み: `parts` を持たない旧形式（`version` と並んで項目がトップレベルに並ぶ形）も、項目を部品の id として読む。共通化前に書き出したバックアップを、そのまま読み込める
+- `restoreLearningDataBackup` / `DataManagementSection` の読み込み: `parts` を持たない旧形式（`version` と並んで項目がトップレベルに並ぶ形）も、項目を部品のidとして読む。共通化前に書き出したバックアップを、そのまま読み込める
 
 ## [0.35.0] - 2026-10-10
 
@@ -694,7 +694,7 @@ Phase 2.5として先送り）は `ukalab-boki3` の `docs/question_types_v1_des
 ### Added
 - `QuestionType.journal`: 仕訳問題タイプ。`JournalSide`（debit/credit）・`JournalLine`（side・account・amount）・`JournalAnswer`（複合仕訳＝行の配列）
 - `judgeJournal`: 仕訳の正解とユーザー入力を比較し、行ごとに `correct` / `wrongAccount`（科目違い）/ `wrongAmount`（金額違い）/ `sideSwapped`（貸借逆）/ `missing`（不足）/ `extra`（余分）を判定。入力中の貸借合計一致（`balanced`）も返す
-- `validateQuestions`: journal型の検証を追加（行が空でない、金額1以上、勘定科目が空でない、借方合計＝貸方合計）。choice型の検証（選択肢数・正解の一意性など）は従来どおり type が choice の問題にのみ適用される
+- `validateQuestions`: journal型の検証を追加（行が空でない、金額1以上、勘定科目が空でない、借方合計＝貸方合計）。choice型の検証（選択肢数・正解の一意性など）は従来どおり type が choice の問題にのみ適用
 - `scoreMockExam`: journal型の問題を採点できるよう `answers` の値の型を `int?` から `Object?` に広げた（choice型は `int`、journal型は `List<JournalLine>` を渡す）。既存の `Map<String, int?>` の呼び出しはそのまま動く
 
 ### Notes
