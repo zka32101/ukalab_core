@@ -6,6 +6,27 @@
 
 - tools/docs/CI のみ（Dart の公開 API・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
 
+## [0.71.1] - 2026-10-14
+
+文字を大きくした・幅の狭い端末（320dp・280dp、文字 200〜300%）で、文字が切れる・はみ出す箇所を直す。公開 API（コンストラクタ・シグネチャ）の変更なし。
+
+### Fixed
+- `HomeSectionHeader` / `HomeSection`: 右側の `trailing` を幅の半分までにして折り返す（題名を押しつぶさない・はみ出さない）
+- `HomeMenuTile` / `HomeMenuGrid`: `HomeMenuBadge.label` の長い文言が行を押し出していたのを、バッジ幅に上限（80dp）を付けて折り返すように
+- `WeakSummaryCard`: 回数・推移の文言（右側）が長いときに章名を押しつぶして溢れていたのを、幅に上限を付けて折り返すように
+- `MistakeNoteView`: 見出し・説明・お祝い・絞り込みの部分を高さの半分までにして超えた分はスクロール（文字が大きいと一覧の場所が無くなり溢れていた）
+- `showOshiMedalDialog` / `showOshiGiftDialog`: `AlertDialog(scrollable: true)` にして、題名・ボタンまで含めてスクロールできるように
+- `OshiMedalShareCard` / `PassShareCard`: 共有する「画像」なので文字倍率を固定（端末の文字サイズで 4:5 の枠からはみ出す・極端に縮むのを防ぐ。標準倍率の見た目は変わらない）
+- `GlossaryListView`: 用語の「ひとこと」を 1 行 → 2 行まで表示。分野チップの行の高さを文字倍率に合わせ、チップが上下に切れないように
+- `MlLabWidget` / `NnBuilderWidget`: クラス凡例を `Row` → `Wrap`（大きい文字で溢れていた）。`LegendMark` のラベルは `Flexible`
+- `HyperParamSlider` / `ConfusionMatrixLabWidget` / `PredictRunWidget`: 数値表示の固定幅を文字倍率に合わせて広げる（桁が縦に折れていた）
+
+### Tests
+- `test/ui/text_overflow_test.dart` を追加（幅 320/280 × 文字倍率 1/2/3、長い文言で、共通 UI 部品の描画エラーを検査）
+
+### 移行
+- 不要（自動で反映）。`app_common_kit` のピンは v3.10.0 のまま（kit 側の同種の修正は kit v3.10.1）。
+
 ## [0.71.0] - 2026-10-14
 
 app_common_kit を v3.9.0 → v3.10.0 に追従する。core のコード変更はない。

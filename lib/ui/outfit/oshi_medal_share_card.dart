@@ -174,7 +174,10 @@ class OshiMedalShareCard extends StatelessWidget {
     final s = strings ?? UkalabStrings.of(context);
     final left = corner == OshiMedalCorner.topLeft || corner == OshiMedalCorner.bottomLeft;
     final top = corner == OshiMedalCorner.topLeft || corner == OshiMedalCorner.topRight;
-    return AspectRatio(
+    // 共有する「画像」なので、端末の文字サイズ設定で崩れないよう文字倍率は固定する
+    //（拡大すると 4:5 の枠からはみ出す。画面側の説明文は拡大のまま）。
+    return MediaQuery.withNoTextScaling(
+      child: AspectRatio(
       aspectRatio: 4 / 5,
       child: Container(
         decoration: BoxDecoration(
@@ -230,6 +233,7 @@ class OshiMedalShareCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -331,9 +335,10 @@ class _OshiMedalDialogState extends State<_OshiMedalDialog> {
     final theme = Theme.of(context);
     final s = widget.strings;
     return AlertDialog(
+      // 文字を大きくした小さい画面でも、題名・ボタンまで含めてスクロールできるようにする
+      scrollable: true,
       title: Text(s.medalTitle),
-      content: SingleChildScrollView(
-        child: Column(
+      content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RepaintBoundary(
@@ -351,7 +356,6 @@ class _OshiMedalDialogState extends State<_OshiMedalDialog> {
             const SizedBox(height: 12),
             Text(s.medalNote, style: theme.textTheme.bodySmall),
           ],
-        ),
       ),
       actions: [
         if (widget.onSave != null)

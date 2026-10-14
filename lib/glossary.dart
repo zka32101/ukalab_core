@@ -215,7 +215,8 @@ class _GlossaryListViewState extends State<GlossaryListView> {
         ),
         if (widget.subjects.isNotEmpty)
           SizedBox(
-            height: 48,
+            // 文字を大きくしてもチップが上下に切れないよう、高さも文字倍率に合わせる
+            height: MediaQuery.textScalerOf(context).scale(48),
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -266,7 +267,8 @@ class _GlossaryListViewState extends State<GlossaryListView> {
                       title: Text(t.term),
                       subtitle: Text(
                         t.headline,
-                        maxLines: 1,
+                        // 1 行だと文字が大きいときに数文字しか読めないので、2 行まで見せる
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall,
                       ),

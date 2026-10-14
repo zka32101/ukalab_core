@@ -73,9 +73,19 @@ class _MistakeNoteViewState extends State<MistakeNoteView> {
       });
     final celebrating = widget.celebrateQids.isNotEmpty;
 
-    return Column(
+    return LayoutBuilder(builder: (context, constraints) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // 見出し部分は、文字が大きく画面が低いときでも一覧の場所を残すため、高さの半分までにして
+        // 超えた分はスクロールさせる（切れない）。通常は中身の高さのまま。
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: constraints.hasBoundedHeight ? constraints.maxHeight * 0.5 : double.infinity,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
           child: Semantics(
@@ -109,6 +119,10 @@ class _MistakeNoteViewState extends State<MistakeNoteView> {
             ],
           ),
         ),
+              ],
+            ),
+          ),
+        ),
         Expanded(
           child: shown.isEmpty
               ? _Empty(
@@ -130,7 +144,7 @@ class _MistakeNoteViewState extends State<MistakeNoteView> {
                 ),
         ),
       ],
-    );
+    ));
   }
 }
 

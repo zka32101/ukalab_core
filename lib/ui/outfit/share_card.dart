@@ -53,7 +53,9 @@ class PassShareCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final s = strings ?? UkalabStrings.of(context);
-    return AspectRatio(
+    // 共有する「画像」なので、端末の文字サイズ設定に左右されないよう文字倍率は固定する。
+    return MediaQuery.withNoTextScaling(
+      child: AspectRatio(
       aspectRatio: 4 / 5,
       child: Container(
         decoration: BoxDecoration(
@@ -91,6 +93,7 @@ class PassShareCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

@@ -24,10 +24,10 @@ Future<void> showOshiGiftDialog(
   return showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
+      // 文字を大きくした小さい画面でも、題名・ボタンまで含めてスクロールできるようにする
+      scrollable: true,
       title: Text(s.titleOf(gift.kind)),
-      content: SingleChildScrollView(
-        child: OshiGiftCard(gift: gift, pack: pack, stage: stage, outfit: outfit, strings: s),
-      ),
+      content: OshiGiftCard(gift: gift, pack: pack, stage: stage, outfit: outfit, strings: s),
       actions: [
         FilledButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(s.close)),
       ],

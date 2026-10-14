@@ -31,7 +31,7 @@ class HomeSectionHeader extends StatelessWidget {
     final cs = theme.colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Row(
+      child: LayoutBuilder(builder: (context, constraints) => Row(
         children: [
           if (leading != null) ...[
             ExcludeSemantics(child: leading!),
@@ -61,9 +61,14 @@ class HomeSectionHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (trailing != null) trailing!,
+          // 長い・大きい文字でも題名を押しつぶさないよう、右側は幅の半分まで（超えたら折り返す）
+          if (trailing != null)
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5),
+              child: trailing!,
+            ),
         ],
-      ),
+      )),
     );
   }
 }
@@ -98,6 +103,9 @@ class _BadgeView extends StatelessWidget {
   const _BadgeView(this.badge);
   final HomeMenuBadge badge;
 
+  /// ラベルの幅の上限（超えたら折り返す）。
+  static const double _maxWidth = 80;
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -121,16 +129,21 @@ class _BadgeView extends StatelessWidget {
       case _BadgeKind.count:
       case _BadgeKind.label:
         final isLabel = badge.kind == _BadgeKind.label;
-        return Container(
-          key: ValueKey(isLabel ? 'home-badge-label' : 'home-badge-count'),
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: isLabel ? cs.tertiary : cs.error,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            badge.text!,
-            style: isLabel ? style?.copyWith(color: cs.onTertiary) : style,
+        // 長いラベルでも行を押し出さないよう幅に上限を付け、超えたら折り返す（隠さない）
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _maxWidth),
+          child: Container(
+            key: ValueKey(isLabel ? 'home-badge-label' : 'home-badge-count'),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: isLabel ? cs.tertiary : cs.error,
+              borderRadius: BorderRadius.circular(isLabel ? 12 : 999),
+            ),
+            child: Text(
+              badge.text!,
+              textAlign: TextAlign.center,
+              style: isLabel ? style?.copyWith(color: cs.onTertiary) : style,
+            ),
           ),
         );
     }
@@ -385,7 +398,7 @@ class _HomeSectionState extends State<HomeSection> {
       leading: widget.leading,
       trailing: widget.collapsible
           ? Row(mainAxisSize: MainAxisSize.min, children: [
-              if (widget.trailing != null) widget.trailing!,
+              if (widget.trailing != null) Flexible(child: widget.trailing!),
               Icon(_expanded ? Icons.expand_less : Icons.expand_more,
                   color: cs.onSurfaceVariant),
             ])
