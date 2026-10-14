@@ -51,6 +51,8 @@ export 'ui/ukalab_strings.dart';
 export 'ui/exam_prep/exam_prep_strings.dart';
 export 'ui/exam_prep/exam_prep_views.dart';
 export 'ui/exam_countdown/exam_countdown_views.dart';
+export 'ui/peer_stats/firestore_peer_stats_source.dart';
+export 'ui/peer_stats/peer_stats_card.dart';
 export 'ui/mistake_note/mistake_note_store.dart';
 export 'ui/mistake_note/mistake_note_view.dart';
 export 'ui/review_scheduler/review_scheduler_store.dart';
