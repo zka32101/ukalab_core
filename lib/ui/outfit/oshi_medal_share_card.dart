@@ -11,7 +11,7 @@ import 'share_card.dart';
 /// メダルの種類。
 enum OshiMedalKind { achievement, streak, mockPass }
 
-/// メダルを置く隔。
+/// メダルを置く隅。
 enum OshiMedalCorner { topLeft, topRight, bottomLeft, bottomRight }
 
 /// 推しの画像に置くメダル。[image] が無ければコードで描く（後で画像アセットに差し替える前提）。
@@ -143,7 +143,7 @@ class _MedalPainter extends CustomPainter {
   bool shouldRepaint(_MedalPainter old) => old.color != color;
 }
 
-/// 推しの画像の隔にメダルを置いた共有カード（4:5）。画像化は [captureShareCard]。
+/// 推しの画像の隅にメダルを置いた共有カード（4:5）。画像化は [captureShareCard]。
 /// 個人情報の欄は無い。日付・ブランド・「自己記録・非公式」の注記だけ。
 class OshiMedalShareCard extends StatelessWidget {
   const OshiMedalShareCard({
