@@ -74,7 +74,8 @@ class _PredictRunWidgetState extends State<PredictRunWidget> {
               ),
             ),
             SizedBox(
-              width: 56,
+              // 数値の欄は文字倍率に合わせて広げる（固定幅だと桁が縦に折れる）
+              width: MediaQuery.textScalerOf(context).scale(56),
               child: Text(
                 _format(_prediction),
                 textAlign: TextAlign.end,

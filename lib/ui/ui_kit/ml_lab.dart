@@ -139,10 +139,12 @@ class _MlLabWidgetState extends State<MlLabWidget> {
           ),
         ),
         const SizedBox(height: 8),
-        Row(
+        // 文字が大きいときは 2 行に折り返して全部見せる
+        Wrap(
+          spacing: 16,
+          runSpacing: 4,
           children: [
             LegendMark(color: theme.colorScheme.primary, shape: BoxShape.circle, label: l.class0),
-            const SizedBox(width: 16),
             LegendMark(color: theme.colorScheme.error, shape: BoxShape.rectangle, label: l.class1),
           ],
         ),

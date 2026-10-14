@@ -199,7 +199,8 @@ class _CellSlider extends StatelessWidget {
             onChanged: (v) => onChanged(v.round()),
           ),
         ),
-        SizedBox(width: 32, child: Text('$value', textAlign: TextAlign.end)),
+        // 数値の欄は文字倍率に合わせて広げる（固定幅だと桁が縦に折れる）
+        SizedBox(width: MediaQuery.textScalerOf(context).scale(32), child: Text('$value', textAlign: TextAlign.end)),
       ],
     );
   }
