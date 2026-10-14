@@ -40,7 +40,8 @@ class HyperParamSlider extends StatelessWidget {
             onChanged: onChanged,
           ),
         ),
-        SizedBox(width: 40, child: Text(text, textAlign: TextAlign.end)),
+        // 数値の欄は文字倍率に合わせて広げる（固定幅だと桁が縦に折れる）
+        SizedBox(width: MediaQuery.textScalerOf(context).scale(40), child: Text(text, textAlign: TextAlign.end)),
       ],
     );
   }
@@ -61,7 +62,7 @@ class LegendMark extends StatelessWidget {
       children: [
         Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: shape)),
         const SizedBox(width: 6),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        Flexible(child: Text(label, style: Theme.of(context).textTheme.bodySmall)),
       ],
     );
   }

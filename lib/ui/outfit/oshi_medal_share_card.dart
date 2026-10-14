@@ -11,7 +11,7 @@ import 'share_card.dart';
 /// メダルの種類。
 enum OshiMedalKind { achievement, streak, mockPass }
 
-/// メダルを置く隅。
+/// メダルを置く隔。
 enum OshiMedalCorner { topLeft, topRight, bottomLeft, bottomRight }
 
 /// 推しの画像に置くメダル。[image] が無ければコードで描く（後で画像アセットに差し替える前提）。
@@ -143,7 +143,7 @@ class _MedalPainter extends CustomPainter {
   bool shouldRepaint(_MedalPainter old) => old.color != color;
 }
 
-/// 推しの画像の隅にメダルを置いた共有カード（4:5）。画像化は [captureShareCard]。
+/// 推しの画像の隔にメダルを置いた共有カード（4:5）。画像化は [captureShareCard]。
 /// 個人情報の欄は無い。日付・ブランド・「自己記録・非公式」の注記だけ。
 class OshiMedalShareCard extends StatelessWidget {
   const OshiMedalShareCard({
@@ -174,7 +174,10 @@ class OshiMedalShareCard extends StatelessWidget {
     final s = strings ?? UkalabStrings.of(context);
     final left = corner == OshiMedalCorner.topLeft || corner == OshiMedalCorner.bottomLeft;
     final top = corner == OshiMedalCorner.topLeft || corner == OshiMedalCorner.topRight;
-    return AspectRatio(
+    // 共有する「画像」なので、端末の文字サイズ設定で崩れないよう文字倍率は固定する
+    //（拡大すると 4:5 の枠からはみ出す。画面側の説明文は拡大のまま）。
+    return MediaQuery.withNoTextScaling(
+      child: AspectRatio(
       aspectRatio: 4 / 5,
       child: Container(
         decoration: BoxDecoration(
@@ -230,6 +233,7 @@ class OshiMedalShareCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -331,9 +335,10 @@ class _OshiMedalDialogState extends State<_OshiMedalDialog> {
     final theme = Theme.of(context);
     final s = widget.strings;
     return AlertDialog(
+      // 文字を大きくした小さい画面でも、題名・ボタンまで含めてスクロールできるようにする
+      scrollable: true,
       title: Text(s.medalTitle),
-      content: SingleChildScrollView(
-        child: Column(
+      content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RepaintBoundary(
@@ -351,7 +356,6 @@ class _OshiMedalDialogState extends State<_OshiMedalDialog> {
             const SizedBox(height: 12),
             Text(s.medalNote, style: theme.textTheme.bodySmall),
           ],
-        ),
       ),
       actions: [
         if (widget.onSave != null)
