@@ -1,0 +1,90 @@
+name: Question quality (reusable)
+
+# 各アプリの CI から、コピーなしで呼べる再利用可能ワークフロー。
+# 問題データの「選択肢の長さの偏り」「断定語バランス」を警告として集計する（既定は失敗させない）。
+#
+# 呼び出し側（各アプリの .github/workflows/*.yml）:
+#   jobs:
+#     question-quality:
+#       uses: zka32101/ukalab_core/.github/workflows/question-quality.yml@main
+#       with:
+#         files: 'assets/questions/*.jsonl'
+# 詳細: docs/question_quality_viewpoints.md「CI で警告として実行する」
+
+on:
+  workflow_call:
+    inputs:
+      files:
+        description: '問題ファイル（JSON Lines）。glob 可（** 可）。空白区切りで複数指定'
+        required: true
+        type: string
+      choices_key:
+        description: '選択肢の配列のフィールド名'
+        required: false
+        type: string
+        default: 'choices'
+      answer_key:
+        description: '正解の 0 始まり番号のフィールド名'
+        required: false
+        type: string
+        default: 'answerIndex'
+      category_key:
+        description: 'カテゴリ別内訳に使うフィールド名'
+        required: false
+        type: string
+        default: 'subjectId'
+      extra_args:
+        description: 'run_checks.py に渡す追加引数（例: --words-file words.txt --negation）'
+        required: false
+        type: string
+        default: ''
+      strict:
+        description: 'true にすると警告があるとき失敗させる（初期は false のまま運用）'
+        required: false
+        type: boolean
+        default: false
+      core_ref:
+        description: 'ツールを取得する ukalab_core の ref（タグ・ブランチ・SHA）'
+        required: false
+        type: string
+        default: 'main'
+    secrets:
+      core_token:
+        description: 'ukalab_core が private で、呼び出し側から読めないときの PAT（read 権限）'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  question-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 呼び出し側リポジトリを取得
+        uses: actions/checkout@v4
+      - name: ukalab_core のツールを取得
+        uses: actions/checkout@v4
+        with:
+          repository: zka32101/ukalab_core
+          ref: ${{ inputs.core_ref }}
+          path: .ukalab_core_tools
+          sparse-checkout: tools/question_quality
+          token: ${{ secrets.core_token || github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 問題の質チェック（警告のみ）
+        env:
+          FILES: ${{ inputs.files }}
+          CHOICES_KEY: ${{ inputs.choices_key }}
+          ANSWER_KEY: ${{ inputs.answer_key }}
+          CATEGORY_KEY: ${{ inputs.category_key }}
+          EXTRA_ARGS: ${{ inputs.extra_args }}
+          STRICT: ${{ inputs.strict }}
+        run: |
+          args=()
+          [ "$STRICT" = "true" ] && args+=(--strict)
+          # shellcheck disable=SC2086
+          python3 .ukalab_core_tools/tools/question_quality/run_checks.py $FILES \
+            --choices-key "$CHOICES_KEY" --answer-key "$ANSWER_KEY" --category-key "$CATEGORY_KEY" \
+            "${args[@]}" $EXTRA_ARGS

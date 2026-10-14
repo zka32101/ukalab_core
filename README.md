@@ -26,7 +26,7 @@ bin/
   validate_content.dart   問題データ検証 CLI
 tools/
   icon_gen/                アイコン生成
-  question_quality/        問題の質の集計スクリプト（選択肢の長さの手がかり）
+  question_quality/        問題の質の集計スクリプト（選択肢の長さ・断定語バランス）と run_checks.py（両方を実行）
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
 ```
 
@@ -79,7 +79,8 @@ final exam = ExamConfig.fromJson(jsonDecode(text) as Map<String, dynamic>);
 
 選択式の問題は、**正解だけ詳しく書かない**。誤答にも正解と同程度の具体性・長さを持たせる（そうしないと「最も長い選択肢」を選ぶだけで当たる問題になる）。
 
-- 作成・追加の直後に `python3 tools/question_quality/choice_length_bias.py questions.jsonl` で自己点検する。
+- 作成・追加の直後に `python3 tools/question_quality/run_checks.py questions.jsonl`（長さ `choice_length_bias.py` と断定語 `assertive_word_bias.py` の両方）で自己点検する。断定語は誤答にだけ「必ず」「のみ」を付けると当たってしまう偏りで、含有率の差が 10 ポイント以上かつ p < 0.05 なら見直す。
+- CI では各アプリから再利用可能ワークフロー `zka32101/ukalab_core/.github/workflows/question-quality.yml@main` を呼ぶと、コピーなしで警告として実行できる（初期は失敗させない）。導入手順は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md#ci-で警告として実行する)。
 - 新規アプリでは、**問題の初回バッチを作った時点で必ず集計**する。本数が増えてから直すと全問の書換えになる（危険物乙4は約1,200問の書換えが必要になった）。
 - 判定の目安（暫定）: 最長が正解の割合が期待値より 10 ポイント超、または p < 0.01 なら見直す。
 
@@ -95,7 +96,7 @@ dart run ukalab_core:validate_content exam.json questions.jsonl
 
 検査する項目: 出典の説明が必須／`licensed` は `license` 必須／`statute` は `lawVersion` 必須／qid の重複／選択肢の個数／同じ文面の選択肢（正解の一意性）／`answerIndex` の範囲／解説・`contentVer` の有無／試験定義との整合（examId・subjectId・levelId）。問題が1件でもあれば終了コード 1。
 
-形式の検査では見えない問題の質の観点（選択肢の長さの手がかり＝最長の選択肢が正解になりがち、など）は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md) にまとめている。
+形式の検査では見えない問題の質の観点（選択肢の長さの手がかり＝最長の選択肢が正解になりがち、断定語バランス、など）は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md) にまとめている。
 
 ### 用語データを検証する（配信前・CI、決定50）
 

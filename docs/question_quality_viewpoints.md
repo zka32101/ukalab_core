@@ -5,7 +5,7 @@
 | 観点 | 状態 |
 |---|---|
 | [選択肢の長さの手がかり](#選択肢の長さの手がかり最も長い選択肢が正解になりがち) | 本書 |
-| 選択肢の断定語バランス（「必ず」「のみ」などを含む選択肢が誤答に偏る） | ITパスポート（`zka32101/ukalab_it_passport` PR #15）で是正済み。本書とは別観点（下記「関連」） |
+| [選択肢の断定語バランス](#選択肢の断定語バランス断定語否定の言い切りが誤答に偏る)（「必ず」「のみ」などを含む選択肢が誤答に偏る） | 本書（`assertive_word_bias.py`）。ITパスポート（`zka32101/ukalab_it_passport` PR #15）、乙4 #172〜#178、情セマネ #18/#19、seisei #117 で是正済み |
 
 ## 選択肢の長さの手がかり（最も長い選択肢が正解になりがち）
 
@@ -79,5 +79,86 @@ python3 tools/question_quality/choice_length_bias.py q.jsonl --choices-key optio
 
 ### 関連
 
-- **選択肢の断定語バランス**（ITパスポート PR #15）: 「必ず」「すべて」など断定語を含む選択肢が誤答に偏ると、断定語の有無で正誤が当てられる、という別の手がかりへの対応。本観点（長さ）と同じ「選択肢の書き方の癖で当てられる」系統なので、レビューでは両方を続けて確認する。断定語を外すために誤答を言い足すと長さの偏りが逆転しうるため、是正後は両方を再集計する。
+- 次節の**断定語バランス**: 本観点（長さ）と同じ「選択肢の書き方の癖で当てられる」系統なので、レビューでは両方を続けて確認する。断定語を外すために誤答を言い足すと長さの偏りが逆転しうるため、是正後は両方を再集計する。
 - `validate_content`: 形式の検査。本観点は意味の偏りを見るので重複しない。
+
+## 選択肢の断定語バランス（断定語・否定の言い切りが誤答に偏る）
+
+対象は選択式（`type: choice`）のみ。
+
+### なぜ問題か
+
+誤答だけに「必ず」「のみ」「すべて」などを付ける（または正解だけ「場合がある」と濁す）癖があると、内容を知らなくても断定語の有無で正誤が当てられる。長さの偏りと同じく、模擬試験の点数が実力を表さなくなる。
+
+### 確認方法
+
+断定語を含む選択肢の割合を、**正解の選択肢**と**誤答の選択肢**で比べる。
+
+- 基本語: だけ / のみ / 全て / すべて / 必ず / 常に / 一切 / 全く / まったく / 絶対 / 決して
+- 拡張語（既定で有効、`--no-extended` で外す）: 唯一 / 完全に / 全部 / 例外なく / いつも / 無条件 / 一律 / 常時 / 一度も / 二度と
+- 否定の言い切り（`--negation` で有効）: ではない / できない / しない / ならない / ありえない / 存在しない / 含まれない / 起こらない / 不可能 / 認められない
+- 断定にならない語句は照合前に除く（非常に・必ずしも・絶対値・絶対温度・絶対評価 等。`--exceptions` で追加）。
+- 語リストは `--words-file`（1行1語）で差し替え、`--add-words` / `--exclude-words` で増減できる。アプリ固有の頻出語（例: 法令の「〜に限る」）は各アプリで足す。
+
+判定: 含有率の差が **10 ポイント以上**、かつ両側 Fisher 正確確率検定で **p < 0.05** → 是正対象の候補。カテゴリ別（`subjectId` など）にも同じ基準で出す（20 問未満の群は参考値）。誤答に偏る場合も正解に偏る場合も警告する。選択肢は同じ問題の中で独立ではないため p 値は目安。**しきい値は暫定**で、数値を超えても自動で不合格にせず、人が問題文を見て判断する。
+
+### 是正方針
+
+- 誤答にも正解と同じ割合で断定語が入るよう、または双方から断定語を除くよう書き換える（誤答だけ・正解だけにしない）。
+- 断定語を外すために誤答を言い足すと長さの偏りが逆転しうる。是正後は**長さと断定語の両方を再集計**する。
+- 書換えで正解本文・正解位置・選択肢数が意図せず変わっていないことを前後比較する。
+
+### 新規問題追加時のチェック項目
+
+- [ ] 選択式の問題で、断定語を含む選択肢が誤答（または正解）に偏っていない（`tools/question_quality/assertive_word_bias.py` で確認）
+
+### 集計スクリプト
+
+`tools/question_quality/assertive_word_bias.py`（Python 3 標準ライブラリのみ）。入力・フィールド名のオプションは `choice_length_bias.py` と同じ。
+
+```bash
+python3 tools/question_quality/assertive_word_bias.py questions.jsonl
+python3 tools/question_quality/assertive_word_bias.py q.jsonl --choices-key options --answer-key answer
+python3 tools/question_quality/assertive_word_bias.py q.jsonl --words-file my_words.txt --negation
+```
+
+出力例（架空の偏りサンプル `tools/question_quality/testdata_biased.jsonl`）:
+
+```
+## 全体（選択式 40 問）
+- 断定語を含む選択肢: 正解 0/40 =   0.0% / 誤答 120/120 = 100.0%（誤答 - 正解 = +100.0pt、両側 p = 0.0000）
+- 語別（正解/誤答）: 必ず:0/40 だけ:0/40 すべて:0/40
+- 判定: 要確認 誤答に偏り（断定語がない選択肢が正解になりやすい）（是正対象の候補）
+```
+
+## CI で警告として実行する
+
+2 つのツールは、問題を追加するたびに CI で自動実行できる。**初期は警告のみ（失敗させない）**。しきい値が暫定のためで、運用して様子を見てから `strict` を検討する。
+
+- 両ツールの終了コードは既定で 0。`--strict` を付けたときだけ、警告があれば 1。
+- `--annotate`（GitHub Actions 上では自動）で、要確認の群を `::warning::` 注釈として PR に表示する。結果の全文は Actions の Summary にも出る。
+- ローカルで 2 つ同時に回す入口: `python3 tools/question_quality/run_checks.py 'assets/questions/*.jsonl'`（glob 可、一致なしでも失敗しない）。
+- ツール自体のテスト: `python3 -m unittest discover -s tools/question_quality -v`（ukalab_core の CI で実行）。
+
+### 各アプリへの導入（コピー不要・1 ジョブ）
+
+アプリの `.github/workflows/` に次を追加する（問題データのパスだけ書き換える）。
+
+```yaml
+name: Question quality
+on:
+  pull_request:
+    paths: ['assets/questions/**']   # 問題データの場所
+jobs:
+  question-quality:
+    uses: zka32101/ukalab_core/.github/workflows/question-quality.yml@main
+    with:
+      files: 'assets/questions/*.jsonl'
+      # フィールド名が違うアプリ: choices_key: options / answer_key: answer / category_key: topicId
+      # 語リストを足す: extra_args: '--add-words 限る --negation'
+```
+
+- `files` は空白区切りで複数指定でき、glob（`**` 可）を展開する。
+- `core_ref` でツールの版を固定できる（既定 `main`。タグ・SHA 可）。ツールだけの追加なので、**core の Dart のバージョン（pubspec のタグ）とは無関係**で、アプリ側の依存更新は不要。
+- ukalab_core が private で呼び出し側から読めない場合は、リポジトリ設定（Actions > General > Access）で同一オーナーのリポジトリからの利用を許可する。それでも取得に失敗するときは `secrets: { core_token: ${{ secrets.CORE_READ_TOKEN }} }` で read 権限の PAT を渡す。
+- reusable workflow を使わない場合の 1 行版（ukalab_core を別途取得している CI 向け）: `python3 <core>/tools/question_quality/run_checks.py 'assets/questions/*.jsonl'`
