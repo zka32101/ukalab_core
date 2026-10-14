@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [0.71.0] - 2026-10-14
+
+app_common_kit を v3.9.0 → v3.10.0 に追従する。core のコード変更はない。
+
+### Changed
+- `app_common_kit` のピンを v3.9.0 → v3.10.0 に。kit 側は追加のみ（`SettingsScreen(showTextScale:)`、`loadKitPreferences()`、`WhatsNewGate`）。アプリごとの配線をキットに寄せた
+
+### 移行
+- アプリは `ukalab_core` を `v0.71.0`、`app_common_kit` を `v3.10.0` に上げる
+
 ## [0.70.0] - 2026-10-14
 
 app_common_kit を v3.5.0 → v3.9.0 に追従する。core のコード変更はない。
