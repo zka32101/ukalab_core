@@ -1,6 +1,6 @@
 name: ukalab_core
 description: "うかラボ（成人向け検定アプリ）の共通エンジンとUI。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッションと、推し・衣装・コイン・テーマ・学習ラボのUI。"
-version: 0.71.0
+version: 0.71.1
 publish_to: 'none'
 
 environment:
@@ -8,7 +8,7 @@ environment:
   flutter: ">=1.17.0"
 
 # 依存の向き: アプリ → ukalab_core → app_common_kit。
-# `package:ukalab_core/ukalab_core.dart` は純Dart（検証CLIなど）、`package:ukalab_core/ui.dart` は Flutter の UI。
+# `package:ukalab_core/ukalab_core.dart` は純Dart（検証 CLI など）、`package:ukalab_core/ui.dart` は Flutter の UI。
 dependencies:
   flutter:
     sdk: flutter
