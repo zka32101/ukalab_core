@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.71.3] - 2026-10-14
+
+### Changed
+- 通常衣装の価格を 300 → 200 コインに（`Outfit.regularPrice`）。
+
 - tools/docs/CI のみ（Dart の公開 API・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
 
 ## [0.71.2] - 2026-10-14

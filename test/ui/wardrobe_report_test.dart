@@ -115,8 +115,8 @@ void main() {
       expect(find.text('Outfits & shop'), findsOneWidget);
       expect(find.text('Unlocked when you pass'), findsOneWidget);
       expect(find.text('合格したときに解放されます'), findsNothing);
-      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 300, strings: UkalabStrings.en), 'Buy for 300 coins');
-      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 300), '300コインで購入できます');
+      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 200, strings: UkalabStrings.en), 'Buy for 200 coins');
+      expect(outfitLockedReason(OutfitAvailability.notPurchased, price: 200), '200コインで購入できます');
     });
 
     testWidgets('コインが足りないと買えず、ロック理由が見える', (tester) async {
@@ -133,7 +133,7 @@ void main() {
       final c = await pump(tester, passes: 6);
       await c.read(coinProvider.notifier).load();
       await tester.pump();
-      await tester.tap(find.text('300コイン'));
+      await tester.tap(find.text('200コイン'));
       await tester.pump();
       await tester.tap(find.text('着る'));
       await tester.pump();

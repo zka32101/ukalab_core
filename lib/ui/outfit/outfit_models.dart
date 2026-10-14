@@ -48,7 +48,7 @@ class OutfitCatalog {
   const OutfitCatalog._();
 
   /// 通常衣装の価格（衣装の目安 200〜500 の中央）。
-  static const int regularPrice = 300;
+  static const int regularPrice = 200;
 
   static String idOf(UkalabCert cert, OutfitKind kind) => '${kind.name}.${cert.id}';
 
