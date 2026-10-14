@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [0.72.0] - 2026-10-14
+
+「他にも頑張っている人がいる」ための匿名集計を追加（追加のみ。既存 API は変更しない）。決定事項は `docs/DECISIONS.md`、設計・ルール案・集計方法・プライバシー影響は `docs/peer_stats.md`。送信側・ルール適用・アプリへの組み込みは別 PR。
+
+### Added
+- 純 Dart（`ukalab_core.dart`）: `PeerStatsSnapshot`（匿名の集計値）、`PeerStatsPolicy`（閾値・中央値・連続日数の上位 %）、`PeerStatsView`（閾値を満たす項目だけ）、`PeerStatsSource`（取得の抽象）、`PeerStatsSink` / `PeerContribution` / `PeerStatsSettings`（送信側のインターフェースのみ）、`PeerStatsStrings`（ja・en）
+- `PeerStatsCard`・`FirestorePeerStatsSource`（`ui.dart`）: ホームに置けるカードと、`peer_summaries/{examId}` を読むだけの Firestore 実装。表示する項目が無ければ何も描画しない
+- 表示するのは 案1 今日の学習人数・案2 同じ試験日の仲間（あと何日）・案3 みんなの累計問題数と1人あたり中央値・案5 連続日数の上位 %（上位 50% 以内のときだけ）。**項目ごとの母数が 100 人を超えるまで表示しない**（100 ちょうどは非表示）
+
+### Tests
+- `test/peer_stats_test.dart`（閾値 99/100/101・中央値の偶奇・上位 % の端・JSON・文言）、`test/ui/peer_stats_card_test.dart`、`test/ui/text_overflow_test.dart` に `peerStats`
+
 ## [0.71.3] - 2026-10-14
 
 ### Changed

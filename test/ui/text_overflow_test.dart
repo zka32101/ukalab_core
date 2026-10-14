@@ -181,6 +181,23 @@ void main() {
               ExamCountdownCard(examDate: DateTime(2026, 12, 1), clock: () => DateTime(2026, 10, 14)),
             ]),
           ),
+      'peerStats': () => _errorsFor(
+            t,
+            () => PeerStatsCard(
+              snapshot: PeerStatsSnapshot(
+                asOf: '2026-10-14',
+                activeToday: 123456,
+                participants: 123456,
+                totalQuestions: 987654321,
+                medianQuestions: 12345,
+                streakCounts: const {1: 100000, 365: 23456},
+                examDateCounts: const {'2026-12-01': 123456},
+              ),
+              streakDays: 365,
+              examDate: DateTime(2026, 12, 1),
+              clock: () => DateTime(2026, 10, 14),
+            ),
+          ),
     });
   });
 
