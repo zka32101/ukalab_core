@@ -145,12 +145,18 @@ class WeakSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text('$rank. ', style: theme.textTheme.titleSmall),
-              Expanded(child: Text(label(t.chapterId), style: theme.textTheme.titleSmall)),
-              Text(s.weakAttempts(t.attempts, t.misses), style: theme.textTheme.bodySmall),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                Text('$rank. ', style: theme.textTheme.titleSmall),
+                Expanded(child: Text(label(t.chapterId), style: theme.textTheme.titleSmall)),
+                // 回数の文言が長い・大きいときも章名を押しつぶさず、折り返して全部見せる
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.45),
+                  child: Text(s.weakAttempts(t.attempts, t.misses), style: theme.textTheme.bodySmall),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
           LinearProgressIndicator(value: t.score.clamp(0.0, 1.0).toDouble()),
@@ -179,13 +185,18 @@ class WeakSummaryCard extends StatelessWidget {
             : (Icons.trending_flat, s.trendSame);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 6),
-          Expanded(child: Text(label(t.chapterId))),
-          Text(text),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          children: [
+            Icon(icon, size: 18),
+            const SizedBox(width: 6),
+            Expanded(child: Text(label(t.chapterId))),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.4),
+              child: Text(text),
+            ),
+          ],
+        ),
       ),
     );
   }
