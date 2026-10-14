@@ -115,7 +115,7 @@ MascotWidget(
 
 | 衣装 | 入手 | 呼び出し |
 |---|---|---|
-| 通常（資格別の小物） | コインで買う（300） | `CoinService.purchase(OutfitCatalog.idOf(cert, OutfitKind.regular))` |
+| 通常（資格別の小物） | コインで買う（200） | `CoinService.purchase(OutfitCatalog.idOf(cert, OutfitKind.regular))` |
 | 合格記念 | 合格報告で「合格」を選んだ場合のみ（無料） | `OutfitService.reportPassed(cert)`（コインの `CoinEvent.passReport` は別に付与） |
 | 試験日の装い | 試験日を設定した人だけ（無料） | `examPhase` を渡す |
 | 準備完了 | 最短ルートの目標達成（無料） | `OutfitService.markReady(cert)` |
