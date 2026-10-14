@@ -34,3 +34,17 @@ jobs:
         with:
           name: icons
           path: build/icons
+  question-quality-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tools/question_quality -v
+  question-quality-reusable:
+    # 各アプリが呼ぶ再利用可能ワークフローの動作確認（この PR/コミットのツールで実行）
+    uses: ./.github/workflows/question-quality.yml
+    with:
+      files: 'example/sample_questions.jsonl'
+      core_ref: ${{ github.sha }}
