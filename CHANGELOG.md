@@ -16,27 +16,27 @@
 ### Tests
 - `test/peer_stats_test.dart`（閾値 99/100/101・中央値の偶奇・上位 % の端・JSON・文言）、`test/ui/peer_stats_card_test.dart`、`test/ui/text_overflow_test.dart` に `peerStats`
 
+### 資格別の小物 12 種（#97）
+
+資格の分野に合う小物の画像 12 種を追加する（デザイン素材フォルダの「資格別」小物から）。既存の公開 API は変更なし（追加のみ）。
+
+#### Added
+- `UkalabCertProp`（電卓・チップ・バイクのヘルメット・筆・コイン・ガソリン缶・ヘルメット・すずり・帳簿・地図・モニター・レンチ）と、画像の受け口 `UkalabProps.certFile` / `UkalabProps.certImage`。画像は `assets/mascot/props/prop_<名前>.webp`（896×896・背景透過・約 460KB 合計）。部屋の汎用小物 `UkalabProp` とは別の列挙で、どの資格にどの小物を使うか・いつ出すかはアプリ側で決める
+- データ整合テスト `test/ui/ukalab_cert_props_test.dart`: 画像の存在、896×896、透過、メタデータ（EXIF・XMP・ICC）なし、1枚 100KB 未満
+
+#### 補足
+- 画像は AI 生成（Leonardo.Ai）。公開・ストア申告の前に、利用規約・商用利用の可否の確認が要る
+- 透過は、背景が単色の元画像から背景色を抜いて作った（既存の小物 3 種で同じ手順を再現して一致度を確認済み）。小物は有償・無償の区別をコア側で持たない（出し方はアプリ側）
+
+#### 移行
+- アプリは `ukalab_core` を `v0.72.0` に上げる（任意。小物を使うときだけ）
+
 ## [0.71.3] - 2026-10-14
 
 ### Changed
 - 通常衣装の価格を 300 → 200 コインに（`Outfit.regularPrice`）。
 
 - tools/docs/CI のみ（Dart の公開 API・バージョンは変更なし、タグ不要）: 断定語バランスの集計 `tools/question_quality/assertive_word_bias.py`、両ツールをまとめて実行する `run_checks.py`、各アプリから呼べる再利用可能ワークフロー `.github/workflows/question-quality.yml`（警告のみ）、単体テストを追加。
-
-## [0.72.0] - 2026-10-14
-
-資格の分野に合う小物の画像 12 種を追加する（デザイン素材フォルダの「資格別」小物から）。既存の公開 API は変更なし（追加のみ）。
-
-### Added
-- `UkalabCertProp`（電卓・チップ・バイクのヘルメット・筆・コイン・ガソリン缶・ヘルメット・すずり・帳簿・地図・モニター・レンチ）と、画像の受け口 `UkalabProps.certFile` / `UkalabProps.certImage`。画像は `assets/mascot/props/prop_<名前>.webp`（896×896・背景透過・約 460KB 合計）。部屋の汎用小物 `UkalabProp` とは別の列挙で、どの資格にどの小物を使うか・いつ出すかはアプリ側で決める
-- データ整合テスト `test/ui/ukalab_cert_props_test.dart`: 画像の存在、896×896、透過、メタデータ（EXIF・XMP・ICC）なし、1枚 100KB 未満
-
-### 補足
-- 画像は AI 生成（Leonardo.Ai）。公開・ストア申告の前に、利用規約・商用利用の可否の確認が要る
-- 透過は、背景が単色の元画像から背景色を抜いて作った（既存の小物 3 種で同じ手順を再現して一致度を確認済み）。小物は有償・無償の区別をコア側で持たない（出し方はアプリ側）
-
-### 移行
-- アプリは `ukalab_core` を `v0.72.0` に上げる（任意。小物を使うときだけ）
 
 ## [0.71.2] - 2026-10-14
 
