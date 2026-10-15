@@ -58,6 +58,18 @@ void main() {
     expect(File('assets/mascot/kai/outfits/bike_license_lv5.webp').existsSync(), true);
   });
 
+  test('衣装画像: 全資格（17）に通常・合格記念・試験日が全キャラ分（4キャラ×3種）ある', () {
+    expect(UkalabCharacters.costumedCerts, UkalabCert.values.map((c) => c.id).toSet());
+    for (final p in UkalabCharacters.imagePacks) {
+      for (final c in UkalabCert.values) {
+        for (final kind in const ['normal', 'pass', 'exam']) {
+          if (c == UkalabCert.bikeLicense && kind == 'exam') continue; // バイク免許の試験日は通常衣装の絵を使う
+          expect(File('assets/mascot/${p.id}/outfits/${c.id}_$kind.webp').existsSync(), true, reason: '${p.id} ${c.id} $kind');
+        }
+      }
+    }
+  });
+
   test('標準キャラは画像なし、byIdは不明IDで標準に戻る', () {
     expect(CharacterPack.standard.isBuiltIn, true);
     expect(UkalabCharacters.byId('mio').id, 'mio');

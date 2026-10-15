@@ -4,6 +4,26 @@
 
 ## [Unreleased]
 
+## [0.73.0] - 2026-10-15
+
+資格別の衣装画像を 11 資格分追加して有効にする。これで全 17 資格に、通常・合格記念・試験日の衣装画像がそろう（追加のみ。既存の公開 API は変更しない）。
+
+### Added
+- 衣装画像（`assets/mascot/<キャラ>/outfits/<資格id>_<normal|pass|exam>.webp`、736×1120・透過・メタデータなし）: `it_passport` / `info_security` / `data_management` / `ds_kentei` / `fe` / `gen_ai_practitioner` / `sme_consultant` / `sme_ma` / `denken3` / `drone` / `japanese_teacher` の各 4 キャラ×3 種（132 枚、合計約 7.6MiB）
+
+### Changed
+- `UkalabCharacters.costumedCerts` に上の 11 資格を追加。これらの資格の衣装が `outfitImage` で画像になる（それまでは画像なし）
+
+### Tests
+- `test/ui/ukalab_characters_test.dart`: 全 17 資格が `costumedCerts` に含まれ、全キャラ×全種別の画像ファイルが存在することを検査
+
+### 補足
+- 画像は AI 生成（Leonardo.Ai）。公開・ストア申告の前に、利用規約・商用利用の可否・AI コンテンツの申告の確認が要る
+- 保存元の記録に、軽微な残りがある（ミケの一部に薄いもや、ミオのヘアクリップが鉢巻で隠れる）。実機で確認する
+
+### 移行
+- アプリは `ukalab_core` を `v0.73.0` に上げる（任意。新しい資格の衣装を使うときだけ）
+
 ## [0.72.0] - 2026-10-14
 
 「他にも頑張っている人がいる」ための匿名集計を追加（追加のみ。既存 API は変更しない）。決定事項は `docs/DECISIONS.md`、設計・ルール案・集計方法・プライバシー影響は `docs/peer_stats.md`。送信側・ルール適用・アプリへの組み込みは別 PR。
