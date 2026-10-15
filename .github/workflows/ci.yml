@@ -17,7 +17,7 @@ jobs:
       - run: flutter analyze
       - run: flutter test
       - name: サンプル問題データの検証
-        run: dart run ukalab_core:validate_content example/sample_exam.json --update-log example/sample_update_log.jsonl --next-steps example/sample_next_steps.jsonl --checklist example/sample_checklist.jsonl example/sample_questions.jsonl
+        run: dart run ukalab_core:validate_content example/sample_exam.json --update-log example/sample_update_log.jsonl --next-steps example/sample_next_steps.jsonl --checklist example/sample_checklist.jsonl example/sample_questions.jsonl example/sample_question_types.jsonl
   peer-stats-functions:
     # 匿名集計の Cloud Functions（ローカルのユニットテストのみ。デプロイはしない）
     runs-on: ubuntu-latest
@@ -79,5 +79,5 @@ jobs:
     # 各アプリが呼ぶ再利用可能ワークフローの動作確認（この PR/コミットのツールで実行）
     uses: ./.github/workflows/question-quality.yml
     with:
-      files: 'example/sample_questions.jsonl'
+      files: 'example/sample_questions.jsonl example/sample_question_types.jsonl'
       core_ref: ${{ github.sha }}

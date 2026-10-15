@@ -36,6 +36,9 @@ class QuestionTimeEstimator {
     QuestionType.journal: 120,
     QuestionType.worksheet: 300,
     QuestionType.ledger: 300,
+    QuestionType.trueFalse: 20,
+    QuestionType.cloze: 60,
+    QuestionType.reverseLookup: 45,
   };
 
   static const minSeconds = 10;

@@ -29,6 +29,7 @@ export 'engine/exam_countdown_engine.dart';
 export 'engine/exam_countdown_strings.dart';
 export 'engine/exam_date.dart';
 export 'engine/exam_eve.dart';
+export 'engine/answer_check.dart';
 export 'engine/journal_judge.dart';
 export 'engine/ledger_judge.dart';
 export 'engine/mock_exam.dart';

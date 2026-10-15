@@ -293,7 +293,7 @@ python tools/icon_gen/check_icons.py --spec tools/icon_gen/specs/sample.json --o
 
 ## まだ入っていないもの
 
-Firebase 連携、課金・広告の組み込み、問題タイプ（○×・数値・仕訳・手書き）、苦手分析、学習プラン、問題の自動生成。
+Firebase 連携、課金・広告の組み込み、問題タイプ（数値・手書き。○×・空欄補充・説明から用語は入った）、苦手分析、学習プラン、問題の自動生成。
 設計は `kentei-engine（うかラボ）` の企画設計書・決定ログ・`app_common_kit_v0_2_追加仕様.md` を参照。
 
 ## 開発
