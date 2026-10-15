@@ -4,6 +4,26 @@
 
 ## [Unreleased]
 
+## [0.74.0] - 2026-10-15
+
+匿名集計 PeerStats の**送信側・集計側のソース**を追加する（追加のみ。既存の公開 API は変更しない）。**Firebase への配備・Functions のデプロイ・ルールの適用は行わない**（人が `docs/peer_stats.md` の配備チェックリストに沿って行う）。
+
+### Added
+- `lib/peer/peer_stats_sender.dart`（純 Dart）: `PeerStatsSender`（オプトイン ON ＋ ゲート通過 ＋ 日本時間の当日未送信のときだけ送る。失敗は握りつぶして次回）、`PeerStatsGate` / `NoPeerStatsGate`、`InstallIdStore` / `InstallId`（UUID v4）、`PeerSentDateStore`、`PeerStatsEraser`、`PeerDevicePayload`、`peerJstDateKey`
+- `lib/ui/peer_stats/`: `FirestorePeerStatsSink` / `PeerDeviceWriter`、`SharedPrefsInstallIdStore` / `SharedPrefsPeerSentDateStore`、`ParentalPeerStatsGate`（app_common_kit の `requireParentalGate` を再利用）
+- `functions/`（TypeScript・firebase-functions v2）: `aggregatePeerStats`（毎日 JST 5:00 に `peer_summaries/{examId}` を作る。60 日以上更新の無い端末を除外・物理削除）、`erasePeerStats`（callable。App Check 必須）。Jest のユニットテスト付き
+- `firebase/firestore.rules`: `peer_devices`（create/update のみ・許可キーと値域・更新は 20 時間以上の間隔）と `peer_summaries`（read のみ）
+- `firebase/firebase.json`: functions の設定（コードベース `peer-stats`）
+- `firebase/emulator_test/`: ルールのエミュレータテスト（19 件）。`firebase/test_rules.py` に peer のケースを追加
+- `docs/peer_stats_privacy_draft.md`: プライバシーポリシー追記案・Apple App Privacy / Google Play Data safety の申告案（下書き。公開は人の確認後）
+- CI: `peer-stats-functions`、`firestore-rules-emulator` ジョブ
+
+### Changed
+- `docs/peer_stats.md` を確定内容に更新（配備チェックリスト・運用を追加）、`docs/DECISIONS.md` に 6 つの決定を記録
+
+### Tests
+- `test/peer_stats_send_test.dart`: 送信条件（オフ・ゲート未通過・当日送信済み・失敗）、書き込みデータが最小限であること、installId の形式・永続性
+
 ## [0.73.0] - 2026-10-15
 
 資格別の衣装画像を 11 資格分追加して有効にする。これで全 17 資格に、通常・合格記念・試験日の衣装画像がそろう（追加のみ。既存の公開 API は変更しない）。

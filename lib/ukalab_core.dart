@@ -65,6 +65,7 @@ export 'engine/mock_exam_analysis_strings.dart';
 export 'oshi/weekly_recap_engine.dart';
 export 'oshi/weekly_recap_strings.dart';
 export 'peer/peer_stats.dart';
+export 'peer/peer_stats_sender.dart';
 export 'peer/peer_stats_source.dart';
 export 'peer/peer_stats_strings.dart';
 export 'experience/story_mode.dart';

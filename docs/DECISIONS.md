@@ -25,3 +25,13 @@
 - レビューの集計は最新の `origin/main` で行う（ローカルの作業コピーは古いことがある）。
 - 是正は事実を新たに作らない。専門確認が必要な点を PR に明記し、マージはユーザーの「マージ」の指示があるときだけ。
 - 通常衣装は 200 コイン（core v0.71.3）。core v0.72.0 は匿名集計 PeerStats と資格別の小物 12 種を含む。
+
+## 2026-10 匿名集計 PeerStats の送信・集計（決定日 2026-10-15、決定者=ユーザー（推奨案を承認））
+1. **送信はオプトイン（既定オフ）**。参加しなくても集計の表示は見られる。
+2. **年少者は保護者ゲートを通した場合だけ送信できる**。通さない場合は表示のみ。ゲートは app_common_kit の `requireParentalGate`（v3.11.0）を再利用する（core では抽象 `PeerStatsGate` ＋ `ParentalPeerStatsGate`）。成人向けは `NoPeerStatsGate`。
+3. **集計は案A**: 日次の Cloud Function（日本時間 5:00 頃）が `peer_devices/{examId}/devices/{installId}` を走査し `peer_summaries/{examId}` に書く。
+4. **データ削除は Cloud Function（callable）で installId 指定**。60 日以上更新の無い端末は集計から外し、物理削除も日次ジョブで行う。
+5. **プライバシーポリシー追記案とストア申告（Apple App Privacy / Google Play Data safety）の下書きを作る**（`docs/peer_stats_privacy_draft.md`）。公開は人が確認してから。
+6. **送る値**: 累計は「延べ回答数」（totalQuestions）。連続日数は日本時間の暦日で数え、当日未学習の扱いは kit の `loadCurrentStreak` の規約（前日まで続いていれば数え、2 日以上空いたら 0）に合わせる。
+- 実装上の補足（上の決定の範囲内）: Firestore ルールで更新は前回の `updatedAt` から 20 時間以上空けることを要求（過剰頻度の防壁。理由は `docs/peer_stats.md`）。この決定の実装 PR は**配備しない**（Firebase への配備・Functions のデプロイ・ルール適用・本番への書き込みはすべて人が後で行う）。
+
