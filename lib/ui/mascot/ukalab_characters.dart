@@ -22,6 +22,17 @@ class UkalabCharacters {
     'boki3',
     'hazmat4',
     'gen_ai_passport',
+    'it_passport',
+    'info_security',
+    'data_management',
+    'ds_kentei',
+    'fe',
+    'gen_ai_practitioner',
+    'sme_consultant',
+    'sme_ma',
+    'denken3',
+    'drone',
+    'japanese_teacher',
   };
 
   static const kai = CharacterPack(
