@@ -173,3 +173,13 @@ enum QuestionAngle { definition, scenario, comparison, reverse, cloze, trueFalse
 5. 概念SRSで観点間の箱の上がり方（同一観点連続正解の上限）。
 6. `ai-draft` タグ運用と、専門確認の担当・記録の置き場所。
 7. 先行アプリを G検定でよいか、実装の担当順（モデル → 検証/レポート → UI → SRS の 4 PR 程度に分割する想定）。
+
+## 8. 実装状況（フェーズ2）
+
+フェーズ2（新しい問題タイプ・検証・採点・共通画面）は実装済み。設計との差分は次のとおり。
+
+- 選択肢つき（`cloze` の空欄・`reverseLookup`）は「番号」ではなく**選んだ選択肢の文字列**を `answers` と照合して判定する（検証で「正解に一致する選択肢がちょうど1個」を保証するので結果は同じ。選択肢を並べ替えても壊れない）
+- 模擬試験の `QuestionType` 別比率は `ExamConfig` ではなく、出題関数の引数 `allowedTypes`（既定は従来の4タイプ）で指定する。比率の設定は未実装
+- `type-fields` はコードを型別に分けた（`truefalse-choices` / `cloze-*` / `reverse-*`）。`angle-without-concept` など §3.1 の観点ルールはフェーズ1の実装のまま
+- 追加で、`reverse-answer-leak`（clue に答えが含まれる。警告）を入れた
+- SRS（§4）は未着手（フェーズ3）。`Srs` / `ReviewSchedulerEngine` は無変更

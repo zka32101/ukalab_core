@@ -2,9 +2,15 @@ import '../src/json_util.dart';
 
 /// 問題タイプ。choice=選択式、journal=仕訳（借方・貸方の勘定科目＋金額を入力）、
 /// worksheet=精算表・財務諸表などの表の空欄埋め（セル単位の金額入力）、
-/// ledger=補助簿の記入（商品有高帳・現金出納帳など、行×列グループ×項目のセル入力）。
-/// 他の型（truefalse・numeric 等）は後続。
-enum QuestionType { choice, journal, worksheet, ledger }
+/// ledger=補助簿の記入（商品有高帳・現金出納帳など、行×列グループ×項目のセル入力）、
+/// trueFalse=○×（命題の正誤判断）、cloze=空欄補充（prompt 中の `{{1}}` `{{2}}`）、
+/// reverseLookup=説明から用語を当てる（clue を読んで答える）。
+/// 末尾の3つ（trueFalse / cloze / reverseLookup）は multi-angle フェーズ2で追加。
+/// 既存値の名前・順序は変えない。設計は docs/multi_angle_questions_design.md §2。
+///
+/// 注意: 値を足したため、アプリ側で `switch (q.type)` を網羅している箇所は
+/// 非網羅（non_exhaustive_switch）になる。CHANGELOG の移行欄を参照。
+enum QuestionType { choice, journal, worksheet, ledger, trueFalse, cloze, reverseLookup }
 
 /// 出題の観点。同じ用語・概念（[Question.conceptId]）を別の角度で問うときの区分。
 /// 問題の形式（[QuestionType]）とは別軸。JSON では enum 名の文字列。
@@ -307,6 +313,63 @@ class LedgerAnswer {
       };
 }
 
+/// 空欄補充（[QuestionType.cloze]）の空欄1つ。prompt 中の `{{id}}` に対応する。
+class ClozeBlank {
+  const ClozeBlank({
+    required this.id,
+    required this.answers,
+    this.choices = const [],
+  });
+
+  /// 空欄の番号（1以上・問題内で一意）。prompt の `{{id}}` と対応する。
+  final int id;
+
+  /// 受け付ける正解（表記ゆれ・同義語）。採点は正規化後の完全一致
+  /// （`lib/engine/answer_check.dart`）。1つ以上必要（[validateQuestions] で検査）。
+  final List<String> answers;
+
+  /// 選択肢（任意）。空なら自由入力。あるときは、正解（[answers]）に一致する選択肢が
+  /// ちょうど1つ必要。
+  final List<String> choices;
+
+  bool get hasChoices => choices.isNotEmpty;
+
+  factory ClozeBlank.fromJson(Map<String, dynamic> j, String where) =>
+      ClozeBlank(
+        id: reqInt(j, 'id', where),
+        answers: _reqStringList(j, 'answers', where),
+        choices: _optStringList(j, 'choices', where),
+      );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'answers': answers,
+    if (choices.isNotEmpty) 'choices': choices,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is ClozeBlank &&
+      other.id == id &&
+      _listEq(other.answers, answers) &&
+      _listEq(other.choices, choices);
+
+  @override
+  int get hashCode =>
+      Object.hash(id, Object.hashAll(answers), Object.hashAll(choices));
+
+  @override
+  String toString() => 'ClozeBlank($id, $answers, $choices)';
+}
+
+bool _listEq(List<String> a, List<String> b) {
+  if (a.length != b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
 /// [Question.tags] に使う、うかラボ共通のタグ。
 abstract final class QuestionTag {
   /// 頻出（試験直前モードで優先する）。
@@ -335,6 +398,10 @@ class Question {
     this.journalAnswer,
     this.worksheetAnswer,
     this.ledgerAnswer,
+    this.answerBool,
+    this.blanks = const [],
+    this.clue,
+    this.answers = const [],
     this.difficulty = 3,
     this.points = 1,
     this.license,
@@ -356,6 +423,10 @@ class Question {
         assert(
           type != QuestionType.ledger || ledgerAnswer != null,
           'type が ledger の問題には ledgerAnswer が必要です',
+        ),
+        assert(
+          type != QuestionType.trueFalse || answerBool != null,
+          'type が trueFalse の問題には answerBool が必要です',
         );
 
   final String qid;
@@ -382,6 +453,19 @@ class Question {
 
   /// type が ledger のときの正解（補助簿の記入）。
   final LedgerAnswer? ledgerAnswer;
+
+  /// type が trueFalse のときの正解（true=正しい命題、false=誤った命題）。
+  final bool? answerBool;
+
+  /// type が cloze のときの空欄（prompt 中の `{{id}}` に対応）。
+  final List<ClozeBlank> blanks;
+
+  /// type が reverseLookup のときの説明文（これを読んで用語を答える）。
+  final String? clue;
+
+  /// type が reverseLookup のときの正解（表記ゆれ・同義語を含む）。選択肢つき
+  /// （[choices] あり）のときは、このうち1つだけが選択肢に含まれている必要がある。
+  final List<String> answers;
 
   final String explanation;
 
@@ -444,6 +528,10 @@ class Question {
     JournalAnswer? journalAnswer;
     WorksheetAnswer? worksheetAnswer;
     LedgerAnswer? ledgerAnswer;
+    bool? answerBool;
+    var blanks = const <ClozeBlank>[];
+    String? clue;
+    var answers = const <String>[];
 
     switch (type) {
       case QuestionType.choice:
@@ -469,6 +557,27 @@ class Question {
           fail(where, '"ledgerAnswer" はオブジェクトが必要です');
         }
         ledgerAnswer = LedgerAnswer.fromJson(rawAnswer, '$where.ledgerAnswer');
+      case QuestionType.trueFalse:
+        final raw = j['answerBool'];
+        if (raw is! bool) fail(where, '"answerBool" は true / false が必要です');
+        answerBool = raw;
+      case QuestionType.cloze:
+        final raw = j['blanks'];
+        if (raw is! List) fail(where, '"blanks" は配列が必要です');
+        blanks = [
+          for (var i = 0; i < raw.length; i++)
+            if (raw[i] is Map<String, dynamic>)
+              ClozeBlank.fromJson(
+                raw[i] as Map<String, dynamic>,
+                '$where.blanks[$i]',
+              )
+            else
+              fail(where, 'blanks の要素はオブジェクトが必要です'),
+        ];
+      case QuestionType.reverseLookup:
+        clue = reqString(j, 'clue', where);
+        answers = _reqStringList(j, 'answers', where);
+        choices = _optStringList(j, 'choices', where);
     }
 
     return Question(
@@ -484,6 +593,10 @@ class Question {
       journalAnswer: journalAnswer,
       worksheetAnswer: worksheetAnswer,
       ledgerAnswer: ledgerAnswer,
+      answerBool: answerBool,
+      blanks: blanks,
+      clue: clue,
+      answers: answers,
       explanation: reqString(j, 'explanation', where),
       difficulty: optInt(j, 'difficulty', where, 3),
       points: optInt(j, 'points', where, 1),
@@ -513,6 +626,13 @@ class Question {
           'choices': choices,
           'answerIndex': answerIndex,
         },
+        if (type == QuestionType.reverseLookup && choices.isNotEmpty)
+          'choices': choices,
+        if (answerBool != null) 'answerBool': answerBool,
+        if (type == QuestionType.cloze)
+          'blanks': [for (final b in blanks) b.toJson()],
+        if (clue != null) 'clue': clue,
+        if (type == QuestionType.reverseLookup) 'answers': answers,
         if (journalAnswer != null) 'journalAnswer': journalAnswer!.toJson(),
         if (worksheetAnswer != null) 'worksheetAnswer': worksheetAnswer!.toJson(),
         if (ledgerAnswer != null) 'ledgerAnswer': ledgerAnswer!.toJson(),
@@ -531,6 +651,14 @@ class Question {
         if (tags.isNotEmpty) 'tags': tags,
         if (disabled) 'disabled': true,
       };
+}
+
+List<String> _reqStringList(Map<String, dynamic> j, String key, String where) {
+  final v = j[key];
+  if (v is! List || v.any((e) => e is! String)) {
+    fail(where, '"$key" は文字列の配列が必要です');
+  }
+  return List<String>.from(v);
 }
 
 List<String> _optStringList(Map<String, dynamic> j, String key, String where) {

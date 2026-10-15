@@ -451,6 +451,42 @@ c.daysLeft; c.phase; // ExamCountdownPhase
 - 文言は `ExamCountdownStrings`（ja・en。`copyWith` で上書き可。`UkalabStrings` は変えない）。禁止語リストでテスト。final 期でも「いつもどおりで大丈夫」。運営での文言確認は別途必要
 - `OshiMessageEngine` の `examDaysLeft`（推しのひとこと）とは独立。併用してよい
 
+## 新しい問題タイプの画面（`TrueFalseQuestionView` / `ClozeQuestionView` / `ReverseLookupQuestionView`）
+
+○×・空欄補充・説明から用語の3タイプ（設計は `docs/multi_angle_questions_design.md`）。解答後は「結果（アイコン＋文字）→ 正解 → 解説 → `AnswerFeedbackPanel`（間違えた理由）→ 次へ」の順に出る。
+
+```dart
+switch (q.type) {
+  case QuestionType.trueFalse:
+    return TrueFalseQuestionView(
+      key: ValueKey(q.qid), question: q, index: i + 1, total: n,
+      onAnswered: (r) => session.answerTrueFalse(r.boolAnswer!),
+      onNext: next,
+    );
+  case QuestionType.cloze:
+    return ClozeQuestionView(
+      key: ValueKey(q.qid), question: q,
+      onAnswered: (r) => session.answerCloze(r.blankAnswers!),
+      onSelfReported: session.markLastSelfReportedCorrect, // 自由入力の打ち間違い救済
+      onNext: next,
+    );
+  case QuestionType.reverseLookup:
+    return ReverseLookupQuestionView(
+      key: ValueKey(q.qid), question: q,
+      onAnswered: (r) => session.answerReverseLookup(r.text!),
+      onSelfReported: session.markLastSelfReportedCorrect,
+      onNext: next,
+    );
+  // choice / journal / worksheet / ledger は従来どおり
+}
+```
+
+- アクセシビリティ: ○×は「○ 正しい」「× 誤り」と記号・文字・アイコンを併記し、高さ 48dp 以上。空欄は枠つきの番号と `Semantics(label: '空欄n')`。結果の帯は `liveRegion`。文字を 200% にしても折り返して崩れない
+- 自由入力: 入力の候補表示・自動修正・自動入力は使わない。IME の変換中は「解答する」を押せない（確定してから判定）。判定は `normalizeAnswerText`（全角/半角・空白・長音・中黒の揺れを吸収。ひらがな/カタカナは区別）後の完全一致で、`answers` のどれかに一致すれば正解
+- 選択肢つき（`choices` あり）は選ぶとその場で採点（○×・説明から用語）、空欄補充は選んでから「解答する」
+- 文言は `QuestionTypeStrings`（ja・en。他の言語は日本語）。引数 `strings` で差し替え可
+- 模擬試験には既定で出ない（`pickMockExamQuestions` の `allowedTypes`）
+
 ## 間違いノート（`MistakeNoteEngine` / `MistakeNoteView`）
 
 間違えた問題をあとから見返して解き直せるノート。間違いは「伸びしろ」として扱い、解き直して連続で正解したら「克服」と祝う。件数の多い順などのランキング表示や、件数で圧をかける文言は出さない。

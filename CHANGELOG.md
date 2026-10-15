@@ -4,6 +4,35 @@
 
 ## [Unreleased]
 
+観点を変えた出題（multi-angle）のフェーズ2。**新しい問題タイプ `trueFalse`（○×）/ `cloze`（空欄補充）/ `reverseLookup`（説明から用語）**と、その検証・採点・共通画面。既存の4タイプの JSON・挙動は変えない。`Srs` / `ReviewSchedulerEngine` は無変更（概念単位の SRS はフェーズ3）。pubspec のバージョンはこの変更では上げない（リリース時にまとめて決める）。
+
+### Added (フェーズ2)
+- `QuestionType` に `trueFalse` / `cloze` / `reverseLookup` を**末尾に追加**（既存値の名前・順序は不変）
+- `Question` の任意項目: `answerBool`（○×）、`blanks`（`ClozeBlank { id, answers, choices }`。prompt の `{{1}}` `{{2}}` に対応）、`clue` / `answers` / `choices`（説明から用語。`choices` を省略すると自由入力）。JSON の往復に対応。未使用の項目は `toJson` に出ない
+- `lib/engine/answer_check.dart`（純 Dart）: `normalizeAnswerText`（全角英数→半角、半角カナ→全角、空白・ゼロ幅・中黒の除去、ハイフン類→長音/半角ハイフン、英字小文字化。ひらがな/カタカナは同一視しない）、`answerMatches`（複数の正解）、`judgeTrueFalse` / `judgeCloze`（空欄ごとの正誤・全空欄正解で正解・部分点なし）/ `judgeReverseLookup`、`clozePlaceholderIds` / `splitClozePrompt`
+- `validateQuestions` の新ルール（いずれもエラー）: `truefalse-choices` / `cloze-no-blanks` / `cloze-blank-id` / `cloze-placeholder`（`{{n}}` と `blanks` の不一致・重複・空欄なし）/ `cloze-answers` / `cloze-choices` / `reverse-answers` / `reverse-choices`（選択肢つきは数・空・重複・「正解に一致する選択肢がちょうど1個」）。警告 `reverse-answer-leak`（clue に正解の語が含まれる）
+- `PracticeSession`: `answerTrueFalse` / `answerCloze` / `answerReverseLookup`、`markLastSelfReportedCorrect`（自由入力の打ち間違い救済）。`AnswerRecord` に任意項目 `boolAnswer` / `clozeAnswers` / `textAnswer` / `selfReported`
+- `scoreMockExam` が新タイプを採点（回答は trueFalse=`bool`、cloze=`Map<int, String>`、reverseLookup=`String`）。`QuestionTimeEstimator.defaultSeconds` に新タイプの既定秒数
+- `package:ukalab_core/ui.dart`: `TrueFalseQuestionView` / `ClozeQuestionView` / `ReverseLookupQuestionView`、`QuestionViewResult`、`QuestionTypeStrings`（ja・en）。解答後は結果（アイコン＋文字）→ 正解 → 解説 → `AnswerFeedbackPanel` の流れ。○×は記号・文字・アイコン併記で 48dp 以上、空欄は `Semantics(label: '空欄n')`、自由入力は IME の変換中は解答不可・自動入力/修正/候補なし、折り返しレイアウトで文字 200% でも崩れない
+- `QuestionDetailScreen` が新タイプの正解を要約表示
+- `example/sample_question_types.jsonl`（架空の3タイプ＋観点つきサンプル）。CI の `validate_content` に追加
+
+### Changed (フェーズ2)
+- `pickMockExamQuestions` / `pickCustomMockExamQuestions` に `allowedTypes`（既定 `defaultMockExamTypes` = 従来の4タイプ）を追加。**既定では新タイプを模擬試験に出さない**
+
+### 移行（アプリ側）— enum 値の追加について
+`QuestionType` に値を足したため、**`switch (q.type)` を網羅している（`default` を書いていない）アプリ側のコードは、次回の `ref` 更新でコンパイル時に非網羅の警告/エラーになる**（semver 上は minor。データに新タイプを含めない限り実行時の挙動は変わらない）。
+1. 新タイプを扱わないなら、`default:` を足すか、`case QuestionType.trueFalse: case QuestionType.cloze: case QuestionType.reverseLookup:` を既存の「未対応」側へ寄せる
+2. 扱うなら、`package:ukalab_core/ui.dart` の 3 つの画面を `switch` の各 case で出し、`onAnswered` の `QuestionViewResult` を `PracticeSession.answerTrueFalse` / `answerCloze` / `answerReverseLookup`（または自前の記録）へ渡す。自己申告は `onSelfReported` → `markLastSelfReportedCorrect`
+3. 新タイプを含む問題 JSONL は、**更新前の ukalab_core では `未対応の type` で読み込めない**。データを先に配信しない（アプリの `ref` 更新を先に）
+4. 模擬試験に新タイプを出したいときだけ `allowedTypes` を明示する
+
+### Tests (フェーズ2)
+- `test/question_types_test.dart`: 後方互換・往復・不正な形・検証ルール（正例/負例）・正規化の境界（全半角/空白/長音/中黒/半角カナ/冪等）・複数正解・部分正解・`PracticeSession`・模擬試験の既定除外と採点
+- `test/ui/question_type_views_test.dart`: 3つの画面の表示・採点・Semantics・48dp・IME 変換中・自己申告・文字 200% × 幅 320dp・qid 切替
+
+（以下はフェーズ1）
+
 観点を変えた出題（multi-angle）のフェーズ1。**任意項目の追加と検証・レポートのみ**（追加のみ。未指定なら JSON も挙動も従来どおり。新しい `QuestionType` はフェーズ2）。
 
 ### Added

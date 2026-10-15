@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../config/exam_config.dart';
+import '../engine/answer_check.dart';
 import '../question/question.dart';
 
 /// 問題データの検証結果1件。
@@ -87,8 +88,12 @@ List<ContentIssue> validateQuestions(
   ValidationOptions options = const ValidationOptions(),
 }) {
   final issues = <ContentIssue>[];
-  void add(Question q, String code, String message) =>
-      issues.add(ContentIssue(q.qid, code, message));
+  void add(
+    Question q,
+    String code,
+    String message, {
+    ContentSeverity severity = ContentSeverity.error,
+  }) => issues.add(ContentIssue(q.qid, code, message, severity: severity));
 
   final seen = <String>{};
   for (final q in questions) {
@@ -182,6 +187,15 @@ List<ContentIssue> validateQuestions(
                 '同じ行・列グループ・項目の組み合わせのセルが重複しています（givenCellsとblankCellsの重複を含む）');
           }
         }
+      case QuestionType.trueFalse:
+        // answerBool の有無は fromJson / コンストラクタで保証される。選択肢は使わない。
+        if (q.choices.isNotEmpty) {
+          add(q, 'truefalse-choices', '○×問題に choices は使えません');
+        }
+      case QuestionType.cloze:
+        _validateCloze(q, options, add);
+      case QuestionType.reverseLookup:
+        _validateReverseLookup(q, options, add);
     }
 
     if (q.difficulty < 1 || q.difficulty > 5) {
@@ -227,4 +241,139 @@ List<ContentIssue> validateCompareTargets(
     }
   }
   return issues;
+}
+
+typedef _AddIssue =
+    void Function(
+      Question q,
+      String code,
+      String message, {
+      ContentSeverity severity,
+    });
+
+void _validateCloze(Question q, ValidationOptions options, _AddIssue add) {
+  if (q.blanks.isEmpty) {
+    add(q, 'cloze-no-blanks', '空欄補充の blanks がありません');
+    return;
+  }
+  final ids = [for (final b in q.blanks) b.id];
+  if (ids.any((id) => id < 1))
+    add(q, 'cloze-blank-id', '空欄の id は1以上である必要があります');
+  if (ids.toSet().length != ids.length) {
+    add(q, 'cloze-blank-id', '空欄の id が重複しています');
+  }
+  final placeholders = clozePlaceholderIds(q.prompt);
+  if (placeholders.toSet().length != placeholders.length) {
+    add(q, 'cloze-placeholder', 'prompt に同じ空欄 {{n}} が複数あります');
+  }
+  final inPrompt = placeholders.toSet();
+  final inBlanks = ids.toSet();
+  final missing = inPrompt.difference(inBlanks);
+  final unused = inBlanks.difference(inPrompt);
+  if (inPrompt.isEmpty) {
+    add(q, 'cloze-placeholder', 'prompt に空欄 {{n}} がありません');
+  }
+  if (missing.isNotEmpty) {
+    add(
+      q,
+      'cloze-placeholder',
+      'prompt の空欄 ${_ids(missing)} に対応する blanks がありません',
+    );
+  }
+  if (unused.isNotEmpty) {
+    add(q, 'cloze-placeholder', 'blanks の ${_ids(unused)} が prompt に現れません');
+  }
+  for (final b in q.blanks) {
+    _validateAnswers('cloze-answers', '空欄${b.id}', b.answers, add, q);
+    _validateAnswerChoices(
+      'cloze-choices',
+      '空欄${b.id}',
+      b.answers,
+      b.choices,
+      options,
+      add,
+      q,
+    );
+  }
+}
+
+void _validateReverseLookup(
+  Question q,
+  ValidationOptions options,
+  _AddIssue add,
+) {
+  _validateAnswers('reverse-answers', '説明から用語', q.answers, add, q);
+  _validateAnswerChoices(
+    'reverse-choices',
+    '説明から用語',
+    q.answers,
+    q.choices,
+    options,
+    add,
+    q,
+  );
+  final clue = normalizeAnswerText(q.clue ?? '');
+  if (clue.isNotEmpty &&
+      q.answers.any((a) {
+        final n = normalizeAnswerText(a);
+        return n.isNotEmpty && clue.contains(n);
+      })) {
+    add(
+      q,
+      'reverse-answer-leak',
+      'clue に正解の語がそのまま含まれています（答え漏れの疑い）',
+      severity: ContentSeverity.warning,
+    );
+  }
+}
+
+String _ids(Set<int> ids) =>
+    (ids.toList()..sort()).map((i) => '{{$i}}').join(', ');
+
+void _validateAnswers(
+  String code,
+  String label,
+  List<String> answers,
+  _AddIssue add,
+  Question q,
+) {
+  if (answers.isEmpty) {
+    add(q, code, '$label: answers が空です');
+    return;
+  }
+  final normalized = [for (final a in answers) normalizeAnswerText(a)];
+  if (normalized.any((a) => a.isEmpty)) add(q, code, '$label: 空の正解があります');
+  if (normalized.toSet().length != normalized.length) {
+    add(q, code, '$label: 正規化すると同じになる正解が重複しています');
+  }
+}
+
+/// 選択肢つき（choices が空でない）のとき、数・空・重複・正解との整合を検査する。
+void _validateAnswerChoices(
+  String code,
+  String label,
+  List<String> answers,
+  List<String> choices,
+  ValidationOptions options,
+  _AddIssue add,
+  Question q,
+) {
+  if (choices.isEmpty) return; // 自由入力
+  final n = choices.length;
+  if (n < options.minChoices || n > options.maxChoices) {
+    add(
+      q,
+      code,
+      '$label: 選択肢は${options.minChoices}〜${options.maxChoices}個（現在$n個）',
+    );
+  }
+  final normalized = [for (final c in choices) normalizeAnswerText(c)];
+  if (normalized.any((c) => c.isEmpty)) add(q, code, '$label: 空の選択肢があります');
+  if (normalized.toSet().length != normalized.length) {
+    add(q, code, '$label: 同じ文面の選択肢があり、正解が一意になりません');
+  }
+  final correct = choices.where((c) => answerMatches(c, answers)).length;
+  if (correct != 1) {
+    add(q, code, '$label: 正解に一致する選択肢が$correct個です（ちょうど1個が必要）');
+  }
 }
