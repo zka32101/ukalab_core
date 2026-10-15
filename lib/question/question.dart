@@ -6,6 +6,13 @@ import '../src/json_util.dart';
 /// 他の型（truefalse・numeric 等）は後続。
 enum QuestionType { choice, journal, worksheet, ledger }
 
+/// 出題の観点。同じ用語・概念（[Question.conceptId]）を別の角度で問うときの区分。
+/// 問題の形式（[QuestionType]）とは別軸。JSON では enum 名の文字列。
+/// definition=定義・性質、scenario=事例への当てはめ、comparison=紛らわしい相手との違い、
+/// reverse=説明から用語を当てる、cloze=空欄補充、trueFalse=命題の正誤判断。
+/// 設計は docs/multi_angle_questions_design.md。
+enum QuestionAngle { definition, scenario, comparison, reverse, cloze, trueFalse }
+
 /// 出典の区分。出典なし（区分なし）の問題は配信しない。
 enum QuestionSource { original, statute, licensed }
 
@@ -333,6 +340,8 @@ class Question {
     this.license,
     this.lawVersion,
     this.subtopicId,
+    this.conceptId,
+    this.angle,
     this.compareWith = const [],
     this.tags = const [],
     this.disabled = false,
@@ -396,6 +405,14 @@ class Question {
   /// 論点タグの細目（任意）。章は [topicId]（必須）。弱点スコアは細目単位、
   /// 集計表示は章単位で行う。細目が未付与の問題は章単位で扱う。
   final String? subtopicId;
+
+  /// 用語・概念の安定ID（任意）。用語カードがある概念は [Term.termId] と同じ値、
+  /// 無い概念は `c-` 接頭辞の独自ID。不変（改名しない。廃止は [disabled]）。
+  /// 未設定の問題は「観点カウントの対象外」で、出題・採点・SRS は従来どおり。
+  final String? conceptId;
+
+  /// 出題の観点（任意）。形式（[type]）とは別軸。
+  final QuestionAngle? angle;
 
   /// 比較対象の用語ID（[Term.termId]）。紛らわしい相手の用語・物質・標識などを指し、
   /// 「違いの比較表示」はこのタグから自動生成する。存在チェックは
@@ -476,6 +493,8 @@ class Question {
       lawVersion: optString(j, 'lawVersion', where),
       contentVer: reqString(j, 'contentVer', where),
       subtopicId: optString(j, 'subtopicId', where),
+      conceptId: _optConceptId(j, where),
+      angle: _lenientAngle(j['angle']),
       compareWith: _optStringList(j, 'compareWith', where),
       tags: _optStringList(j, 'tags', where),
       disabled: j['disabled'] == true,
@@ -506,6 +525,8 @@ class Question {
         if (lawVersion != null) 'lawVersion': lawVersion,
         'contentVer': contentVer,
         if (subtopicId != null) 'subtopicId': subtopicId,
+        if (conceptId != null) 'conceptId': conceptId,
+        if (angle != null) 'angle': angle!.name,
         if (compareWith.isNotEmpty) 'compareWith': compareWith,
         if (tags.isNotEmpty) 'tags': tags,
         if (disabled) 'disabled': true,
@@ -520,3 +541,23 @@ List<String> _optStringList(Map<String, dynamic> j, String key, String where) {
   }
   return List<String>.from(v);
 }
+
+/// conceptId は省略可。書くなら空文字・空白のみは不可（実体の無いIDを許さない）。
+String? _optConceptId(Map<String, dynamic> j, String where) {
+  if (!j.containsKey('conceptId') || j['conceptId'] == null) return null;
+  return reqString(j, 'conceptId', where);
+}
+
+/// 未知の angle は読み込みでは落とさず null にする（配信側を壊さない）。
+/// 未知値の指摘は [parseQuestionsJsonl] が警告（`angle-unknown`）として出す。
+QuestionAngle? _lenientAngle(Object? raw) {
+  if (raw is! String) return null;
+  for (final a in QuestionAngle.values) {
+    if (a.name == raw) return a;
+  }
+  return null;
+}
+
+/// JSON の `angle` の値が非 null なのに [QuestionAngle] として解釈できないか。
+bool isUnknownAngleValue(Object? raw) =>
+    raw != null && (raw is! String || _lenientAngle(raw) == null);

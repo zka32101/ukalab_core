@@ -12,6 +12,7 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import angle_coverage as ac  # noqa: E402
 import assertive_word_bias as aw  # noqa: E402
 import choice_length_bias as cl  # noqa: E402
 import run_checks as rc  # noqa: E402
@@ -147,6 +148,52 @@ class RunChecksTest(unittest.TestCase):
         with contextlib.redirect_stdout(buf):
             self.assertEqual(rc.main(["no/such/*.jsonl", "--strict"]), 0)
         self.assertIn("::warning", buf.getvalue())
+
+
+class AngleCoverageTest(unittest.TestCase):
+    ROWS = [
+        {"qid": "a1", "conceptId": "t-1", "angle": "definition"},
+        {"qid": "a2", "conceptId": "t-1", "angle": "reverse"},
+        {"qid": "a3", "conceptId": "t-1", "angle": "reverse"},
+        {"qid": "b1", "conceptId": "t-2", "angle": "cloze"},
+        {"qid": "c1", "conceptId": "t-3"},
+        {"qid": "d1", "conceptId": "t-4", "angle": "bogus"},
+        {"qid": "e1", "conceptId": "t-5", "angle": "scenario", "disabled": True},
+        {"qid": "f1"},
+    ]
+
+    def test_analyze(self):
+        rep, warns = ac.analyze(self.ROWS)
+        self.assertEqual(rep["totalQuestions"], 7)  # disabled 除外
+        self.assertEqual(rep["questionsWithConcept"], 6)
+        self.assertEqual(rep["conceptCount"], 4)
+        self.assertEqual(rep["conceptsWithMultipleAngles"], 1)
+        self.assertEqual(rep["questionsByAngle"]["reverse"], 2)
+        self.assertEqual(rep["conceptsBelowTwoAngles"], ["t-2", "t-3", "t-4"])
+        codes = sorted(c for c, _, _ in warns)
+        self.assertEqual(codes, ["angle-unknown", "concept-single-angle", "concept-single-angle",
+                                 "concept-single-angle", "concept-without-angle"])
+
+    def test_no_concept_data_is_silent(self):
+        rep, warns = ac.analyze([{"qid": "x", "choices": ["a", "b"], "answerIndex": 0}])
+        self.assertEqual(rep["conceptCount"], 0)
+        self.assertEqual(warns, [])
+        path = write_jsonl([{"qid": "x"}])
+        code, out = run(ac, [path, "--strict"])
+        self.assertEqual((code, out), (0, ""))
+
+    def test_exit_codes_and_formats(self):
+        path = write_jsonl(self.ROWS)
+        code, out = run(ac, [path])
+        self.assertEqual(code, 0)
+        self.assertIn("# 観点カバレッジ", out)
+        self.assertIn("| t-1 | 2 |", out)
+        code, _ = run(ac, [path, "--strict"])
+        self.assertEqual(code, 1)
+        code, out = run(ac, [path, "--format", "json"])
+        data = json.loads(out)
+        self.assertEqual(data["conceptCount"], 4)
+        self.assertEqual(out, run(ac, [path, "--format", "json"])[1])  # 決定的
 
 
 if __name__ == "__main__":

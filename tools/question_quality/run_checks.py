@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""問題の質の2ツール（選択肢の長さ・断定語）をまとめて実行する入口。各アプリの CI から1行で呼ぶ用。
+"""問題の質の3ツール（選択肢の長さ・断定語・観点カバレッジ）をまとめて実行する入口。各アプリの CI から1行で呼ぶ用。
 
   python3 tools/question_quality/run_checks.py 'assets/questions/*.jsonl'
   python3 tools/question_quality/run_checks.py data/q.jsonl --choices-key options --answer-key answer
@@ -18,6 +18,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import angle_coverage  # noqa: E402
 import assertive_word_bias  # noqa: E402
 import choice_length_bias  # noqa: E402
 
@@ -59,7 +60,8 @@ def main(argv=None):
 
     rc, md = 0, []
     for name, mod, own in (("選択肢の長さの偏り", choice_length_bias, []),
-                           ("断定語バランス", assertive_word_bias, extra)):
+                           ("断定語バランス", assertive_word_bias, extra),
+                           ("観点カバレッジ", angle_coverage, [])):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             r = mod.main(files + common + own)
