@@ -69,6 +69,60 @@ cases.append({
     'resource': {'data': good_fb},
 })
 
+
+# --- 匿名集計 peer stats ---
+import datetime as _dt
+_NOW = _dt.datetime(2026, 10, 15, 3, 0, 0, tzinfo=_dt.timezone.utc)
+_iso = lambda t: t.strftime('%Y-%m-%dT%H:%M:%SZ')
+PEER_ID = '123e4567-e89b-42d3-a456-426614174000'
+PEER_PATH = f'peer_devices/fe/devices/{PEER_ID}'
+good_peer = {'day': '2026-10-15', 'streakDays': 5, 'totalQuestions': 300,
+             'examDate': '2026-12-06', 'updatedAt': _iso(_NOW)}
+
+
+def peer_case(name, method, path, expect, data=None, existing_updated_at=None, uid='u1'):
+    c = {'name': name, 'expectation': expect,
+         'request': {'method': method, 'path': f'{DOC}/{path}', 'time': _iso(_NOW)}}
+    if uid:
+        c['request']['auth'] = {'uid': uid, 'token': {}}
+    if data is not None:
+        c['request']['resource'] = {'data': data}
+    if existing_updated_at is not None:
+        c['resource'] = {'data': {**good_peer, 'updatedAt': _iso(existing_updated_at)}}
+    return c
+
+
+_h = lambda n: _dt.timedelta(hours=n)
+cases += [
+    peer_case('peer: 正常な create', 'create', PEER_PATH, 'ALLOW', good_peer),
+    peer_case('peer: 試験日なしの create', 'create', PEER_PATH, 'ALLOW',
+              {k: v for k, v in good_peer.items() if k != 'examDate'}),
+    peer_case('peer: 21時間後の update は許可', 'update', PEER_PATH, 'ALLOW', good_peer, _NOW - _h(21)),
+    peer_case('peer: 1時間後の update は過剰頻度で拒否', 'update', PEER_PATH, 'DENY', good_peer, _NOW - _h(1)),
+    peer_case('peer: 19時間後の update は拒否', 'update', PEER_PATH, 'DENY', good_peer, _NOW - _h(19)),
+    peer_case('peer: 読み取り(get)は拒否', 'get', PEER_PATH, 'DENY', None, _NOW - _h(30)),
+    peer_case('peer: 一覧(list)は拒否', 'list', 'peer_devices/fe/devices', 'DENY'),
+    peer_case('peer: 削除は拒否', 'delete', PEER_PATH, 'DENY', None, _NOW - _h(30)),
+    peer_case('peer: 余計なキーは拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'userId': 'u1'}),
+    peer_case('peer: 必須キー欠落は拒否', 'create', PEER_PATH, 'DENY',
+              {k: v for k, v in good_peer.items() if k != 'day'}),
+    peer_case('peer: streakDays が範囲外(3651)は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'streakDays': 3651}),
+    peer_case('peer: streakDays が負は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'streakDays': -1}),
+    peer_case('peer: totalQuestions が範囲外は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'totalQuestions': 1000001}),
+    peer_case('peer: 数値が文字列は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'totalQuestions': '300'}),
+    peer_case('peer: day の形式が不正は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'day': '2026/10/15'}),
+    peer_case('peer: examDate の形式が不正は拒否', 'create', PEER_PATH, 'DENY', {**good_peer, 'examDate': 'soon'}),
+    peer_case('peer: updatedAt がサーバ時刻でないと拒否', 'create', PEER_PATH, 'DENY',
+              {**good_peer, 'updatedAt': _iso(_NOW - _h(1))}),
+    peer_case('peer: installId が UUID 形式でないと拒否(他人の uid 風 ID)', 'create', 'peer_devices/fe/devices/u1', 'DENY', good_peer),
+    peer_case('peer: 未登録の examId は拒否', 'create', f'peer_devices/unknown/devices/{PEER_ID}', 'DENY', good_peer),
+    peer_case('peer: 未ログインは拒否', 'create', PEER_PATH, 'DENY', good_peer, uid=None),
+    peer_case('peer: 要約はログインすれば読める', 'get', 'peer_summaries/fe', 'ALLOW'),
+    peer_case('peer: 要約は未ログインだと読めない', 'get', 'peer_summaries/fe', 'DENY', uid=None),
+    peer_case('peer: 要約は書けない', 'create', 'peer_summaries/fe', 'DENY', {'asOf': '2026-10-14'}),
+    peer_case('peer: 要約の更新も不可', 'update', 'peer_summaries/fe', 'DENY', {'asOf': '2026-10-14'}),
+]
+
 names = [c.pop('name') for c in cases]
 body = {'source': {'files': [{'name': 'firestore.rules', 'content': rules}]},
         'testSuite': {'testCases': cases}}

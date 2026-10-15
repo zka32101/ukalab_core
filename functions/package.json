@@ -1,0 +1,23 @@
+{
+  "name": "ukalab-peer-stats-functions",
+  "private": true,
+  "description": "うかラボ 匿名集計（peer stats）の Cloud Functions。デプロイは人が行う（docs/peer_stats.md の配備チェックリスト）。",
+  "engines": { "node": "22" },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.0"
+  }
+}
