@@ -4,7 +4,9 @@
 
 ## [Unreleased]
 
-観点を変えた出題（multi-angle）のフェーズ2。**新しい問題タイプ `trueFalse`（○×）/ `cloze`（空欄補充）/ `reverseLookup`（説明から用語）**と、その検証・採点・共通画面。既存の4タイプの JSON・挙動は変えない。`Srs` / `ReviewSchedulerEngine` は無変更（概念単位の SRS はフェーズ3）。pubspec のバージョンはこの変更では上げない（リリース時にまとめて決める）。
+## [0.75.0] - 2026-10-15
+
+観点を変えた出題（multi-angle）のフェーズ2。**新しい問題タイプ `trueFalse`（○×）/ `cloze`（空欄補充）/ `reverseLookup`（説明から用語）**と、その検証・採点・共通画面。既存の4タイプの JSON・挙動は変えない。`Srs` / `ReviewSchedulerEngine` は無変更（概念単位の SRS はフェーズ3）。このリリースは multi-angle のフェーズ1（`conceptId` / `angle`、検証、カバレッジレポート）とフェーズ2（`trueFalse` / `cloze` / `reverseLookup` タイプ）をまとめたもの。
 
 ### Added (フェーズ2)
 - `QuestionType` に `trueFalse` / `cloze` / `reverseLookup` を**末尾に追加**（既存値の名前・順序は不変）
@@ -45,6 +47,9 @@
 
 ### Tests
 - `test/question_angle_test.dart`、`tools/question_quality/test_question_quality.py`: 往復・後方互換・各ルール・strict・レポート・CLI
+
+### 移行
+アプリは `ukalab_core` を `v0.75.0` にピンする。`switch (q.type)` の網羅への影響は上の「移行（アプリ側）— enum 値の追加について」を参照。
 
 ## [0.74.0] - 2026-10-15
 
