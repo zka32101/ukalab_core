@@ -4,8 +4,13 @@ import '../config/exam_config.dart';
 import '../question/question.dart';
 
 /// 問題データの検証結果1件。
+/// [ContentIssue] の重大度。error は配信を止める（CLI は終了コード 1）。
+/// warning は表示のみで終了コードに影響しない（`--strict-angles` 等で error 扱いにできる）。
+enum ContentSeverity { error, warning }
+
 class ContentIssue {
-  const ContentIssue(this.qid, this.code, this.message);
+  const ContentIssue(this.qid, this.code, this.message,
+      {this.severity = ContentSeverity.error});
 
   /// 対象の qid。行そのものが読めなかった場合は 'line:N'。
   final String qid;
@@ -14,8 +19,18 @@ class ContentIssue {
   final String code;
   final String message;
 
+  /// 既定は error。
+  final ContentSeverity severity;
+
+  bool get isWarning => severity == ContentSeverity.warning;
+
+  /// 同じ指摘を重大度だけ変えて返す。
+  ContentIssue withSeverity(ContentSeverity s) =>
+      ContentIssue(qid, code, message, severity: s);
+
   @override
-  String toString() => '[$code] $qid: $message';
+  String toString() =>
+      isWarning ? '[warning:$code] $qid: $message' : '[$code] $qid: $message';
 }
 
 class ValidationOptions {
@@ -48,6 +63,14 @@ ParsedQuestions parseQuestionsJsonl(String text) {
         throw const FormatException('1行は JSON オブジェクトが必要です');
       }
       questions.add(Question.fromJson(decoded));
+      if (isUnknownAngleValue(decoded['angle'])) {
+        issues.add(ContentIssue(
+          decoded['qid'] is String ? decoded['qid'] as String : 'line:${i + 1}',
+          'angle-unknown',
+          '未知の angle: ${decoded['angle']}（${QuestionAngle.values.map((a) => a.name).join(' / ')} のいずれか）。観点なしとして扱います',
+          severity: ContentSeverity.warning,
+        ));
+      }
     } on FormatException catch (e) {
       issues.add(ContentIssue('line:${i + 1}', 'parse', e.message));
     }

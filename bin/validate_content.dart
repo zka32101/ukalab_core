@@ -7,7 +7,10 @@ import 'package:ukalab_core/ukalab_core.dart';
 ///
 /// 使い方: `dart run ukalab_core:validate_content exam_config.json [--terms terms.jsonl]... [--boundary boundary.jsonl]... [--reading reading.jsonl]... [--predict predict.jsonl]... [--misconception misconception.jsonl]... [--failure failure.jsonl]... [--confusion-matrix confusion_matrix.jsonl]... [--method-choice method_choice.jsonl]... [--ml-lab ml_lab.jsonl]... [--ai-news ai_news.jsonl]... [--conv-lab conv_lab.jsonl]... [--attention-viz attention_viz.jsonl]... [--nn-builder nn_builder.jsonl]... [--ethics-case ethics_case.jsonl]... [--story story_mode.jsonl]... [--update-log update_log.jsonl]... [--next-steps next_steps.jsonl]... [--checklist checklist.jsonl]... questions.jsonl...`
 /// `--subtopic-scope=subject` で、細目IDの衝突検査（subtopic-conflict）の単位を章（topicId、既定）から科目（subjectId）に変える。
-/// 問題が1件でもあれば終了コード1（CI で配信を止める）。
+/// `--angle-report=md|json` で観点（conceptId / angle）のカバレッジを標準出力に出す（`--angle-report-out=PATH` でファイルへ）。
+/// `--strict-angles` で `concept-single-angle`（概念あたりの異なる観点が2未満）の警告をエラーにする。
+/// 観点の警告（angle-unknown / concept-without-angle / concept-single-angle）は終了コードに影響しない。
+/// エラーの問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
   if (args.length < 2) {
     stderr.writeln(
@@ -27,6 +30,7 @@ Future<void> main(List<String> args) async {
       '[--next-steps next_steps.jsonl]... '
       '[--checklist checklist.jsonl]... '
       '[--subtopic-scope=topic|subject] '
+      '[--angle-report=md|json] [--angle-report-out=PATH] [--strict-angles] '
       '<questions.jsonl>...',
     );
     exit(64);
@@ -61,6 +65,9 @@ Future<void> main(List<String> args) async {
   final nextStepPaths = <String>[];
   final checklistPaths = <String>[];
   var subtopicScope = SubtopicScope.topic;
+  String? angleReportFormat;
+  String? angleReportOut;
+  var strictAngles = false;
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
     if (rest[i].startsWith('--subtopic-scope=')) {
@@ -73,6 +80,17 @@ Future<void> main(List<String> args) async {
         stderr.writeln('--subtopic-scope は topic か subject を指定してください: $v');
         exit(64);
       }
+    } else if (rest[i].startsWith('--angle-report=')) {
+      final v = rest[i].substring('--angle-report='.length);
+      if (v != 'md' && v != 'json') {
+        stderr.writeln('--angle-report は md か json を指定してください: $v');
+        exit(64);
+      }
+      angleReportFormat = v;
+    } else if (rest[i].startsWith('--angle-report-out=')) {
+      angleReportOut = rest[i].substring('--angle-report-out='.length);
+    } else if (rest[i] == '--strict-angles') {
+      strictAngles = true;
     } else if (rest[i] == '--terms') {
       if (i + 1 >= rest.length) {
         stderr.writeln('--terms の後にファイルパスが必要です');
@@ -196,6 +214,7 @@ Future<void> main(List<String> args) async {
     ));
   }
   issues.addAll(validateQuestions(questions, exam: exam));
+  issues.addAll(validateQuestionAngles(questions, strictAngles: strictAngles));
 
   final terms = <Term>[];
   for (final path in termPaths) {
@@ -469,8 +488,20 @@ Future<void> main(List<String> args) async {
       nextStepRules.isEmpty ? '' : '、次の一手${nextStepRules.length}件を検査';
   final checklistSummary =
       checklistItems.isEmpty ? '' : '、チェックリスト${checklistItems.length}項目を検査';
+  final errorCount = issues.where((i) => !i.isWarning).length;
+  final warningCount = issues.length - errorCount;
+  final warningSummary = warningCount == 0 ? '' : '、警告${warningCount}件';
   stdout.writeln(
-    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$readingSummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary$updateLogSummary$nextStepSummary$checklistSummary、問題${issues.length}件',
+    '${exam.examId}: ${questions.length}問を検査$termsSummary$boundarySummary$readingSummary$predictSummary$misconceptionSummary$failureSummary$confusionMatrixSummary$methodChoiceSummary$mlLabSummary$aiNewsSummary$convLabSummary$attentionVizSummary$nnBuilderSummary$ethicsCaseSummary$storySummary$updateLogSummary$nextStepSummary$checklistSummary、問題${errorCount}件$warningSummary',
   );
-  exit(issues.isEmpty ? 0 : 1);
+  if (angleReportFormat != null) {
+    final report = AngleCoverageReport.fromQuestions(questions);
+    final text = angleReportFormat == 'json' ? report.toJsonString() : report.toMarkdown();
+    if (angleReportOut != null) {
+      await File(angleReportOut).writeAsString(text);
+    } else {
+      stdout.write(text);
+    }
+  }
+  exit(errorCount == 0 ? 0 : 1);
 }

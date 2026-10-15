@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+観点を変えた出題（multi-angle）のフェーズ1。**任意項目の追加と検証・レポートのみ**（追加のみ。未指定なら JSON も挙動も従来どおり。新しい `QuestionType` はフェーズ2）。
+
+### Added
+- `Question.conceptId`（`String?`）と `Question.angle`（`QuestionAngle?`）。`QuestionAngle { definition, scenario, comparison, reverse, cloze, trueFalse }`。`toJson` は null のとき出力しない
+- `ContentSeverity`（error / warning）と `ContentIssue.severity`（既定 error）
+- `validateQuestionAngles`: 警告 `concept-without-angle`（`conceptId` ありで `angle` なし）、`concept-single-angle`（概念あたりの異なる `angle` が 2 未満。`conceptId` を持つ問題のみ対象）。`parseQuestionsJsonl` が未知の `angle` を警告 `angle-unknown` にする
+- `AngleCoverageReport`: 観点別・概念別のカバレッジ集計（Markdown / JSON、決定的）
+- `validate_content`: `--angle-report=md|json`（`--angle-report-out=PATH`）、`--strict-angles`（`concept-single-angle` をエラー化）。警告は終了コードに影響せず、サマリに「警告N件」を出す
+- `tools/question_quality/angle_coverage.py`（Python 版の同じ集計）。`run_checks.py` から実行
+
+### Tests
+- `test/question_angle_test.dart`、`tools/question_quality/test_question_quality.py`: 往復・後方互換・各ルール・strict・レポート・CLI
+
 ## [0.74.0] - 2026-10-15
 
 匿名集計 PeerStats の**送信側・集計側のソース**を追加する（追加のみ。既存の公開 API は変更しない）。**Firebase への配備・Functions のデプロイ・ルールの適用は行わない**（人が `docs/peer_stats.md` の配備チェックリストに沿って行う）。

@@ -26,7 +26,7 @@ bin/
   validate_content.dart   問題データ検証 CLI
 tools/
   icon_gen/                アイコン生成
-  question_quality/        問題の質の集計スクリプト（選択肢の長さ・断定語バランス）と run_checks.py（両方を実行）
+  question_quality/        問題の質の集計スクリプト（選択肢の長さ・断定語バランス・観点カバレッジ）と run_checks.py（まとめて実行）
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
 ```
 
@@ -95,6 +95,33 @@ dart run ukalab_core:validate_content exam.json questions.jsonl
 ```
 
 検査する項目: 出典の説明が必須／`licensed` は `license` 必須／`statute` は `lawVersion` 必須／qid の重複／選択肢の個数／同じ文面の選択肢（正解の一意性）／`answerIndex` の範囲／解説・`contentVer` の有無／試験定義との整合（examId・subjectId・levelId）。問題が1件でもあれば終了コード 1。
+
+#### 観点（`conceptId` / `angle`）と検査・カバレッジレポート
+
+「同じ用語・概念を別の角度で解く」ための任意項目（設計は [docs/multi_angle_questions_design.md](docs/multi_angle_questions_design.md)、これはフェーズ1）。
+
+- `Question.conceptId`（`String?`）: 用語・概念の安定ID。用語カードがある概念は `Term.termId` と同じ値、無い概念は `c-` 接頭辞の独自ID。
+- `Question.angle`（`QuestionAngle?`）: `definition` / `scenario` / `comparison` / `reverse` / `cloze` / `trueFalse`。問題の形式（`QuestionType`）とは別軸。
+- どちらも未指定なら `toJson` に出ず、既存の問題 JSONL は無変更で読める・往復できる。出題・採点・SRS は従来どおり。
+- `conceptId` は書くなら空でない文字列。未知の `angle` は読み込みでは落とさず観点なしとして扱い、警告にする。
+
+`validate_content` の観点ルール（すべて**警告**。終了コードに影響しない。`conceptId` を持つ問題が無いデータでは何も出ない）:
+
+| コード | 内容 |
+|---|---|
+| `angle-unknown` | `angle` が上記6値以外 |
+| `concept-without-angle` | `conceptId` があるのに `angle` が無い |
+| `concept-single-angle` | 概念あたりの異なる `angle` が 2 未満（`conceptId` を持つ有効な問題が対象。`disabled` は除外） |
+
+```bash
+# 観点のカバレッジをレポートに出す（md か json。--angle-report-out でファイルへ）
+dart run ukalab_core:validate_content exam.json --angle-report=md questions.jsonl
+dart run ukalab_core:validate_content exam.json --angle-report=json --angle-report-out=angle_report.json questions.jsonl
+# concept-single-angle をエラーにする（アプリ側 CI が任意に有効化）
+dart run ukalab_core:validate_content exam.json --strict-angles questions.jsonl
+```
+
+レポートは概念別・観点別の問題数、`conceptId` 付与率、2 観点以上の概念の割合を出す（有効な問題のみ。出力は決定的）。同じ集計の Python 版が `tools/question_quality/angle_coverage.py`（`run_checks.py` からも実行される。既定は警告のみ、`--strict` で失敗）。
 
 形式の検査では見えない問題の質の観点（選択肢の長さの手がかり＝最長の選択肢が正解になりがち、断定語バランス、など）は [docs/question_quality_viewpoints.md](docs/question_quality_viewpoints.md) にまとめている。
 

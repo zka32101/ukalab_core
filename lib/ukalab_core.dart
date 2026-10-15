@@ -19,6 +19,7 @@ export 'content/ml_lab_validator.dart';
 export 'content/next_step_validator.dart';
 export 'content/nn_builder_validator.dart';
 export 'content/predict_run_validator.dart';
+export 'content/question_angle_validator.dart';
 export 'content/question_validator.dart';
 export 'content/story_mode_validator.dart';
 export 'content/teach_mascot_validator.dart';
