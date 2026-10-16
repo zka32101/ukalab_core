@@ -35,6 +35,7 @@ export 'engine/ledger_judge.dart';
 export 'engine/mock_exam.dart';
 export 'engine/practice_session.dart';
 export 'engine/question_filters.dart';
+export 'engine/question_display.dart';
 export 'engine/srs.dart';
 export 'engine/time_boxed_plan.dart';
 export 'engine/weak_drill.dart';

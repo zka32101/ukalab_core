@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../engine/question_display.dart';
 import '../../question/question.dart';
 import 'bookmark_tag_store.dart';
 
@@ -29,7 +30,7 @@ class BookmarkTagEditScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                q.prompt,
+                q.displayPrompt,
                 style: theme.textTheme.bodyMedium,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

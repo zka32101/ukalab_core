@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../engine/question_filters.dart';
+import '../../engine/question_display.dart';
 import '../../question/question.dart';
 import 'question_detail_screen.dart';
 import 'question_memo_store.dart';
@@ -88,7 +89,7 @@ class _MemoListScreenState extends ConsumerState<MemoListScreen> {
                                 final q = filtered[i];
                                 return Card(
                                   child: ListTile(
-                                    title: Text(q.prompt, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                    title: Text(q.displayPrompt, maxLines: 2, overflow: TextOverflow.ellipsis),
                                     subtitle: Text(
                                       memos[q.qid] ?? '',
                                       maxLines: 2,
