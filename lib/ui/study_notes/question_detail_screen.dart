@@ -2,6 +2,7 @@ import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 
 import '../../engine/answer_check.dart';
+import '../../engine/question_display.dart';
 import '../../question/question.dart';
 
 /// 選択肢の記号の既定（五肢択一まで）。
@@ -32,7 +33,11 @@ class QuestionDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          QuestionCard(text: q.prompt, index: 1, total: 1),
+          QuestionCard(
+            text: q.type == QuestionType.cloze ? q.displayPrompt : q.prompt,
+            index: 1,
+            total: 1,
+          ),
           const SizedBox(height: 12),
           for (var i = 0; i < q.choices.length; i++)
             Padding(

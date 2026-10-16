@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../engine/question_filters.dart';
+import '../../engine/question_display.dart';
 import '../../question/question.dart';
 import 'bookmark_store.dart';
 import 'bookmark_tag_edit_screen.dart';
@@ -116,7 +117,7 @@ class _BookmarkedQuestionsScreenState extends ConsumerState<BookmarkedQuestionsS
                               final qTags = (tags[q.qid] ?? const <String>{}).toList()..sort();
                               return Card(
                                 child: ListTile(
-                                  title: Text(q.prompt, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                  title: Text(q.displayPrompt, maxLines: 2, overflow: TextOverflow.ellipsis),
                                   subtitle: qTags.isEmpty ? null : Text(qTags.join(' / ')),
                                   trailing: const Icon(Icons.chevron_right),
                                   onTap: () => Navigator.of(context).push(

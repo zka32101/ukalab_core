@@ -9,7 +9,8 @@ List<Question> filterByBookmark(
 }) =>
     onlyBookmarked ? [for (final q in pool) if (bookmarkedQids.contains(q.qid)) q] : pool;
 
-/// [keyword] が問題文・解説・選択肢のいずれかに含まれる問題を返す
+/// [keyword] が問題文・解説・選択肢（reverseLookup は clue / answers、
+/// cloze は空欄の answers を含む）のいずれかに含まれる問題を返す
 /// （大文字小文字は区別しない）。空のキーワードでは何も返さない。
 List<Question> searchQuestions(List<Question> pool, String keyword) {
   final kw = keyword.trim().toLowerCase();
@@ -18,7 +19,8 @@ List<Question> searchQuestions(List<Question> pool, String keyword) {
     for (final q in pool)
       if (q.prompt.toLowerCase().contains(kw) ||
           q.explanation.toLowerCase().contains(kw) ||
-          q.choices.any((c) => c.toLowerCase().contains(kw)))
+          q.choices.any((c) => c.toLowerCase().contains(kw)) ||
+          _newTypeSearchTexts(q).any((t) => t.toLowerCase().contains(kw)))
         q,
   ];
 }
@@ -51,3 +53,11 @@ List<String> allBookmarkTags(Map<String, Set<String>> tags, Iterable<String> qid
   final sorted = names.toList()..sort();
   return sorted;
 }
+
+/// 新形式問題の検索対象テキスト。reverseLookup は clue / answers、
+/// cloze は各空欄の answers。他のタイプでは空。
+Iterable<String> _newTypeSearchTexts(Question q) => switch (q.type) {
+      QuestionType.reverseLookup => [if (q.clue != null) q.clue!, ...q.answers],
+      QuestionType.cloze => [for (final b in q.blanks) ...b.answers],
+      _ => const <String>[],
+    };

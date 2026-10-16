@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### Added
+- `QuestionDisplay` 拡張の `Question.displayPrompt`（`lib/engine/question_display.dart`、`ukalab_core.dart` から公開）: 一覧表示用のテキスト。choice / trueFalse / journal / worksheet / ledger は `prompt`、cloze は `{{n}}` を「◯」に置換、reverseLookup は `clue`（空なら `prompt`）
+
+### Changed
+- `searchQuestions` の検索対象に reverseLookup の `clue` / `answers` と cloze の `blanks[].answers` を追加（既存タイプの結果は不変）
+- ブックマーク一覧・メモ一覧・タグ編集・問題詳細（cloze の本文）の表示を `displayPrompt` に差し替え。公開 API の変更なし（後方互換）
+
 ## [0.75.0] - 2026-10-15
 
 観点を変えた出題（multi-angle）のフェーズ2。**新しい問題タイプ `trueFalse`（○×）/ `cloze`（空欄補充）/ `reverseLookup`（説明から用語）**と、その検証・採点・共通画面。既存の4タイプの JSON・挙動は変えない。`Srs` / `ReviewSchedulerEngine` は無変更（概念単位の SRS はフェーズ3）。このリリースは multi-angle のフェーズ1（`conceptId` / `angle`、検証、カバレッジレポート）とフェーズ2（`trueFalse` / `cloze` / `reverseLookup` タイプ）をまとめたもの。
