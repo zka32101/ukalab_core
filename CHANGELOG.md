@@ -4,12 +4,17 @@
 
 ## [Unreleased]
 
+## [0.76.0] - 2026-10-16
+
 ### Added
 - `QuestionDisplay` 拡張の `Question.displayPrompt`（`lib/engine/question_display.dart`、`ukalab_core.dart` から公開）: 一覧表示用のテキスト。choice / trueFalse / journal / worksheet / ledger は `prompt`、cloze は `{{n}}` を「◯」に置換、reverseLookup は `clue`（空なら `prompt`）
 
 ### Changed
 - `searchQuestions` の検索対象に reverseLookup の `clue` / `answers` と cloze の `blanks[].answers` を追加（既存タイプの結果は不変）
 - ブックマーク一覧・メモ一覧・タグ編集・問題詳細（cloze の本文）の表示を `displayPrompt` に差し替え。公開 API の変更なし（後方互換）
+
+### 移行
+アプリは `ukalab_core` を `v0.76.0` にピンする。公開 API の変更は後方互換（追加のみ）。
 
 ## [0.75.0] - 2026-10-15
 
