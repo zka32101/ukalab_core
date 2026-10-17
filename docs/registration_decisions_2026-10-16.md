@@ -18,6 +18,8 @@
 | D9 | 本番の広告ユニットID | **ビルド時に注入**(`--dart-define` / CI Secrets)。コミット済みのG検定・漢検は注入式に移す |
 | D10 | RevenueCat 構成 | **1プロジェクトに7アプリ**。entitlement は `noads` / `premium` に統一 |
 | 補足 | iOS | **今は Android のみ**。Apple 側の登録、`RC_APPLE_KEY`、ATT 文言は後回し |
+| 補足 | 漢検の applicationId | **現状のまま `com.yourwish.ukarulab.kanji`**(2026-10-17 決定)。Play Console のアプリがこの名前で作成済みで、AAB 登録後はパッケージ名を変えられないため。綴りは内部のみでユーザーには見えない |
+| 補足 | 乙4の applicationId | **`com.yourwish.ukalab_otsu`**(運営者指定。ukalab#199) |
 
 ## 2. アプリごとの値(Android)
 
@@ -29,7 +31,7 @@
 | 生成AIパスポート | `com.yourwish.ukalab.seisei_ai_passport` | 本番形式(マニフェストに既にある) | **未配線** | `seisei_ai_passport_noads` / `seisei_ai_passport_premium` | AdGate の配線が要る |
 | 簿記3級 | `com.yourwish.ukalab.boki3` | **テストID** | **未配線** | `boki3_noads` / `boki3_premium` | AdMob の登録と配線が要る |
 | 危険物乙4 | **未生成**(`android/` が無い) | なし | 未配線 | `otsu4_noads` / `otsu4_premium` | Android プラットフォームの生成から。RevenueCat への切替コードは追加済み |
-| 漢検(うかラボ 漢字検定) | `com.yourwish.ukarulab.kanji` | 本番形式 | 独自の `AdService`(子ども向け設定あり) | 現状 `premium-*`。**D8により、他と同じ `<app>_noads` / `<app>_premium` の型へ合わせる。`<app>` の綴りは未決(applicationId の判断と一緒に決める)** | 綴り `ukarulab` は他と異なり旧ブランド名を含む。**公開前に変更するか要判断**(applicationId は未公開の間しか変えられない) |
+| 漢検(うかラボ 漢字検定) | `com.yourwish.ukarulab.kanji`(**変更しない**) | 本番形式 | 独自の `AdService`(子ども向け設定あり) | 現状 `premium-*`。**D8により、他と同じ `<app>_noads` / `<app>_premium` の型へ合わせる。`<app>` の綴りは applicationId と無関係に決められる(未決)** | 綴り `ukarulab` は他と異なり旧ブランド名を含むが、Play のアプリが作成済みのため変更しない |
 
 iOS バンドルID(参考。今は使わない): G検定 `com.yourwish.ukalabGKentei` / ITパス `com.yourwish.ukalabItPassport` / 情セマネ `com.yourwish.ukalabInfosecmanage`。他4本は `ios/` が無く未確定。
 
@@ -44,7 +46,8 @@ iOS バンドルID(参考。今は使わない): G検定 `com.yourwish.ukalabGKe
 コードの変更(1アプリ1 PR。すべて別PRで、マージは指示があったときだけ):
 - 広告ユニットID・RevenueCat キーを `--dart-define` 読み込みにする(G検定・漢検は、コミット済みの値を外す)。
 - 生成AI・簿記・乙4に AdGate を配線する。乙4は `android/` を生成する。
-- 漢検の課金を kit 標準(`noads` / `premium`、`PurchaseSection`)に合わせる。子ども向け設定と保護者ゲートは維持。
+- 漢検の課金を kit 標準(`noads` / `premium`、`PurchaseSection`)に合わせる。子ども向け設定と保護者ゲートは維持。applicationId は変えない。
+- 無料枠(D6)は段階的に入れる。第1弾: 模擬試験の月1回(G検定・ITパス・情セマネ・生成AIパスは PR 済み。簿記・乙4は別PR)。復習(1日10問)・苦手分析(3分野)は未実装(苦手分析は現状すべて premium 限定。無料で3分野見せるかは未決)。
 - `FreeTierLimits.standard` を7アプリに適用する(模試・苦手分析・復習・自動生成)。
 - `PremiumFeature` の適用を共通の7機能にそろえる(乙4に模試成長グラフと弱点ドリルを追加。カスタム模試は現状どのアプリも未使用)。
 - 簿記 README の無料範囲の記述を直す。
