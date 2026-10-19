@@ -27,6 +27,10 @@ class UkalabTheme {
   /// タップ領域の最小サイズ（pt）。
   static const double minTapTarget = 44;
 
+  /// 同梱の日本語フォント（BIZ UDPゴシック）。端末の標準フォントだと、機種によって字形が
+  /// 変わる（「解」などが崩れて見える）ため、全アプリで固定する。ライセンスは SIL OFL。
+  static const String fontFamily = 'packages/ukalab_core/BIZUDPGothic';
+
   static ThemeData build({
     required UkalabField field,
     UkalabCert? cert,
@@ -53,7 +57,7 @@ class UkalabTheme {
       onSurfaceVariant: p.textSecondary,
     );
 
-    final text = _textTheme(p);
+    final text = _textTheme(p).apply(fontFamily: fontFamily);
     final buttonShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(buttonRadius),
     );

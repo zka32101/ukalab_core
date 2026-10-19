@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.77.0] - 2026-10-20
+
+### Changed
+- `UkalabTheme` の文字に、同梱の日本語フォント BIZ UDPゴシック（Regular・Bold、SIL OFL）を指定。端末の標準フォントに依存せず、「解」などの字形が機種で変わらない。`UkalabTheme.fontFamily` で参照できる。各アプリの AAB は約 9.3MB 増える
+
 ## [0.76.0] - 2026-10-16
 
 ### Added
