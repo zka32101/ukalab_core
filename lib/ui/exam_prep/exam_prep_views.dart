@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../engine/exam_date.dart';
 import '../../engine/exam_eve.dart';
@@ -9,6 +8,7 @@ import '../../experience/update_log.dart';
 import '../../progress/history_export.dart';
 import '../../progress/progress_record.dart';
 import '../../question/question.dart';
+import '../file_export/save_file.dart';
 import 'exam_prep_strings.dart';
 
 /// 一般の当日チェック項目の itemId（文言は `ExamPrepStrings.defaultChecklistLabels`）。
@@ -356,7 +356,8 @@ class UpdateLogView extends StatelessWidget {
   }
 }
 
-/// 学習データのCSV書き出し。保存・共有のプラグインは足さず、表示とコピーで渡す。
+/// 学習データのCSV書き出し。表示に加え、ダウンロード（Web）／共有シート（その他）でファイルとして渡す
+/// （UTF-8 BOM 付き、`ukalab_history_YYYYMMDD.csv`）。
 /// 氏名・ID・端末情報・問題文は含まない（`historyCsvText`）。
 class HistoryExportView extends StatelessWidget {
   const HistoryExportView({
@@ -364,9 +365,17 @@ class HistoryExportView extends StatelessWidget {
     required this.records,
     required this.questions,
     this.strings,
+    this.saver,
+    this.now,
   });
 
   final List<ProgressRecord> records;
+
+  /// ファイルの渡し方。null なら [defaultFileSaver]（Web はダウンロード、他は共有シート）。テスト用に差し替える。
+  final FileSaver? saver;
+
+  /// ファイル名の日付に使う現在時刻。null なら `DateTime.now`。
+  final DateTime Function()? now;
 
   /// 分野の集計に使う問題データ。
   final List<Question> questions;
@@ -393,17 +402,37 @@ class HistoryExportView extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 8),
-                FilledButton.icon(
-                  key: const ValueKey('copyCsv'),
-                  icon: const Icon(Icons.copy),
-                  label: Text(s.exportCopy),
+                Builder(
+                  builder: (btnContext) => FilledButton.icon(
+                  key: const ValueKey('downloadCsv'),
+                  icon: const Icon(Icons.download),
+                  label: Text(s.exportSave),
                   onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: csv));
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(s.exportCopied)));
+                    final messenger = ScaffoldMessenger.of(context);
+                    // iPad の共有シートの位置（ボタンの矩形）。
+                    final box = btnContext.findRenderObject() as RenderBox?;
+                    final origin = box != null && box.hasSize
+                        ? box.localToGlobal(Offset.zero) & box.size
+                        : null;
+                    String? message;
+                    try {
+                      final done = await shareCsv(
+                        csv: csv,
+                        fileName: historyCsvFileName((now ?? DateTime.now)()),
+                        saver: saver,
+                        sharePositionOrigin: origin,
+                      );
+                      if (done) message = s.exportSaved;
+                    } catch (_) {
+                      message = s.exportSaveFailed;
+                    }
+                    if (message != null) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(message)),
+                      );
+                    }
                   },
+                  ),
                 ),
                 const SizedBox(height: 12),
                 SelectableText(

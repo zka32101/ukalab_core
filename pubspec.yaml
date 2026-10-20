@@ -17,6 +17,9 @@ dependencies:
       url: https://github.com/zka32101/app_common_kit.git
       ref: v3.11.0
   flutter_riverpod: ^2.6.1
+  # 学習履歴などの書き出し（lib/ui/file_export）。ShareParams API（11 以降）を使う。
+  share_plus: ">=11.0.0 <14.0.0"
+  web: ">=1.0.0 <2.0.0"
   shared_preferences: ^2.3.0
   cloud_firestore: ">=5.0.0 <7.0.0"
   # 相互紹介（lib/cross_promo.dart）。firebase_core は cloud_firestore と同じ世代に収まる範囲、

@@ -76,7 +76,7 @@ const ukalabStringsKo = UkalabStrings(
     'moka': '느긋한 짝꿍 (강아지)',
     'mike': '친절한 해설 담당 (고양이)',
   },
-  tabLabels: ['홈', '학습', '모의', '기록', '설정'],
+  tabLabels: ['홈', '풀기', '모의', '기록', '설정'],
   mockRecordTitle: '학습 기록 카드',
   mockRecordNote: '모의고사 기록입니다. 실제 시험 합격이 아닙니다. 이름 등 개인 정보는 들어가지 않아요.',
   mockRecordMessage: '합격점을 넘었어요!',
