@@ -9,6 +9,16 @@
 - `UkalabStrings` の `characterNames` / `characterRoles` に circa の名前と役割(日英中韓)を追加
 - 画像(`assets/mascot/circa/`)と pubspec.yaml への登録は PR-A で行う(ディレクトリが空だとビルドが失敗するため、今回は登録しない)。画像はすべて AI 生成で、試験団体の公式キャラではない
 
+## [0.80.0] - 2026-10-20
+
+学習アプリ向けの部品を `package:ukalab_core/learning.dart` として追加する（app_common_kit は v3.12.0 のまま）。キットを学習に依存しない共通基盤に絞るための第1段階で、キット側の削除は次のキット v4.0.0 で行う。
+
+### 追加
+
+- `QuestionCard`・`ExplanationPanel`・`ResultSummary`・`StreakBadge`・`MockExamTrendChart`／`MockExamTrendPoint`・`recordStudyToday`／`loadCurrentStreak`（連続学習）・`AnswerFeedback`（音・触覚。`SoundBackend`／`HapticBackend` など）。キットから移したもので、挙動は同じ
+- `ui.dart` とは別の入口にした。キット v3.x と同じ名前なので、アプリは移行（キット v4.0.0 への更新）まで `learning.dart` を import しない
+- コア内の `QuestionDetailScreen`・`OshiHomeCard` は、この版から core の実装を使う
+
 ## [0.79.1] - 2026-10-20
 
 ### Changed
