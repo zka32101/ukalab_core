@@ -13,8 +13,6 @@ void main() {
       for (final l in UkalabShell.defaultLabels) {
         expect(find.text(l), findsOneWidget);
       }
-      expect(UkalabShell.defaultLabels[1], '解く');
-      expect(find.text('学ぶ'), findsNothing);
       await tester.tap(find.text('設定'));
       await tester.pump();
       expect(find.text('page-S'), findsOneWidget);

@@ -76,7 +76,7 @@ const ukalabStringsZhHant = UkalabStrings(
     'moka': '悠閒的夥伴（狗）',
     'mike': '細心的講解員（貓）',
   },
-  tabLabels: ['首頁', '做題', '模擬', '紀錄', '設定'],
+  tabLabels: ['首頁', '學習', '模擬', '紀錄', '設定'],
   mockRecordTitle: '學習紀錄卡',
   mockRecordNote: '這是模擬考試的紀錄，並非正式考試通過。不包含姓名等個人資訊。',
   mockRecordMessage: '超過及格分了！',

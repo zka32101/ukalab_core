@@ -506,7 +506,7 @@ class DailyGoalSetting extends ConsumerWidget {
         Text('デイリーミッション', style: theme.textTheme.titleSmall),
         const Padding(
           padding: EdgeInsets.fromLTRB(0, 8, 0, 12),
-          child: Text('1日の目標問題数を決めて、解くタブで達成状況を確認できます。', style: TextStyle(fontSize: 12, height: 1.6)),
+          child: Text('1日の目標問題数を決めて、学ぶタブで達成状況を確認できます。', style: TextStyle(fontSize: 12, height: 1.6)),
         ),
         Wrap(
           spacing: 8,

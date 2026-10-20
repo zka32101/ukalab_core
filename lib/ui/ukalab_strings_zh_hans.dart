@@ -76,7 +76,7 @@ const ukalabStringsZhHans = UkalabStrings(
     'moka': '悠闲的搭档（狗）',
     'mike': '细心的讲解员（猫）',
   },
-  tabLabels: ['首页', '做题', '模拟', '记录', '设置'],
+  tabLabels: ['首页', '学习', '模拟', '记录', '设置'],
   mockRecordTitle: '学习记录卡',
   mockRecordNote: '这是模拟考试的记录，并非正式考试通过。不包含姓名等个人信息。',
   mockRecordMessage: '超过及格分了！',
