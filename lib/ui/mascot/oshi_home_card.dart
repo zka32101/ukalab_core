@@ -230,7 +230,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
       expression: day.expression,
       examPhase: phase,
       display: _display,
-      size: small ? 56 : 88,
+      size: small ? 70 : 110,
       line: small ? null : line,
       onTap: () => setState(() => _seed++),
     );

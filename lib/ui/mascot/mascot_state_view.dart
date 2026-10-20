@@ -6,7 +6,7 @@ import 'ukalab_characters.dart';
 
 /// 推しの絵（ポーズ）。画像の無いキャラ（標準キャラ）はコード描画の [MascotWidget] に戻る。
 class MascotPoseImage extends StatelessWidget {
-  const MascotPoseImage({super.key, required this.pack, this.pose, this.state, this.size = 120})
+  const MascotPoseImage({super.key, required this.pack, this.pose, this.state, this.size = 150})
     : assert(pose != null || state != null, 'pose か state のどちらかを指定する');
 
   final CharacterPack pack;
@@ -41,7 +41,7 @@ class MascotStateView extends StatelessWidget {
     required this.message,
     this.actionLabel,
     this.onAction,
-    this.imageSize = 140,
+    this.imageSize = 175,
   });
 
   const MascotStateView.empty({

@@ -93,7 +93,7 @@ class WardrobeScreen extends ConsumerWidget {
                 stage: stage,
                 outfit: outfit.equipped,
                 examPhase: examPhase,
-                size: 140,
+                size: 175,
               ),
             ),
             const SizedBox(height: 8),
