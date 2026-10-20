@@ -242,10 +242,8 @@ Lv<1-5>: <成長の特徴>。表情: <normal=穏やか / joy=満面の笑み>。
 
 - 資格キャラは既存の `CharacterPack` を再利用する。`UkalabCharacters` に資格キャラを追加し、`id` で選べるようにする。
 - 「資格専用」の意味を持たせるため、`CharacterPack` に任意項目 `certId`（例 `it_passport`）を足す案。無い場合は通常の推しとして扱われる。
-- アプリ側（`ukalab_it_passport`）の選び方は2案。
-  - 案1: 既定の推しにする。そのアプリでは初回起動時（`ukalab.mascot.selected` が未設定のとき）だけ資格キャラを選ぶ。
-  - 案2: 選択画面に追加するだけにして、ユーザーが選ぶ。
-  - 注意: 保存キー `ukalab.mascot.selected` はうかラボ共通。端末内でアプリ間共有されると、他アプリの推しが変わる可能性がある（`character_selection.dart` のコメントに同様の記載あり）。案1を採る場合は、資格キャラを他アプリでも選べるか（表示だけ未解放にするか）を決める（U3）。
+- アプリ側（`ukalab_it_passport`）での選び方: 資格キャラは選択画面に追加し、そのアプリのプレミアム購入者のみ選べる（オーナー決定、§6.4）。既定の推しにはしない。
+- 保存キー `ukalab.mascot.selected` はうかラボ共通で、端末内でアプリ間共有される可能性がある（`character_selection.dart` のコメントに同様の記載あり）。他アプリでの扱いは §6.4 の7で吸収する。
 - 衣装（`outfits/`）は作らない案。`outfitImageBuilder` は null を返し、通常の画像で表示する（既存の「衣装画像がない資格は私服のまま」と同じ挙動）。
 
 ### 6.2 変更が必要なファイル候補
@@ -253,19 +251,47 @@ Lv<1-5>: <成長の特徴>。表情: <normal=穏やか / joy=満面の笑み>。
 | ファイル | 変更内容 |
 |---|---|
 | `lib/ui/mascot/ukalab_characters.dart` | 新 `CharacterPack` の定義、`all` / `imagePacks` への追加（または `certPacks` を新設）、画像ビルダー。1体ずつラッパーを書く現行方式は増えるほど冗長になるため、`id` から組み立てる共通関数に整理する案 |
-| `lib/ui/mascot/mascot_models.dart` | `CharacterPack` に任意の `certId` と、使える画像のセットを示す項目（例: scenes/states がない場合のフォールバック指定）を追加する案 |
+| `lib/ui/mascot/mascot_models.dart` | `CharacterPack` に任意の `requiresPremium`（§6.4）と `certId` と、使える画像のセットを示す項目（例: scenes/states がない場合のフォールバック指定）を追加する案 |
 | `lib/ui/ukalab_strings.dart` | `characterNames` / `characterRoles`（日本語・英語）に新キャラを追加 |
 | `pubspec.yaml` | `assets/mascot/<id>/` とサブディレクトリ（`scenes/` `guide/` `poses/` `states/` `items/`）を登録 |
 | `test/ui/ukalab_characters_test.dart` ほか（`ukalab_medals_test`, `mascot_pose_state_test`, `ukalab_accessories_test`） | `all.length == 5` の更新、新キャラの画像存在確認。衣装テストは「衣装なし」を許容する条件分岐が必要 |
 | `lib/ui/mascot/mascot_lines.dart` | 新キャラ固有のセリフがあれば追加（`findForbiddenExpressions` の検査に通すこと） |
 | `README.md` / `CHANGELOG.md` | キャラ追加の記載、AI生成素材の記載 |
-| `lib/ui/mascot/character_selection.dart` | 資格キャラの並び順・見出し、既定選択の扱い（案1の場合） |
+| `lib/ui/mascot/character_selection.dart` | 資格キャラの並び順・見出し、ロック表示・購入導線（§6.4） |
 
 ### 6.3 フォールバック
 
 - 画像Bの一部が無い場合に備え、`sceneImageBuilder` / `poseImage` / `stateImage` が null を返したとき、Lv画像で代用する経路が既存の表示ウィジェットにあるかを、実装時に確認する（このドラフトの調査では未確認）。
 
-### 6.4 リリース
+### 6.4 プレミアム限定の組み込み（オーナー決定）
+
+オーナー決定: 追加の推し（資格専用キャラ）は、その資格アプリのプレミアム購入者（entitlement `premium`、商品 `<app>_premium`）のみ選択できる。既存4体（kai, mio, moka, mike）は従来どおりの仕様（現行の選択画面は「無料で全員選べる」）のまま変えない。
+
+**読んだ事実**（`docs/local_handover_monetization.md` の記述による。権利管理の本体は依存先の `app_common_kit` にあり、今回そのソースは読んでいない）:
+
+- `EntitlementService`（抽象）、`EntitlementState`（`hasNoAds` / `hasPremium` / `premiumExpiresAt`）、`EntitlementIds`（既定の権利名は `noads` と `premium`）、`FakeEntitlementService`、`RevenueCatEntitlementService`、`entitlementServiceProvider` / `entitlementStateProvider`、`PurchaseSection`（購入欄と復元ボタン）が app_common_kit にある。
+- `entitlementServiceProvider` の既定は未実装で例外を投げ、各アプリが `ProviderScope.overrides` で差し込む。
+- ukalab_core の `lib/` には entitlement 関連のコードは無い（ukalab_core が依存する側）。
+- 商品IDは `<app>_premium`（例: `it_passport_premium`）、権利IDは `premium`。
+
+**設計案**（実装は別PR、v0.79.0 想定。この PR では実装しない）:
+
+1. **フラグ**: `CharacterPack` に任意項目 `requiresPremium`（既定 false。既存4体と標準キャラは false のまま）を足す。資格キャラだけ true にする。
+2. **判定の置き場所**: ukalab_core の `CharacterSelectScreen` は、権利状態を直接は読まない。アプリが渡す形にする（例: `CharacterSelectScreen(isUnlocked: bool Function(CharacterPack))`、または `Provider<bool>` を override）。理由: 権利の配線は各アプリが `entitlementServiceProvider` を override して持っているため。ukalab_core が app_common_kit の `entitlementStateProvider` を直接 watch できるかは、実装時にコードを読んで決める（未確認）。
+3. **未購入時の表示**: 選択画面で資格キャラをロック表示にする（鍵アイコン、「プレミアムで使える」の短い文）。タップしても選択は変えず、アプリが指定する購入導線（設定の購入欄など）を開く。購入前の確認（保護者ゲート等）は既存の `BeforePurchase` の仕組みに任せる。
+4. **購入後の解放**: `entitlementStateProvider` の変化でロックが外れる。購入直後に自動で選ぶかは未決（U8）。
+5. **失効・返金時のフォールバック**: 保存済みの選択（`ukalab.mascot.selected`）が、ロック中の資格キャラを指していたら、描画時に既定の推し（標準キャラ「うか」）として扱う。保存値は消さず、再購入・復元で権利が戻れば元の資格キャラに戻る。`UkalabCharacters.byId` の呼び出し側（`CharacterSelectionNotifier._load` ほか）で、アンロック判定を通すかを実装時に決める。
+6. **復元購入**: 既存の「購入の復元」で `premium` が戻ればロックが外れる。専用の処理は不要（権利状態に従うだけ）。
+7. **共有キーの注意**: `ukalab.mascot.selected` は端末内でうかラボ共通。別アプリで選んだ資格キャラが、その資格アプリ以外にも伝わる場合の扱い（他アプリでは未購入扱いでロック→標準キャラ表示）を、上記5のフォールバックで吸収する。
+8. **漢検は別扱い**: 漢検は独自ラッパー `PurchasesService` を使い、権利IDが `ad_free`（広告なし）と `premium` の別体系（`docs/local_handover_monetization.md` と `docs/kanken_billing_unification_plan_2026-10-17.md` による）。kit の `entitlementServiceProvider` を override していない。漢検に資格キャラを入れる場合は、統一作業の後に判定の渡し方を決める。この仕様書の対象外。
+
+**注意事項**:
+
+- 実決済が有効なのは、SDKキーを渡した Android ビルドのみ（各アプリの `_useRevenueCat` は `Platform.isAndroid` かつキーが空でないとき。文書の記述による）。それ以外のビルドは `FakeEntitlementService`。乙4は RevenueCat への切替コード自体が無い（Fake のみ）。
+- Fake では、購入なしで解放されるか、されないかは、既定の挙動を確認していない（未確認）。文書上は `grantOnPurchase` で購入結果を模擬し、`restorable` で復元を模擬するとだけある。実装時に Fake の既定値を読み、テストで両方（購入前=ロック、購入後=解放）を検査する。
+- ストア掲載文・広告に「プレミアムで〇〇（資格キャラ）が使える」と書くのは、実装と商品登録（Play / App Store の `<app>_premium`、RevenueCat の `premium`）が済んでからにする。現時点では書かない。
+
+### 6.5 リリース
 
 - 画像追加はパッケージのサイズを増やす（A+Bで約1〜1.5MB 見込み）。ukalab_core の他アプリ全てに入る点に注意する。キャラ追加は minor バージョン（v0.79.0 想定）として、本仕様書の PR とは別 PR で行う。この PR ではタグも付けない。
 
@@ -277,11 +303,15 @@ Lv<1-5>: <成長の特徴>。表情: <normal=穏やか / joy=満面の笑み>。
 |---|---|
 | U1 | ITパスポート用の企画案（案1〜3）の採用、キャラ名、キャラid（商標・類似の確認を含む） |
 | U2 | 画像セットの範囲（A のみで先行か、A+B まで作るか。C は作るか） |
-| U3 | 資格キャラを共通の選択画面に出すか、その資格アプリ限定にするか。既定の推しにするか |
 | U4 | （解決）AI画像生成サービスの利用規約はオーナー確認済み。確認内容の記録はオーナー側。サービス名・プランはこの文書に記載しない |
 | U5 | 資格キャラの衣装（`outfits/`）を作らない案でよいか（作る場合は追加 3枚x資格数） |
 | U6 | 他資格へ広げるときの命名ルール、およびモチーフの決め方は §3 の方針でよいか |
 | U7 | scenes の画像サイズを 460x700 / 736x1120 のどちらに統一するか |
+| U8 | （プレミアム限定に伴う新規）購入直後に資格キャラを自動で選ぶか、本人に選ばせるか |
+| U9 | （同上）無料でお試し表示（プレビュー。ロック画面で絵だけ見せる、数十秒だけ試す等）を許すか。許す場合の範囲（Lv1 の絵のみ等） |
+| U10 | （同上）プレミアムの価格訴求（`<app>_premium` ¥1,500 の説明文・ストア文）で資格キャラをどう扱うか。商品登録・実装が済むまで掲載文には書かない |
+| U11 | （同上）失効時のフォールバック先（標準キャラ「うか」でよいか）と、選択状態の保存を消さず残す方針でよいか |
+| U12 | （同上）選択画面への判定の渡し方（アプリが関数で渡すか、app_common_kit の権利状態を直接読むか。§6.4 の2） |
 
 ---
 
