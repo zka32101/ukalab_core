@@ -1,8 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ukalab_core/ui.dart';
 import 'package:ukalab_core/ukalab_core.dart';
@@ -181,28 +181,27 @@ void main() {
     expect(find.text(ja.updateLogEmpty), findsOneWidget);
   });
 
-  testWidgets('書き出し: 空なら案内、あればCSVを表示しコピーできる', (tester) async {
-    String? copied;
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          copied = (call.arguments as Map)['text'] as String;
-        }
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
+  testWidgets('書き出し: 空なら案内、あればCSVを表示しファイルとして保存できる', (tester) async {
+    Uint8List? savedBytes;
+    String? savedName;
+    String? savedMime;
+    Future<bool> saver({
+      required Uint8List bytes,
+      required String fileName,
+      required String mimeType,
+      Rect? sharePositionOrigin,
+    }) async {
+      savedBytes = bytes;
+      savedName = fileName;
+      savedMime = mimeType;
+      return true;
+    }
 
     await tester.pumpWidget(
       _app(const HistoryExportView(records: [], questions: [])),
     );
     expect(find.text(ja.exportEmpty), findsOneWidget);
+    expect(find.byKey(const ValueKey('downloadCsv')), findsNothing);
 
     await tester.pumpWidget(
       _app(
@@ -217,14 +216,49 @@ void main() {
             ),
           ],
           questions: [_q('q1')],
+          saver: saver,
+          now: () => DateTime(2026, 10, 20, 8),
         ),
       ),
     );
     expect(find.textContaining('2026-10-12,1,1,100.0'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('copyCsv')));
+    expect(find.byKey(const ValueKey('copyCsv')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('downloadCsv')));
     await tester.pump();
-    expect(copied, contains('2026-10-12,1,1,100.0'));
-    expect(find.text(ja.exportCopied), findsOneWidget);
+    expect(savedName, 'ukalab_history_20261020.csv');
+    expect(savedMime, 'text/csv');
+    expect(savedBytes!.sublist(0, 3), [0xEF, 0xBB, 0xBF]);
+    expect(utf8.decode(savedBytes!.sublist(3)), contains('2026-10-12,1,1,100.0'));
+    expect(find.text(ja.exportSaved), findsOneWidget);
+  });
+
+  testWidgets('書き出し: 保存に失敗したら案内を出す', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        HistoryExportView(
+          records: [
+            ProgressRecord(
+              qid: 'q1',
+              subjectId: 'law',
+              topicId: 'ch1',
+              at: DateTime(2026, 10, 12, 9),
+              correct: true,
+            ),
+          ],
+          questions: [_q('q1')],
+          saver:
+              ({
+                required Uint8List bytes,
+                required String fileName,
+                required String mimeType,
+                Rect? sharePositionOrigin,
+              }) async => throw Exception('x'),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('downloadCsv')));
+    await tester.pump();
+    expect(find.text(ja.exportSaveFailed), findsOneWidget);
   });
 
   group('ExamPrepCard', () {

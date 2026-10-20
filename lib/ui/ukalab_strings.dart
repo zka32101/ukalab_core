@@ -312,7 +312,7 @@ class UkalabStrings {
       'moka': 'ゆるい相棒（犬）',
       'mike': 'ていねいな解説役（猫）',
     },
-    tabLabels: ['ホーム', '学ぶ', '模擬', '記録', '設定'],
+    tabLabels: ['ホーム', '解く', '模擬', '記録', '設定'],
     mockRecordTitle: '学習の記録カード',
     mockRecordNote: '模擬試験の記録です。本番の合格ではありません。名前などの個人情報は入りません。',
     mockRecordMessage: '合格点を超えました！',
@@ -398,7 +398,7 @@ class UkalabStrings {
       'moka': 'Easygoing buddy (dog)',
       'mike': 'Careful explainer (cat)',
     },
-    tabLabels: ['Home', 'Learn', 'Mock', 'Records', 'Settings'],
+    tabLabels: ['Home', 'Solve', 'Mock', 'Records', 'Settings'],
     mockRecordTitle: 'Study record card',
     mockRecordNote:
         'This is a mock exam record, not an actual pass. It contains no personal information such as your name.',

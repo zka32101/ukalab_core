@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Changed
+- 下部タブの「学ぶ」を「解く」に変更: `UkalabShell.defaultLabels`、`UkalabStrings` の `tabLabels`（日本語「解く」／英語 `Solve`／韓国語「풀기」／簡体字「做题」／繁体字「做題」）、デイリー目標・リマインダー・試験直前の空表示の文言。アプリが `labels` を自前で渡している場合は、アプリ側で差し替える
+- 学習履歴の書き出し画面（`HistoryExportView`）の「コピー」ボタン（key `copyCsv`）を「ダウンロード」（key `downloadCsv`）に置き換えた。Web はブラウザのダウンロード、それ以外は共有シートで、UTF-8 BOM 付き・`text/csv`・`ukalab_history_YYYYMMDD.csv` として渡す。`HistoryExportView` に `saver` / `now`（テスト用の差し替え）を追加
+- `ExamPrepStrings` の `exportCopy` / `exportCopied` を `exportSave` / `exportSaved` / `exportSaveFailed` に置き換えた（`ExamPrepStrings.ja` などの既定を使うアプリは影響なし。自前で `ExamPrepStrings(...)` を組み立てているアプリはフィールド名を差し替える）
+
+### Added
+- `PremiumBenefitsCard` / `PremiumBenefitsStrings`（`lib/ui/premium/premium_benefits_card.dart`、`ui.dart` から公開）: `PremiumFeature` ごとの機能名と一言説明の一覧（日英中韓）。価格は載せない。設定画面の購入節に差し込む
+- `shareCsv` / `saveTextFile` / `historyCsvFileName` / `encodeTextFile` / `defaultFileSaver` / `FileSaver`（`lib/ui/file_export/save_file.dart`、`ui.dart` から公開）: テキスト・CSV をファイルとして保存する共通ヘルパー。`FileSaver` を渡すと共有処理を差し替えられる。データ管理のバックアップ JSON は変更なし
+- 依存に `share_plus`（`>=11.0.0 <14.0.0`）と `web`（`>=1.0.0 <2.0.0`）を追加
+
+### 移行
+アプリは設定タイルなどで `shareCsv` を使うと、独自のクリップボード書き出しを置き換えられる。
+
 ## [0.78.0] - 2026-10-20
 
 ### Changed
