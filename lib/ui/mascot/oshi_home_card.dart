@@ -1,4 +1,5 @@
-import 'package:app_common_kit/app_common_kit.dart';
+import 'package:app_common_kit/app_common_kit.dart' hide StreakBadge;
+import '../../learning/streak_badge.dart';
 import '../ukalab_scope.dart';
 import 'dart:typed_data';
 
