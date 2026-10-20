@@ -171,7 +171,7 @@ class StudyReminderCard extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '今日はまだ目標（${goal.target}問）に届いていません。解くタブから続けましょう',
+                '今日はまだ目標（${goal.target}問）に届いていません。学ぶタブから続けましょう',
                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onErrorContainer),
               ),
             ),

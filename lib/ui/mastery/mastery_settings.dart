@@ -7,7 +7,7 @@ import 'mastery_store.dart';
 class MasterySettingsStrings {
   const MasterySettingsStrings({
     this.toggleTitle = '正解済みの問題を出さない',
-    this.toggleSubtitle = '同じ問題に2回続けて正解したら、「解く」の通常出題とペース走で出さなくなります',
+    this.toggleSubtitle = '同じ問題に2回続けて正解したら、「学ぶ」の通常出題とペース走で出さなくなります',
     this.countTemplate = '除外中の問題: {n}問',
     this.restoreButton = '除外した問題を戻す（全件）',
     this.confirmTitle = '除外した問題を戻しますか？',
