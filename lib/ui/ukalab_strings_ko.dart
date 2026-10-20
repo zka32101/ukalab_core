@@ -75,6 +75,7 @@ const ukalabStringsKo = UkalabStrings(
     'mio': '밝은 후배',
     'moka': '느긋한 짝꿍 (강아지)',
     'mike': '친절한 해설 담당 (고양이)',
+    'circa': '원리를 좋아하는 회로 고양이',
   },
   tabLabels: ['홈', '학습', '모의', '기록', '설정'],
   mockRecordTitle: '학습 기록 카드',

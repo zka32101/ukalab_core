@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Added
+- 資格専用キャラ「サーキ」(`circa`、回路ネコ)のモデルと定義(PR-B。UI は未配線で、選択画面の一覧には出ない)。`CharacterPack` に任意項目 `requiresPremium`(既定 false)と `appIds`(`Set<String>?`、既定 null=全アプリ)、`isAvailableIn(appId)` を追加(既存コードは変更不要)。`UkalabCharacters.circa` / `qualificationPacks` を新設(`all` / `imagePacks` には入れない。`byId('circa')` では解決できる)。対象アプリは g_kentei / it_passport / info_security / gen_ai_passport
+- `UkalabStrings` の `characterNames` / `characterRoles` に circa の名前と役割(日英中韓)を追加
+- 画像(`assets/mascot/circa/`)と pubspec.yaml への登録は PR-A で行う(ディレクトリが空だとビルドが失敗するため、今回は登録しない)。画像はすべて AI 生成で、試験団体の公式キャラではない
+
 ## [0.79.1] - 2026-10-20
 
 ### Changed
