@@ -60,6 +60,8 @@ export 'ui/peer_stats/firestore_peer_stats_sink.dart';
 export 'ui/peer_stats/firestore_peer_stats_source.dart';
 export 'ui/peer_stats/peer_stats_prefs.dart';
 export 'ui/peer_stats/peer_stats_card.dart';
+export 'ui/mastery/mastery_settings.dart';
+export 'ui/mastery/mastery_store.dart';
 export 'ui/mistake_note/mistake_note_store.dart';
 export 'ui/mistake_note/mistake_note_view.dart';
 export 'ui/review_scheduler/review_scheduler_store.dart';

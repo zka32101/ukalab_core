@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+- 「同じ問題を2回連続で正解したら以後出題しない」機能の部品（アプリ側の適用は別途）: `MasteryStreak`（qid ごとの連続正解数と除外集合。不正解で 0 に戻り自動解除）、`withoutExcluded` / `isAllMastered`（`ukalab_core.dart` から公開）、`MasteryStore` / `SharedPreferencesMasteryStore`（キー `ukalab_<アプリID>_streak_v1`、ON/OFF は `ukalab_<アプリID>_streak_enabled_v1`・既定OFF）、`masteryStreakDataPart`（バックアップ・リセット対象 `masteryStreak`）、設定用 `MasterySettingsTile`（`ui.dart` から公開）
+- `PracticeSession` に任意引数 `excludeQids`（出題から除く qid。既定は空で従来どおり）
+
 ## [0.78.0] - 2026-10-20
 
 ### Changed

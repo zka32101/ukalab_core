@@ -50,13 +50,15 @@ class PracticeSession {
   /// [pool] から [size] 問を選ぶ。無効（disabled）の問題は除く。
   /// [priorityQids]（間隔反復の期限切れなど）は先頭に、与えた順で並べる。
   /// 残りは [seed] で再現可能にシャッフルする。
+  /// [excludeQids]（習得済みで出さない問題など）は、優先指定も含めて出題から除く。
   PracticeSession({
     required Iterable<Question> pool,
     required this.size,
     this.mode = PracticeMode.practice,
     int seed = 0,
     List<String> priorityQids = const [],
-  }) : questions = _pick(pool, size, seed, priorityQids);
+    Set<String> excludeQids = const {},
+  }) : questions = _pick(pool, size, seed, priorityQids, excludeQids);
 
   final int size;
   final PracticeMode mode;
@@ -68,10 +70,11 @@ class PracticeSession {
     int size,
     int seed,
     List<String> priorityQids,
+    Set<String> excludeQids,
   ) {
     final active = {
       for (final q in pool)
-        if (!q.disabled) q.qid: q,
+        if (!q.disabled && !excludeQids.contains(q.qid)) q.qid: q,
     };
     final first = [
       for (final id in priorityQids) ?active.remove(id),
