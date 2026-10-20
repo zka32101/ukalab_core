@@ -10,6 +10,8 @@
 - `ExamPrepStrings` の `exportCopy` / `exportCopied` を `exportSave` / `exportSaved` / `exportSaveFailed` に置き換えた（`ExamPrepStrings.ja` などの既定を使うアプリは影響なし。自前で `ExamPrepStrings(...)` を組み立てているアプリはフィールド名を差し替える）
 
 ### Added
+- 「同じ問題を2回連続で正解したら以後出題しない」機能の部品（アプリ側の適用は別途）: `MasteryStreak`（qid ごとの連続正解数と除外集合。不正解で 0 に戻り自動解除）、`withoutExcluded` / `isAllMastered`（`ukalab_core.dart` から公開）、`MasteryStore` / `SharedPreferencesMasteryStore`（キー `ukalab_<アプリID>_streak_v1`、ON/OFF は `ukalab_<アプリID>_streak_enabled_v1`・既定OFF）、`masteryStreakDataPart`（バックアップ・リセット対象 `masteryStreak`）、設定用 `MasterySettingsTile`（`ui.dart` から公開）
+- `PracticeSession` に任意引数 `excludeQids`（出題から除く qid。既定は空で従来どおり）
 - `PremiumBenefitsCard` / `PremiumBenefitsStrings`（`lib/ui/premium/premium_benefits_card.dart`、`ui.dart` から公開）: `PremiumFeature` ごとの機能名と一言説明の一覧（日英中韓）。価格は載せない。設定画面の購入節に差し込む
 - `shareCsv` / `saveTextFile` / `historyCsvFileName` / `encodeTextFile` / `defaultFileSaver` / `FileSaver`（`lib/ui/file_export/save_file.dart`、`ui.dart` から公開）: テキスト・CSV をファイルとして保存する共通ヘルパー。`FileSaver` を渡すと共有処理を差し替えられる。データ管理のバックアップ JSON は変更なし
 - 依存に `share_plus`（`>=11.0.0 <14.0.0`）と `web`（`>=1.0.0 <2.0.0`）を追加
