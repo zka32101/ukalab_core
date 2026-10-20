@@ -68,14 +68,37 @@ class UkalabCharacters {
     sceneImageBuilder: _mikeScene,
   );
 
+  /// 資格専用キャラ「サーキ」（回路ネコ）。プレミアム限定。衣装は作らない（outfitImageBuilder なし＝通常の画像）。
+  ///
+  /// 画像は PR-A で `assets/mascot/circa/` に入れる。pubspec.yaml への登録も PR-A で行う
+  /// （ディレクトリが空だと Flutter のビルドが失敗するため、画像が入るまで登録しない）。
+  /// 画像はすべて AI 生成。試験団体の公式キャラではない。
+  static const circa = CharacterPack(
+    id: 'circa',
+    name: 'サーキ',
+    tone: MascotTone.cool,
+    imageBuilder: _circaImage,
+    sceneImageBuilder: _circaScene,
+    requiresPremium: true,
+    appIds: {'g_kentei', 'it_passport', 'info_security', 'gen_ai_passport'},
+  );
+
   /// 選べる全員（標準キャラ＋画像4体）。
   static const List<CharacterPack> all = [CharacterPack.standard, kai, mio, moka, mike];
 
   /// 画像4体だけ。
   static const List<CharacterPack> imagePacks = [kai, mio, moka, mike];
 
+  /// 資格専用キャラ。[all] には含めない（一覧に出さない。UI の配線は後続 PR）。
+  static const List<CharacterPack> qualificationPacks = [circa];
+
+  /// [all] と [qualificationPacks] から id で探す。不明な id は標準キャラ。
+  /// 資格キャラのプレミアム・アプリ判定は呼び出し側（アプリ）で行う。
   static CharacterPack byId(String? id) {
     for (final p in all) {
+      if (p.id == id) return p;
+    }
+    for (final p in qualificationPacks) {
       if (p.id == id) return p;
     }
     return CharacterPack.standard;
@@ -99,7 +122,7 @@ class UkalabCharacters {
   static ImageProvider? specialBowImage(String id) => _special(id, 'bow');
 
   static ImageProvider? _special(String id, String kind) {
-    if (!imagePacks.any((p) => p.id == id)) return null;
+    if (!_hasImages(id)) return null;
     return AssetImage('assets/mascot/$id/${id}_special_$kind.webp', package: package);
   }
 
@@ -161,7 +184,8 @@ class UkalabCharacters {
   static String sceneDir(MascotScene scene) =>
       scene.isGuide ? 'guide' : (scene == MascotScene.streak ? 'states' : 'scenes');
 
-  static bool _hasImages(String id) => imagePacks.any((p) => p.id == id);
+  static bool _hasImages(String id) =>
+      imagePacks.any((p) => p.id == id) || qualificationPacks.any((p) => p.id == id);
 
   /// 表情・しぐさのポーズ画像（`poses/<id>_<pose>.webp`）。標準キャラ・未知の id は null。
   static ImageProvider? poseImage(String id, MascotPose pose) =>
@@ -183,4 +207,6 @@ class UkalabCharacters {
   static ImageProvider? _mokaScene(MascotScene sc, MascotStage s) => sceneImage('moka', sc, s);
   static ImageProvider? _mikeOutfit(Outfit o, MascotStage s) => outfitImage('mike', o, s);
   static ImageProvider? _mikeScene(MascotScene sc, MascotStage s) => sceneImage('mike', sc, s);
+  static ImageProvider? _circaImage(MascotStage s, MascotExpression e) => levelImage('circa', s, e);
+  static ImageProvider? _circaScene(MascotScene sc, MascotStage s) => sceneImage('circa', sc, s);
 }

@@ -75,6 +75,7 @@ const ukalabStringsZhHans = UkalabStrings(
     'mio': '开朗的后辈',
     'moka': '悠闲的搭档（狗）',
     'mike': '细心的讲解员（猫）',
+    'circa': '爱研究原理的电路猫',
   },
   tabLabels: ['首页', '学习', '模拟', '记录', '设置'],
   mockRecordTitle: '学习记录卡',

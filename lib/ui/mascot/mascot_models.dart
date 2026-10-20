@@ -124,6 +124,8 @@ class CharacterPack {
     this.sceneImageBuilder,
     this.fieldAccent = const {},
     this.signature,
+    this.requiresPremium = false,
+    this.appIds,
   });
 
   final String id;
@@ -144,6 +146,16 @@ class CharacterPack {
 
   /// 配信データの署名（検証は配信を実装するときに追加）。
   final String? signature;
+
+  /// true のとき、プレミアム購入者だけが選べる想定（資格専用キャラ）。既定は false。
+  /// core は権利状態を読まない。判定はアプリが関数や Provider で渡す。
+  final bool requiresPremium;
+
+  /// このキャラを有効にするアプリのID（例 `it_passport`）。null なら全アプリ。
+  final Set<String>? appIds;
+
+  /// [appId] のアプリでこのキャラが有効か（[appIds] が null なら常に true）。
+  bool isAvailableIn(String appId) => appIds == null || appIds!.contains(appId);
 
   bool get isBuiltIn => imageBuilder == null;
 
