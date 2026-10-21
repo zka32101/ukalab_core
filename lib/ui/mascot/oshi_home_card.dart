@@ -22,7 +22,7 @@ import '../ukalab_strings.dart';
 
 /// ホームに置く「推し」カードの完成品。アプリは資格と成長段階を渡すだけで使える。
 ///
-/// - 選んだ推し（[selectedCharacterPackProvider]）と、着ている衣装を表示する
+/// - 選んだ推し（[effectiveCharacterPackProvider]）と、着ている衣装を表示する
 /// - 試験日・連続学習・久しぶり（おかえり）に合わせたひとこと。タップで切り替わる
 /// - メニュー: 推しを選ぶ／着替え・ショップ／試験の結果を報告／通常・小さく・非表示
 /// - 表示設定（通常/小さく/非表示）は [appId] ごとに端末内へ保存する
@@ -137,7 +137,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
       _setDisplay(value);
       return;
     }
-    final pack = ref.read(selectedCharacterPackProvider);
+    final pack = ref.read(effectiveCharacterPackProvider);
     // 積まれる画面・ダイアログは Scope の外になりうるので、このカードの文言を渡す。
     final strings = UkalabStrings.of(context);
     final now = widget.now ?? DateTime.now();
@@ -166,7 +166,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final pack = ref.watch(selectedCharacterPackProvider);
+    final pack = ref.watch(effectiveCharacterPackProvider);
     final now = widget.now ?? DateTime.now();
     final day = MascotDayState(
       studiedToday: widget.studiedToday,

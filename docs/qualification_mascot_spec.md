@@ -47,7 +47,7 @@
 |---|---|---|
 | PR-A | キャラ別の画像制作と取り込み（`assets/mascot/<id>/`、pubspec 登録、画像存在テスト）。サーキ（39枚）と、7資格の新規6体（各 A+B=36枚） | 画像制作は別セッション。取り込みはキャラ単位で分割可 |
 | PR-B | サーキのモデル・定義・文言（UI未配線） | 済み（#134） |
-| PR-C | 選択UI（プレミアム限定のロック表示、購入導線、失効時のフォールバック。§6.4） | 未着手 |
+| PR-C | 選択UI（プレミアム限定のロック表示、購入導線、失効時のフォールバック。§6.4） | 実装済み（0.81.0。末尾「実装状況（PR-C）」） |
 | PR-D | アプリ別配線。`circa.appIds` を `{'it_passport'}` に絞る1行を含む。各キャラの `appIds` 設定と、各アプリでの権利判定の渡し方。漢検は統一作業の後に別扱い | 未着手 |
 
 各 PR は minor バージョン扱い。本ドキュメント PR にはタグを付けない。空ディレクトリはビルドを壊すため、画像を伴わないキャラの assets 登録は先行させない。
@@ -449,3 +449,45 @@ AI画像生成サービスの利用規約は、オーナーが確認済みです
 - [ ] 個人名・URL・アカウント情報・キー類が、メタデータ・ファイル名・メモにない
 - [ ] 納品メモがある（サービス名、作成日、全画像AI生成の旨）
 ```
+
+---
+
+## 実装状況（PR-C、core 0.81.0）
+
+0.80.0 は学習部品（`learning.dart`）で使用済みのため、PR-C は 0.81.0 とした。タグは作らない。
+
+### 実装したこと
+
+- 資格専用キャラ6体（`noda` `sheru` `hirari` `soro` `sala` `tatsu`）を `UkalabCharacters.qualificationPacks` に追加（`circa` と同じ形式、`requiresPremium: true`）。`appIds` は資格idの綴り（`g_kentei` `info_security` `gen_ai_passport` `boki3` `hazmat4` `kanji_kentei`）。`circa` は `{'it_passport'}` に絞った（PR-D の1行を前倒し）。`all.length == 5` は維持
+- 判定の渡し方（U12）: core は権利状態を読まない。アプリが `characterAppIdProvider`（自アプリのID）と `characterPremiumProvider`（プレミアムか）を `ProviderScope` で override する。既定は appId=null・premium=false で、資格キャラは選択画面に出ず、従来どおりの動き
+- 選択画面: 共通キャラの下に「資格専用キャラ」の見出しで、自アプリの資格キャラだけを表示（`isAvailableIn`）。プレミアムでなければ鍵アイコン＋「プレミアムで使えます」。タップでプレビュー（Lv1・Lv5 の絵。選択は変えない）。`onLockedTap` を渡したときだけ購入導線のボタンが出る
+- 失効（§6.4 の5、U11）: `effectiveCharacterPackProvider` が、使えない資格キャラ（プレミアム切れ・別アプリ）を直前に使っていた共通キャラへ戻す。直前の共通キャラは `ukalab.mascot.lastCommon` に保存する。無ければ標準キャラ「うか」。`ukalab.mascot.selected` は消さないので、権利が戻れば元に戻る。`OshiHomeCard` はこのプロバイダーを使う
+- B 画像なしの代替: `sceneImage` / `poseImage` / `stateImage` は資格キャラで null を返す。`MascotWidget` は通常の Lv 画像、`MascotPoseImage` / `MascotStateView` は `MascotWidget`（Lv 画像）で代用する。画像が読み込めなくても例外にせず、標準キャラの描画（アイコンは標準アイコン）に戻る
+
+### §6.3 の答え
+
+「`sceneImageBuilder` / `poseImage` / `stateImage` が null を返したとき、Lv 画像で代用する経路が既存の表示ウィジェットにあるか」:
+
+- `MascotWidget`: ある。`outfitImageBuilder` → `sceneImageBuilder` → `imageBuilder` の順に `??` でたどるため、`sceneImageBuilder` が無い（または null を返す）と Lv 画像になる。ただし画像読み込み失敗時の `errorBuilder` は無かった（PR-C で追加）
+- `MascotPoseImage` / `MascotStateView`: 画像が null のときは `MascotWidget(pack: pack)`（= Lv 画像）に戻る経路が既にあった。ただし `poseImage` / `stateImage` は資格キャラでも存在しないファイルの `AssetImage` を返していたため、`errorBuilder` 経由の代替になっていた。PR-C で資格キャラは null を返すようにして、最初から Lv 画像にする
+- `sceneImage`（`_circaScene`）は存在しない画像を指していたため、`circa` から `sceneImageBuilder` を外した
+
+### テスト
+
+既存の画像存在テスト（全 `MascotScene` x 全Lv など）は `imagePacks`（共通4体）が対象で、`qualificationPacks` を含まないため、削除や変更なしで B を要求しない。資格キャラは `test/ui/qualification_pack_test.dart`（定義・A 画像の参照・B が null）と `test/ui/qualification_selection_test.dart`（絞り込み・ロック・解除・失効・代替表示・幅320/280 x 文字1〜3倍）で検査する。
+
+### 未決事項（最小実装にした点）
+
+- U8 購入直後の自動選択: しない（本人が選ぶ）
+- U9 お試し表示: ロック画面のプレビュー（Lv1・Lv5 の絵のみ）を出す。時間制の試用はしない
+- U10 価格訴求・ストア文: 書かない（商品登録・実装後）
+- 購入導線: `onLockedTap` をアプリが渡す（設定の購入欄を開くなど）。渡さなければボタンなし
+- 画像: PR-A（未取り込み）。それまでは画像が読み込めず、標準キャラ・標準アイコンの表示になる
+
+### PR-D（アプリ別配線）で必要なこと
+
+- 各アプリの `ProviderScope` で `characterAppIdProvider` と `characterPremiumProvider` を override（権利は `entitlementStateProvider` の `hasPremium` など）
+- `appIds` の綴り（`boki3` `hazmat4` `kanji_kentei` など）が、各アプリが渡す appId と一致するか確認
+- `CharacterSelectScreen(onLockedTap: ...)` で購入欄へ誘導
+- 漢検は独自 `PurchasesService`（§6.4 の8）のため、判定の渡し方を別途決める
+- 実装済み画面で `selectedCharacterPackProvider` を直接 watch しているアプリは `effectiveCharacterPackProvider` に替える

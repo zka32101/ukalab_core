@@ -55,6 +55,10 @@ class UkalabStrings {
     required this.passOutfit,
     required this.characterNames,
     required this.characterRoles,
+    this.characterQualificationHeading = 'Qualification characters',
+    this.characterPremiumNote = 'Available with Premium',
+    this.characterPreviewNote = 'Preview only. Premium is needed to choose this character.',
+    this.characterPurchaseAction = 'See Premium',
     required this.tabLabels,
     required this.mockRecordTitle,
     required this.mockRecordNote,
@@ -118,6 +122,18 @@ class UkalabStrings {
 
   /// `CharacterPack.id` → 役割の説明。
   final Map<String, String> characterRoles;
+
+  /// 選択画面で資格専用キャラを並べる見出し。
+  final String characterQualificationHeading;
+
+  /// ロック中の資格専用キャラに出す短い文(プレミアムで使える)。
+  final String characterPremiumNote;
+
+  /// ロック中の資格専用キャラのプレビューに出す説明(選択はできない)。
+  final String characterPreviewNote;
+
+  /// プレビューの購入導線ボタンの文言(導線をアプリが渡したときだけ出す)。
+  final String characterPurchaseAction;
   final List<String> tabLabels;
   final String mockRecordTitle;
   final String mockRecordNote;
@@ -178,6 +194,10 @@ class UkalabStrings {
     String Function(String name)? passOutfit,
     Map<String, String>? characterNames,
     Map<String, String>? characterRoles,
+    String? characterQualificationHeading,
+    String? characterPremiumNote,
+    String? characterPreviewNote,
+    String? characterPurchaseAction,
     List<String>? tabLabels,
     String? mockRecordTitle,
     String? mockRecordNote,
@@ -235,6 +255,10 @@ class UkalabStrings {
     passOutfit: passOutfit ?? this.passOutfit,
     characterNames: characterNames ?? this.characterNames,
     characterRoles: characterRoles ?? this.characterRoles,
+    characterQualificationHeading: characterQualificationHeading ?? this.characterQualificationHeading,
+    characterPremiumNote: characterPremiumNote ?? this.characterPremiumNote,
+    characterPreviewNote: characterPreviewNote ?? this.characterPreviewNote,
+    characterPurchaseAction: characterPurchaseAction ?? this.characterPurchaseAction,
     tabLabels: tabLabels ?? this.tabLabels,
     mockRecordTitle: mockRecordTitle ?? this.mockRecordTitle,
     mockRecordNote: mockRecordNote ?? this.mockRecordNote,
@@ -304,7 +328,15 @@ class UkalabStrings {
     passAskTitle: _jaPassAskTitle,
     passCoin: _jaPassCoin,
     passOutfit: _jaPassOutfit,
-    characterNames: {'circa': 'サーキ'},
+    characterNames: {
+      'circa': 'サーキ',
+      'noda': 'ノーダ',
+      'sheru': 'シェル',
+      'hirari': 'ヒラリ',
+      'soro': 'ソロ',
+      'sala': 'サラ',
+      'tatsu': 'タツ',
+    },
     characterRoles: {
       'standard': 'フラスコの助手',
       'kai': '頼れる先輩',
@@ -312,7 +344,17 @@ class UkalabStrings {
       'moka': 'ゆるい相棒（犬）',
       'mike': 'ていねいな解説役（猫）',
       'circa': 'しくみ好きな回路ネコ',
+      'noda': 'つながりを広げるタコ',
+      'sheru': 'しっかり守るカメ',
+      'hirari': 'ひらめきで羽ばたく蝶',
+      'soro': 'コツコツ数えるハリネズミ',
+      'sala': '慎重で頼れる火トカゲ',
+      'tatsu': '墨と筆が好きな小さな龍',
     },
+    characterQualificationHeading: '資格専用キャラ',
+    characterPremiumNote: 'プレミアムで使えます',
+    characterPreviewNote: 'プレビュー中です。選ぶにはプレミアムが必要です',
+    characterPurchaseAction: 'プレミアムを見る',
     tabLabels: ['ホーム', '学ぶ', '模擬', '記録', '設定'],
     mockRecordTitle: '学習の記録カード',
     mockRecordNote: '模擬試験の記録です。本番の合格ではありません。名前などの個人情報は入りません。',
@@ -392,6 +434,12 @@ class UkalabStrings {
       'moka': 'Moka',
       'mike': 'Mike',
       'circa': 'Circa',
+      'noda': 'Noda',
+      'sheru': 'Sheru',
+      'hirari': 'Hirari',
+      'soro': 'Soro',
+      'sala': 'Sala',
+      'tatsu': 'Tatsu',
     },
     characterRoles: {
       'standard': 'Flask assistant',
@@ -400,7 +448,17 @@ class UkalabStrings {
       'moka': 'Easygoing buddy (dog)',
       'mike': 'Careful explainer (cat)',
       'circa': 'Circuit cat who loves how things work',
+      'noda': 'Octopus who links ideas together',
+      'sheru': 'Careful turtle who keeps things safe',
+      'hirari': 'Butterfly who takes flight with ideas',
+      'soro': 'Hedgehog who counts step by step',
+      'sala': 'Careful, dependable fire lizard',
+      'tatsu': 'Little dragon who loves ink and brush',
     },
+    characterQualificationHeading: 'Qualification characters',
+    characterPremiumNote: 'Available with Premium',
+    characterPreviewNote: 'Preview only. Premium is needed to choose this character.',
+    characterPurchaseAction: 'See Premium',
     tabLabels: ['Home', 'Learn', 'Mock', 'Records', 'Settings'],
     mockRecordTitle: 'Study record card',
     mockRecordNote:
