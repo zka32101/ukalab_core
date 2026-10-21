@@ -1,4 +1,4 @@
-// うかラボ5アプリ（g_kentei / seisei_ai_passport / boki / otsu4 / kanken）の相互紹介。
+// うかラボ7アプリ（g_kentei / it_passport / infosecmanage / seisei_ai_passport / boki / otsu4 / kanken）の相互紹介。
 //
 // `cross_promo_kit` の薄いラッパー。紹介カテゴリを「うかラボ」に固定し、
 // Firebase の初期化と Remote Config の取得を1回の呼び出しにまとめる。
