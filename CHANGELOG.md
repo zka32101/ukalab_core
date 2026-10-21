@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+## [0.82.0] - 2026-10-21
+
+app_common_kit を v3.12.0 → **v4.0.0** に追従する（キットの破壊的変更）。学習向けの部品はキットから消え、`package:ukalab_core/learning.dart`（0.80.0 で追加）が正になる。
+
+### 移行手順（アプリ）
+
+1. `pubspec.yaml` の `app_common_kit` を `ref: v4.0.0`、`ukalab_core` を `ref: v0.82.0` に上げる（kit・core・アプリのタグを揃える）
+2. `QuestionCard`・`ExplanationPanel`・`ResultSummary`・`StreakBadge`・`MockExamTrendChart`／`MockExamTrendPoint`・`recordStudyToday`／`loadCurrentStreak`・`AnswerFeedback`（`SoundBackend` など）を使うファイルに `import 'package:ukalab_core/learning.dart';` を足す（名前・引数・挙動は同じ）
+3. キット v4.0.0 の CHANGELOG には「コア v0.81.0 以降」とあるが、v0.81.0 はキット v3.12.0 のままなので、**v0.82.0 以降**が正しい
+
+### 変更
+
+- コア内の `question_types`・`QuestionDetailScreen`・`OshiHomeCard` は、`learning.dart` の部品を使う
+- キットから消えた部品の、はみ出し検査（`test/learning_overflow_test.dart`）をコア側に移した
+
 ## [0.81.0] - 2026-10-21
 
 資格専用キャラの選択画面(PR-C)。0.80.0 は学習部品で使用済みのため、この変更は 0.81.0 とする。タグは作らない(マージ後にオーナーが付ける)。

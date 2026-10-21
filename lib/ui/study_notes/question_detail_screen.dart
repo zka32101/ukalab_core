@@ -1,4 +1,4 @@
-import 'package:app_common_kit/app_common_kit.dart' hide ExplanationPanel, QuestionCard;
+import 'package:app_common_kit/app_common_kit.dart';
 import 'package:flutter/material.dart';
 import '../../learning/explanation_panel.dart';
 import '../../learning/question_card.dart';

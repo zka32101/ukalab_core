@@ -1,7 +1,7 @@
 /// 学習アプリ向けの部品（問題カード・解説・結果・連続学習・模試の推移・回答フィードバック）。
 ///
 /// 以前は app_common_kit にあったもの。キットは学習に依存しない共通基盤に絞り、学習固有の部品はコアが持つ。
-/// `package:ukalab_core/ui.dart` とは別の入口にして、名前の衝突を避ける。
+/// `package:ukalab_core/ui.dart` とは別の入口にしてある（学習に関わるアプリだけが import する）。
 library;
 
 export 'learning/answer_feedback.dart';
