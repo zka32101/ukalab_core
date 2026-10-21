@@ -163,6 +163,8 @@ void main() {
       expect(find.text('プレミアムで使えます'), findsOneWidget);
 
       await t.scrollUntilVisible(find.text('サーキ'), 200, scrollable: find.byType(Scrollable).first);
+      await t.ensureVisible(find.text('サーキ'));
+      await t.pump();
       await t.tap(find.text('サーキ'));
       await t.pump();
       await t.pump(const Duration(milliseconds: 300));
@@ -179,6 +181,8 @@ void main() {
       var called = 0;
       await _pump(t, appId: 'it_passport', onLockedTap: () => called++);
       await t.scrollUntilVisible(find.text('サーキ'), 200, scrollable: find.byType(Scrollable).first);
+      await t.ensureVisible(find.text('サーキ'));
+      await t.pump();
       await t.tap(find.text('サーキ'));
       await t.pump(const Duration(milliseconds: 300));
       await t.tap(find.text('プレミアムを見る'));
@@ -195,6 +199,8 @@ void main() {
       await _pump(t, appId: 'hazmat4', premium: true, container: c);
       expect(find.byIcon(Icons.lock_outline), findsNothing);
       await t.scrollUntilVisible(find.text('サラ'), 200, scrollable: find.byType(Scrollable).first);
+      await t.ensureVisible(find.text('サラ'));
+      await t.pump();
       await t.tap(find.text('サラ'));
       await t.pump();
       await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
@@ -223,6 +229,8 @@ void main() {
     testWidgets('画像が無くても例外にならない(アイコン・プレビュー)', (t) async {
       await _pump(t, appId: 'kanji_kentei');
       await t.scrollUntilVisible(find.text('タツ'), 200, scrollable: find.byType(Scrollable).first);
+      await t.ensureVisible(find.text('タツ'));
+      await t.pump();
       await t.tap(find.text('タツ'));
       await t.pump(const Duration(milliseconds: 300));
       expect(tester(t), isNull);
@@ -234,6 +242,8 @@ void main() {
           await _pump(t, appId: 'info_security', size: size, scale: scale);
           expect(tester(t), isNull);
           await t.scrollUntilVisible(find.text('シェル'), 200, scrollable: find.byType(Scrollable).first);
+      await t.ensureVisible(find.text('シェル'));
+      await t.pump();
           await t.tap(find.text('シェル'));
           await t.pump(const Duration(milliseconds: 300));
           expect(find.text('プレビュー中です。選ぶにはプレミアムが必要です'), findsOneWidget);
