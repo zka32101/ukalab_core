@@ -111,4 +111,49 @@ void main() {
       cert: UkalabCert.boki3, stage: MascotStage.lv5, appId: 's6', streakDays: 5, now: now));
     expect((lv5 as AssetImage).assetName, contains('states/kai_streak.webp'));
   });
+
+  group('推しを選ぶ: onLockedTap の受け渡し', () {
+    Future<void> openLockedPreview(WidgetTester tester, {VoidCallback? onLockedTap}) async {
+      tester.view.physicalSize = const Size(400, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(_app(
+        UkalabOshiCard(
+          cert: UkalabCert.itPassport,
+          stage: MascotStage.lv1,
+          appId: 'test',
+          onLockedTap: onLockedTap,
+        ),
+        overrides: [
+          characterAppIdProvider.overrideWithValue('it_passport'),
+          characterPremiumProvider.overrideWithValue(false),
+        ],
+      ));
+      await tester.pump();
+      await tester.tap(find.byTooltip('推しのメニュー'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.tap(find.text('推しを選ぶ'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.scrollUntilVisible(find.text('サーキ'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.text('サーキ'));
+      await tester.pump();
+      await tester.tap(find.text('サーキ'));
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
+    testWidgets('onLockedTap を渡すと、ロック中の資格キャラのプレビューから呼ばれる', (tester) async {
+      var called = 0;
+      await openLockedPreview(tester, onLockedTap: () => called++);
+      expect(find.text('プレミアムを見る'), findsOneWidget);
+      await tester.tap(find.text('プレミアムを見る'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(called, 1);
+    });
+
+    testWidgets('渡さないときは従来どおり、購入導線のボタンは出ない', (tester) async {
+      await openLockedPreview(tester);
+      expect(find.text('プレビュー中です。選ぶにはプレミアムが必要です'), findsOneWidget);
+      expect(find.text('プレミアムを見る'), findsNothing);
+    });
+  });
 }
