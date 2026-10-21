@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [0.82.2] - 2026-10-21
+
+### Added
+- 資格専用キャラ7体（`circa`・`noda`・`sheru`・`hirari`・`soro`・`sala`・`tatsu`）の画像を取り込む。各キャラ `assets/mascot/<id>/` に、A 画像13枚（icon 1・Lv1〜5 の normal/joy 10・special_pass・special_bow）と、`items/` に C 小物2〜3枚（circa 3枚、他6体は各2枚）。計106枚、約1.9MB。これまで画像なしのフォールバック表示だった専用キャラが、画像で表示される
+- `pubspec.yaml` の `flutter.assets` に、各キャラの `assets/mascot/<id>/` と `assets/mascot/<id>/items/` の2行を登録（計14行）。B 画像（`scenes/` `states/` `guide/` `poses/`）と衣装（`outfits/`）は作っていないため登録しない
+- `test/ui/qualification_mascot_assets_test.dart`: 7体の A 画像・C 小物が、アセットとして読み込めること（登録漏れの検出）、コードが指す画像が実在すること、B・衣装のフォルダがないことを確認する
+
+### 注意
+- 全画像がAI生成（画像生成サービス経由）。ストアの申告で、その旨を扱うこと
+- コードの変更なし（画像と登録とテストのみ）。アプリ側は、`ukalab_core` の参照を上げるだけで画像が出る
+
+
 ## [0.82.1] - 2026-10-21
 
 ### Added
