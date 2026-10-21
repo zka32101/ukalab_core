@@ -37,6 +37,7 @@ class MascotWidget extends StatefulWidget {
   final Outfit? outfit;
 
   /// 場面別のポーズ。画像パックで、衣装を着ていないときだけ使う（衣装が優先）。
+  /// パックに場面別の画像が無い(資格専用キャラ)ときは、通常の Lv 画像で代用する。
   final MascotScene? scene;
   final MascotDisplay display;
   final double size;
@@ -88,26 +89,32 @@ class _MascotWidgetState extends State<MascotWidget> with SingleTickerProviderSt
         (scene == null ? null : widget.pack.sceneImageBuilder?.call(scene, widget.stage)) ??
         widget.pack.imageBuilder?.call(widget.stage, widget.expression);
 
-    Widget art;
-    if (image != null) {
-      art = Image(image: image, width: size, height: size, fit: BoxFit.contain);
-    } else {
-      art = AnimatedBuilder(
-        animation: _c,
-        builder: (context, _) => CustomPaint(
-          size: Size.square(size),
-          painter: StandardCharacterPainter(
-            stage: widget.stage,
-            expression: widget.expression,
-            accent: accent,
-            outline: theme.colorScheme.onSurface.withValues(alpha: 0.75),
-            examPhase: widget.examPhase,
-            outfit: widget.outfit,
-            bob: reduce ? 0 : math.sin(_c.value * math.pi * 2),
-          ),
+    Widget drawn() => AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) => CustomPaint(
+        size: Size.square(size),
+        painter: StandardCharacterPainter(
+          stage: widget.stage,
+          expression: widget.expression,
+          accent: accent,
+          outline: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+          examPhase: widget.examPhase,
+          outfit: widget.outfit,
+          bob: reduce ? 0 : math.sin(_c.value * math.pi * 2),
         ),
-      );
-    }
+      ),
+    );
+
+    // 画像が読み込めない(未取り込み・欠落)ときは例外にせず、コード描画の標準キャラに戻す。
+    final Widget art = image != null
+        ? Image(
+            image: image,
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => drawn(),
+          )
+        : drawn();
 
     final line = widget.line;
     return Semantics(
