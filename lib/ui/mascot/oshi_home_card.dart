@@ -42,6 +42,7 @@ class UkalabOshiCard extends ConsumerStatefulWidget {
     this.onShare,
     this.greeting,
     this.now,
+    this.onLockedTap,
   });
 
   final UkalabCert cert;
@@ -62,6 +63,10 @@ class UkalabOshiCard extends ConsumerStatefulWidget {
 
   /// テスト用の現在時刻。
   final DateTime? now;
+
+  /// 「推しを選ぶ」画面で、ロック中の資格専用キャラのプレビューに出す購入導線ボタンが押されたとき。
+  /// [CharacterSelectScreen.onLockedTap] にそのまま渡す。null ならボタンを出さない(従来どおり)。
+  final VoidCallback? onLockedTap;
 
   @override
   ConsumerState<UkalabOshiCard> createState() => _UkalabOshiCardState();
@@ -144,7 +149,7 @@ class _UkalabOshiCardState extends ConsumerState<UkalabOshiCard> {
     final phase = MascotDayState(examDate: widget.examDate).examPhase(now);
     switch (value as _Action) {
       case _Action.choose:
-        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CharacterSelectScreen()));
+        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CharacterSelectScreen(onLockedTap: widget.onLockedTap)));
       case _Action.wardrobe:
         Navigator.of(context).push(MaterialPageRoute<void>(
           builder: (_) =>

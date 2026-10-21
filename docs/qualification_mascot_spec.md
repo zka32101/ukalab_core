@@ -488,6 +488,6 @@ AI画像生成サービスの利用規約は、オーナーが確認済みです
 
 - 各アプリの `ProviderScope` で `characterAppIdProvider` と `characterPremiumProvider` を override（権利は `entitlementStateProvider` の `hasPremium` など）
 - `appIds` の綴り（`boki3` `hazmat4` `kanji_kentei` など）が、各アプリが渡す appId と一致するか確認
-- `CharacterSelectScreen(onLockedTap: ...)` で購入欄へ誘導
+- `CharacterSelectScreen(onLockedTap: ...)` で購入欄へ誘導。ホームの推しカードから開く場合は `UkalabOshiCard(onLockedTap: ...)` で渡せる(0.82.1。カードが選択画面にそのまま渡す)
 - 漢検は独自 `PurchasesService`（§6.4 の8）のため、判定の渡し方を別途決める
 - 実装済み画面で `selectedCharacterPackProvider` を直接 watch しているアプリは `effectiveCharacterPackProvider` に替える
