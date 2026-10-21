@@ -1,6 +1,6 @@
 name: ukalab_core
 description: "うかラボ（成人向け検定アプリ）の共通エンジンとUI。ExamConfig・問題モデル・問題データ検証・模擬試験の採点・間隔反復・演習セッションと、推し・衣装・コイン・テーマ・学習ラボのUI。"
-version: 0.78.1
+version: 0.78.2
 publish_to: 'none'
 
 environment:
@@ -72,6 +72,20 @@ flutter:
     - assets/mascot/mike/poses/
     - assets/mascot/mike/states/
     - assets/mascot/mike/items/
+    - assets/mascot/circa/
+    - assets/mascot/circa/items/
+    - assets/mascot/noda/
+    - assets/mascot/noda/items/
+    - assets/mascot/sheru/
+    - assets/mascot/sheru/items/
+    - assets/mascot/hirari/
+    - assets/mascot/hirari/items/
+    - assets/mascot/soro/
+    - assets/mascot/soro/items/
+    - assets/mascot/sala/
+    - assets/mascot/sala/items/
+    - assets/mascot/tatsu/
+    - assets/mascot/tatsu/items/
 
 executables:
   validate_content:
