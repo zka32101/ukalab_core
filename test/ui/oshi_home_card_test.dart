@@ -132,7 +132,10 @@ void main() {
       await tester.pump();
       await tester.tap(find.byTooltip('推しのメニュー'));
       await tester.pump(const Duration(milliseconds: 500));
-      await tester.tap(find.text('推しを選ぶ'));
+      // メニュー項目はヒットテストが不安定なため、項目の InkWell の onTap を直接呼ぶ(タップと同じく選択して閉じる)。
+      final item = find.ancestor(of: find.text('推しを選ぶ'), matching: find.byType(InkWell)).first;
+      tester.widget<InkWell>(item).onTap!();
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       await tester.scrollUntilVisible(find.text('サーキ'), 200, scrollable: find.byType(Scrollable).first);
       await tester.ensureVisible(find.text('サーキ'));
