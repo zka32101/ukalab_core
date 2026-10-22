@@ -63,13 +63,16 @@ class PremiumBenefitsStrings {
         '解説読み物の読み上げ',
         '章ごとの解説読み物を、全文読み上げで聞けます。',
       ),
+      PremiumFeature.qualificationCharacter: PremiumBenefit(
+        '資格専用キャラ',
+        'この資格だけのオリジナルキャラを、推しに選べます。',
+      ),
     },
   );
 
   static const en = PremiumBenefitsStrings(
     title: 'What Premium adds',
-    freeNote:
-        'Questions, explanations, mock exams and basic weak-point practice stay free.',
+    freeNote: 'Questions, explanations, mock exams and basic weak-point practice stay free.',
     benefits: {
       PremiumFeature.weakDrill: PremiumBenefit(
         'Weak-point drill',
@@ -99,6 +102,10 @@ class PremiumBenefitsStrings {
         'Read-aloud for readings',
         'Listen to the full text of each chapter reading.',
       ),
+      PremiumFeature.qualificationCharacter: PremiumBenefit(
+        'Exam-only mascot',
+        'Pick the mascot made just for this exam as your companion.',
+      ),
     },
   );
 
@@ -106,13 +113,29 @@ class PremiumBenefitsStrings {
     title: '高级版可使用的功能',
     freeNote: '题目、解析、模拟考试和基础的薄弱点练习仍可免费使用。',
     benefits: {
-      PremiumFeature.weakDrill: PremiumBenefit('薄弱点强化练习', '按错误原因查看统计和变化，集中练习薄弱点。'),
+      PremiumFeature.weakDrill: PremiumBenefit(
+        '薄弱点强化练习',
+        '按错误原因查看统计和变化，集中练习薄弱点。',
+      ),
       PremiumFeature.examEveMode: PremiumBenefit('考前模式', '考试前3天起，可复习最近做错的题目。'),
-      PremiumFeature.tenMinutePlan: PremiumBenefit('今日10分钟计划', '挑选10分钟内能完成的题目。'),
-      PremiumFeature.historyExport: PremiumBenefit('导出学习记录', '将每日作答数和各领域正确率保存为文件。'),
-      PremiumFeature.mockExamHistory: PremiumBenefit('模拟考试成长图', '并排比较多次模拟考试的得分率。'),
+      PremiumFeature.tenMinutePlan: PremiumBenefit(
+        '今日10分钟计划',
+        '挑选10分钟内能完成的题目。',
+      ),
+      PremiumFeature.historyExport: PremiumBenefit(
+        '导出学习记录',
+        '将每日作答数和各领域正确率保存为文件。',
+      ),
+      PremiumFeature.mockExamHistory: PremiumBenefit(
+        '模拟考试成长图',
+        '并排比较多次模拟考试的得分率。',
+      ),
       PremiumFeature.customMockExam: PremiumBenefit('自定义模拟考试', '指定科目进行模拟考试。'),
       PremiumFeature.readingReadAloud: PremiumBenefit('解说读物朗读', '全文朗读各章的解说读物。'),
+      PremiumFeature.qualificationCharacter: PremiumBenefit(
+        '专属角色',
+        '可选择专为这个资格设计的原创角色作为你的搭档。',
+      ),
     },
   );
 
@@ -120,13 +143,29 @@ class PremiumBenefitsStrings {
     title: '進階版可使用的功能',
     freeNote: '題目、解析、模擬考試和基礎的弱點練習仍可免費使用。',
     benefits: {
-      PremiumFeature.weakDrill: PremiumBenefit('弱點強化練習', '依錯誤原因查看統計和變化，集中練習弱點。'),
+      PremiumFeature.weakDrill: PremiumBenefit(
+        '弱點強化練習',
+        '依錯誤原因查看統計和變化，集中練習弱點。',
+      ),
       PremiumFeature.examEveMode: PremiumBenefit('考前模式', '考試前3天起，可複習最近答錯的題目。'),
-      PremiumFeature.tenMinutePlan: PremiumBenefit('今日10分鐘計畫', '挑選10分鐘內能完成的題目。'),
-      PremiumFeature.historyExport: PremiumBenefit('匯出學習紀錄', '將每日作答數和各領域正確率儲存為檔案。'),
-      PremiumFeature.mockExamHistory: PremiumBenefit('模擬考試成長圖', '並排比較多次模擬考試的得分率。'),
+      PremiumFeature.tenMinutePlan: PremiumBenefit(
+        '今日10分鐘計畫',
+        '挑選10分鐘內能完成的題目。',
+      ),
+      PremiumFeature.historyExport: PremiumBenefit(
+        '匯出學習紀錄',
+        '將每日作答數和各領域正確率儲存為檔案。',
+      ),
+      PremiumFeature.mockExamHistory: PremiumBenefit(
+        '模擬考試成長圖',
+        '並排比較多次模擬考試的得分率。',
+      ),
       PremiumFeature.customMockExam: PremiumBenefit('自訂模擬考試', '指定科目進行模擬考試。'),
       PremiumFeature.readingReadAloud: PremiumBenefit('解說讀物朗讀', '全文朗讀各章的解說讀物。'),
+      PremiumFeature.qualificationCharacter: PremiumBenefit(
+        '專屬角色',
+        '可選擇專為這個資格設計的原創角色作為你的夥伴。',
+      ),
     },
   );
 
@@ -134,13 +173,38 @@ class PremiumBenefitsStrings {
     title: '프리미엄으로 할 수 있는 것',
     freeNote: '문제·해설·모의시험·기본 취약점 연습은 무료로 계속 쓸 수 있습니다.',
     benefits: {
-      PremiumFeature.weakDrill: PremiumBenefit('취약점 집중 드릴', '틀린 원인별 통계와 추이를 보며 취약점을 집중 연습합니다.'),
-      PremiumFeature.examEveMode: PremiumBenefit('시험 직전 모드', '시험 3일 전부터 최근 틀린 문제를 복습합니다.'),
-      PremiumFeature.tenMinutePlan: PremiumBenefit('오늘의 10분 플랜', '10분 안에 풀 수 있는 만큼 문제를 골라 줍니다.'),
-      PremiumFeature.historyExport: PremiumBenefit('학습 기록 내보내기', '일별 풀이 수와 분야별 정답률을 파일로 저장합니다.'),
-      PremiumFeature.mockExamHistory: PremiumBenefit('모의시험 성장 그래프', '여러 번의 득점률을 나란히 비교합니다.'),
-      PremiumFeature.customMockExam: PremiumBenefit('맞춤 모의시험', '과목을 지정해 모의시험을 풉니다.'),
-      PremiumFeature.readingReadAloud: PremiumBenefit('해설 읽을거리 낭독', '장별 해설 읽을거리를 전문 낭독으로 들을 수 있습니다.'),
+      PremiumFeature.weakDrill: PremiumBenefit(
+        '취약점 집중 드릴',
+        '틀린 원인별 통계와 추이를 보며 취약점을 집중 연습합니다.',
+      ),
+      PremiumFeature.examEveMode: PremiumBenefit(
+        '시험 직전 모드',
+        '시험 3일 전부터 최근 틀린 문제를 복습합니다.',
+      ),
+      PremiumFeature.tenMinutePlan: PremiumBenefit(
+        '오늘의 10분 플랜',
+        '10분 안에 풀 수 있는 만큼 문제를 골라 줍니다.',
+      ),
+      PremiumFeature.historyExport: PremiumBenefit(
+        '학습 기록 내보내기',
+        '일별 풀이 수와 분야별 정답률을 파일로 저장합니다.',
+      ),
+      PremiumFeature.mockExamHistory: PremiumBenefit(
+        '모의시험 성장 그래프',
+        '여러 번의 득점률을 나란히 비교합니다.',
+      ),
+      PremiumFeature.customMockExam: PremiumBenefit(
+        '맞춤 모의시험',
+        '과목을 지정해 모의시험을 풉니다.',
+      ),
+      PremiumFeature.readingReadAloud: PremiumBenefit(
+        '해설 읽을거리 낭독',
+        '장별 해설 읽을거리를 전문 낭독으로 들을 수 있습니다.',
+      ),
+      PremiumFeature.qualificationCharacter: PremiumBenefit(
+        '자격 전용 캐릭터',
+        '이 자격만을 위한 오리지널 캐릭터를 파트너로 고를 수 있습니다.',
+      ),
     },
   );
 

@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+## [0.83.0] - 2026-10-22
+
+### Added
+- `PremiumFeature.qualificationCharacter`（資格専用キャラ）と、その名前・一言説明（日英中韓）を `PremiumBenefitsCard` に追加。資格専用キャラはプレミアム限定なので、「プレミアムでできること」の一覧に出す。`features` を渡さないアプリ（既定は `PremiumFeature.values`）は、そのまま末尾に1項目増える。`features` を指定しているアプリは、一覧に `PremiumFeature.qualificationCharacter` を足すと表示される
+
+### 移行
+`PremiumFeature` を `switch` で網羅しているアプリは、新しい値の分岐を足す（`canUsePremiumFeature` は、これまでどおり premium なら true）。
+
 ## [0.82.3] - 2026-10-22
 
 ### Changed
