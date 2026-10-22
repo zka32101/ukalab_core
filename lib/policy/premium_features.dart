@@ -23,6 +23,9 @@ enum PremiumFeature {
 
   /// 章ごとの解説読み物の全文読み上げ。
   readingReadAloud,
+
+  /// 資格専用キャラ（その資格のアプリでだけ、推しに選べる）。
+  qualificationCharacter,
 }
 
 /// [feature] を使えるか。premium でなければ使えない。
