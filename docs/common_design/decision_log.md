@@ -50,4 +50,29 @@
 - 関連: [experiments.md](experiments.md)。ITパスでの修正 PR は別途進行中
 - 見直し条件: 他アプリ展開時に、資格色の定義箇所を共通化するか。
 
-（プレミアム・キャラ・CI などの個別事項は各文書に記載。追記するときは上の雛形で CD-003 から。）
+### CD-004 bike(原付・バイク免許コレ!)の価格体系はシリーズ標準に合わせる(2026-10-23)
+- 背景: bike は現行で区分別パス(¥980 / ¥1,980。商品ID `single_category_pass_980` / `all_category_set_pass_1980`)を持ち、シリーズ標準と異なる。
+- 決定: シリーズ標準に合わせる。entitlement `noads` ¥480 / `premium` ¥1,500、買い切り、全区分共通。bike 現行の区分別パスは廃止方向。価格は他アプリ同様「暫定」扱い([pricing_policy.md](pricing_policy.md))。
+- 根拠(競合調査 2026-10-23。App Store 日本の掲載情報のみ。Google Play は未取得):
+  - 広告除去の相場は ¥150〜¥500。
+  - 原付アプリ「独学TODAY」は全問無料で、課金は広告除去 ¥500 / プレミアム ¥1,000。
+  - 二輪専用の高品質な競合は見当たらない(網羅性は未確認)。
+  - 利用は試験前の短期集中で、サブスクリプションは相性が悪い。
+- 決定者: ユーザー
+- 影響アプリ: bike(`REVENUECAT_SETUP.md` / README / paywall / RevenueCat 商品設定。実装は編入 PR で行う)
+- 関連: CD-005 / [pricing_policy.md](pricing_policy.md)
+- 見直し条件: 公開後の購入率・評価、および Google Play 側の競合確認後。
+
+### CD-005 bike のアプリIDと編入方針(2026-10-23)
+- 背景: bike は別基盤で作られており、アプリIDもシリーズ規則と異なる(現行 `com.yourwish.bikelicense`)。
+- 決定:
+  - アプリIDはシリーズ規則 `com.yourwish.ukalab.bike_license` に合わせる。ただし Google Play に登録済みの場合は変更できない可能性があるため、**変更前に登録有無の確認が必要(要確認)**。
+  - 編入は次の順で進める: ① 基盤更新(kit → v4.0.0、ukalab_core v0.83.0 追加) ② 資格定義(`UkalabCert.bikeLicense`、`app_cert.dart`) ③ プレミアム整合 ④ 資格専用キャラ ⑤ cross_promo ⑥ CI/ビルド整備(analyze/test のバイパス撤廃、web-e2e は ubuntu-24.04 固定、署名の debug フォールバック廃止、広告ユニットIDの注入式化) ⑦ ストア表記・匿名性・文書整理(`PHASE_*_README` 約100本の整理)。
+  - 多言語(5言語)は現状維持。
+- 最大リスク: 問題データは公開前に一次確認(教則・道路交通法)が必要。AI 査読で 250 問が事実誤りまたは古いと判定済みで、一次確認の結果欄は空。
+- 決定者: ユーザー
+- 影響アプリ: bike
+- 関連: CD-004 / [new_app_checklist.md](new_app_checklist.md) の「既存アプリを編入する場合」/ [expert_review_workflow.md](expert_review_workflow.md)
+- 見直し条件: アプリIDの Google Play 登録有無が確認できたとき。一次確認が完了したとき。
+
+（プレミアム・キャラ・CI などの個別事項は各文書に記載。追記するときは上の雛形で CD-006 から。）

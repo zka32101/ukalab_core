@@ -8,8 +8,8 @@
 
 | 文書 | 内容 |
 |---|---|
-| [decision_log.md](decision_log.md) | 決定ログの運用ルール・雛形・これまでの記録 |
-| [new_app_checklist.md](new_app_checklist.md) | 新資格アプリ追加チェックリスト(タグ固定・プレミアム・キャラ・cross_promo・CI・ストア表記・OPSEC) |
+| [decision_log.md](decision_log.md) | 決定ログの運用ルール・雛形・これまでの記録(CD-004 bike 価格、CD-005 bike 編入方針を含む) |
+| [new_app_checklist.md](new_app_checklist.md) | 新資格アプリ追加チェックリスト(タグ固定・プレミアム・キャラ・cross_promo・CI・ストア表記・OPSEC・既存アプリ編入) |
 | [experience_premium_pattern.md](experience_premium_pattern.md) | 体験型プレミアム教材の標準パターン(ストーリー型) |
 | [ai_draft_content.md](ai_draft_content.md) | AI下書きコンテンツの扱い |
 | [expert_review_workflow.md](expert_review_workflow.md) | 専門確認ワークフローと休眠中の新形式問題 |
