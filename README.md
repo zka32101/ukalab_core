@@ -30,6 +30,10 @@ tools/
 example/      架空のサンプル試験と問題（実在の試験の問題ではない）
 ```
 
+## 共通設計
+
+新しい資格アプリを増やすときの方針・チェックリストは [docs/common_design/README.md](docs/common_design/README.md)。
+
 ## UI（`ui.dart`）
 
 推し・衣装/着せ替え・学習コイン・テーマ・学習ラボ系の部品。使い方は [docs/ui.md](docs/ui.md)。
