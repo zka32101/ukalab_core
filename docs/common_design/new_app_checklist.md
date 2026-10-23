@@ -27,6 +27,7 @@
 
 - [ ] Firebase 設定(`google-services.json`)は**リポジトリに置かない**。CI の Secret `GOOGLE_SERVICES_JSON_BASE64` から注入する(`build-aab.yml` / `release-android.yml` で確認)。
 - [ ] 実キー(RevenueCat・広告ユニットID・API キー)をコミットしない。ビルド時注入(`--dart-define` / CI Secrets。D9)。
+- [ ] 広告方針(バナーの有無、禁止ゾーン、`noads` での非表示、ユニットID注入)をアプリごとに決定ログへ記録する(bike の例は CD-007)。
 
 ## 5. CI
 
