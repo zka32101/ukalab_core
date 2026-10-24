@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.84.0] - 2026-10-24
+
 ### Added
 - 「解いた割合の色表示」を共通化（bike の `solve_coverage.dart` / `app_cert.dart` 由来）。追加のみで既存 API は変えない
   - `package:ukalab_core/ukalab_core.dart`（純 Dart）: `SolveCoverage`・`SolveLevel`・`solveRatio`・`solveLevel`・`aggregateCoverage`。境界は 0 / (0,1/3] / (1/3,2/3] / (2/3,1) / 100%。`percent` は整数演算の切り捨て（浮動小数誤差で 29% が 28% にならない）
