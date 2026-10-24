@@ -1,5 +1,3 @@
-import 'dart:ui' show Rect;
-
 import 'package:flutter/material.dart';
 
 import '../file_export/save_file.dart';
