@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Added
+- `dailyGoal({examDate, unmasteredCount, now, bufferFactor = 1.3})` を `exam_countdown_engine.dart` に追加（`ukalab_core.dart` から export 済み。bike の `ExamPlanService.calculatePlan` と同じ式）。未習得×1.3÷残り日数を切り上げ。当日は 1 日、過去は null、未習得 0 は 0。受験日の保存は既存の `ExamDateStore` を使い、新しい保存は作らない。追加のみ
+
 ## [0.83.0] - 2026-10-22
 
 ### Added

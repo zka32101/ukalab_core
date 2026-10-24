@@ -78,3 +78,29 @@ class ExamCountdownEngine {
     return ExamCountdownPhase.farAway;
   }
 }
+
+/// 未習得問題に掛ける安全マージン。解き直しが発生する前提で、単純な
+/// 「残り問題数÷残り日数」より少し多めに見積もる（bike の ExamPlanService と同じ 1.3）。
+const double kDailyGoalBufferFactor = 1.3;
+
+/// 試験日から逆算した「1日あたりに解く問題数」の目安（純 Dart）。
+///
+/// 式: `ceil(unmasteredCount × bufferFactor ÷ 残り日数)`。残り日数は [daysUntilExam]
+/// （年月日だけの暦日差。時刻は無視）で、試験当日は 1 日として数える。
+/// - 試験日が過去なら null（呼び出し側で「試験日を過ぎています」等を出す）
+/// - [unmasteredCount] が 0 以下なら 0
+///
+/// 受験日の保存は既存の `ExamDateStore`（`package:ukalab_core/exam_date.dart`）を使う。
+/// [now] を省略すると現在時刻。
+int? dailyGoal({
+  required DateTime examDate,
+  required int unmasteredCount,
+  DateTime? now,
+  double bufferFactor = kDailyGoalBufferFactor,
+}) {
+  final daysLeft = daysUntilExam(examDate, now ?? DateTime.now());
+  if (daysLeft < 0) return null;
+  if (unmasteredCount <= 0) return 0;
+  final effectiveDays = daysLeft == 0 ? 1 : daysLeft;
+  return (unmasteredCount * bufferFactor / effectiveDays).ceil();
+}
