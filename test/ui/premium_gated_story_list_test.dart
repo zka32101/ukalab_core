@@ -117,9 +117,9 @@ void main() {
       hasPremium: false,
       onOpen: (_) {},
     )));
-    final adLike = RegExp(r'(^|[a-z])(Ad|Ads)([A-Z]|$)|Banner|Native|Interstitial');
+    final adLike = RegExp(r'(^|[a-z])(Ad|Ads)([A-Z]|$)|BannerAd|NativeAd|Interstitial|Rewarded');
     final names = tester.allWidgets.map((w) => w.runtimeType.toString());
-    expect(names.where((n) => adLike.hasMatch(n) && n != 'MaterialBanner'), isEmpty);
+    expect(names.where((n) => adLike.hasMatch(n)), isEmpty);
     expect(File('lib/ui/ui_kit/premium_gated_story_list.dart').readAsStringSync(),
         isNot(contains('google_mobile_ads')));
   });
