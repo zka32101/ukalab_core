@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Added
+- `package:ukalab_core/ui.dart`: 「達成」の共有カード。追加のみで既存 API は変えない
+  - `AchievementShareData{certLabel, headline, metricText?, dateLabel?}`（個人情報の欄は持たない）・`AchievementShareCard({data, cert})`（4:5、資格色 `UkalabCert`、ライト/ダーク対応、文字倍率固定、長文は省略/縮小、Semantics ラベル付き）
+  - `shareAchievementCard(boundaryKey, {fileName, pixelRatio, saver, sharePositionOrigin})`: `captureShareCard` で PNG 化し、既存の `defaultFileSaver`（share_plus）で共有する薄いヘルパー。依存の追加なし
+  - `PassShareCard`（合格固定文言）とは別。合格を示す文言は持たない
+
 ## [0.84.0] - 2026-10-24
 
 ### Added
