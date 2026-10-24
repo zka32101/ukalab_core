@@ -5,6 +5,9 @@
 ## [Unreleased]
 
 ### Added
+- `PremiumGatedStoryListView`（`ui.dart`）: 「最初のN本は無料、残りはプレミアム」の体験型シナリオ一覧。無料の判定は `freeCount`（先頭N本）または `isFree(id)`、`hasPremium` が true なら全開放。ロック中はロックアイコンを出し、タップで `onLockedTap`（省略時は既定文言の SnackBar）。`draftNotice`（AI下書きの注記）・`intro`・各タイル末尾の `footer` スロット（関連用語チップなど）を受ける。広告は出さない。画面（Scaffold）は持たず `ListView` を返す。項目は `PremiumGatedStoryItem`（`fromScenario` で `StoryScenario` から作れる）。既存の `StoryModeWidget` などは変更なし
+- `validateStoryScenarioText` / `kStoryForbiddenWords` / `storyScenarioTexts`（`ukalab_core.dart`、純Dart）: シナリオの文章の禁止語（公式・本試験相当・過去問・合格保証）検査。`requireOriginalSelfMade: true` で source が original・sourceRef に「自作」も確かめる。ITパス・bike で重複していた検証の共通化
+- テスト: `test/ui/premium_gated_story_list_test.dart`、`test/story_scenario_text_validator_test.dart`
 - `package:ukalab_core/ui.dart`: 「達成」の共有カード。追加のみで既存 API は変えない
   - `AchievementShareData{certLabel, headline, metricText?, dateLabel?}`（個人情報の欄は持たない）・`AchievementShareCard({data, cert})`（4:5、資格色 `UkalabCert`、ライト/ダーク対応、文字倍率固定、長文は省略/縮小、Semantics ラベル付き）
   - `shareAchievementCard(boundaryKey, {fileName, pixelRatio, saver, sharePositionOrigin})`: `captureShareCard` で PNG 化し、既存の `defaultFileSaver`（share_plus）で共有する薄いヘルパー。依存の追加なし

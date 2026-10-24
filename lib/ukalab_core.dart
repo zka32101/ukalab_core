@@ -22,6 +22,7 @@ export 'content/predict_run_validator.dart';
 export 'content/question_angle_validator.dart';
 export 'content/question_validator.dart';
 export 'content/story_mode_validator.dart';
+export 'content/story_scenario_text_validator.dart';
 export 'content/teach_mascot_validator.dart';
 export 'content/term_validator.dart';
 export 'content/update_log_validator.dart';

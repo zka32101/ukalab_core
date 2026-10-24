@@ -85,6 +85,7 @@ export 'ui/ui_kit/nn_builder.dart';
 export 'ui/ui_kit/attention_viz.dart';
 export 'ui/ui_kit/ai_news_card.dart';
 export 'ui/ui_kit/story_mode.dart';
+export 'ui/ui_kit/premium_gated_story_list.dart';
 export 'ui/ui_kit/confusion_matrix_lab.dart';
 export 'ui/ui_kit/lab_controls.dart';
 export 'ui/ui_kit/method_choice.dart';
