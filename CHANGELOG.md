@@ -5,6 +5,10 @@
 ## [Unreleased]
 
 ### Added
+- 「解いた割合の色表示」を共通化（bike の `solve_coverage.dart` / `app_cert.dart` 由来）。追加のみで既存 API は変えない
+  - `package:ukalab_core/ukalab_core.dart`（純 Dart）: `SolveCoverage`・`SolveLevel`・`solveRatio`・`solveLevel`・`aggregateCoverage`。境界は 0 / (0,1/3] / (1/3,2/3] / (2/3,1) / 100%。`percent` は整数演算の切り捨て（浮動小数誤差で 29% が 28% にならない）
+  - `package:ukalab_core/ui.dart`: `solveCoverageFill(cert, brightness, level, surface)`（不透明度 0/.18/.38/.60/.85）・`solveCoverageForeground`（`contrastRatio` で 4.5:1 保証）・`SolveCoverageBadge`
+  - bike が自前の `SolveLevel` 等を持ったまま両方を import すると名前が衝突するため、bike 側は自前ファイルを削除してコアへ移行する
 - `dailyGoal({examDate, unmasteredCount, now, bufferFactor = 1.3})` を `exam_countdown_engine.dart` に追加（`ukalab_core.dart` から export 済み。bike の `ExamPlanService.calculatePlan` と同じ式）。未習得×1.3÷残り日数を切り上げ。当日は 1 日、過去は null、未習得 0 は 0。受験日の保存は既存の `ExamDateStore` を使い、新しい保存は作らない。追加のみ
 
 ## [0.83.0] - 2026-10-22
