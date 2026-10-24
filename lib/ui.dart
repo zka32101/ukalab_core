@@ -77,6 +77,7 @@ export 'ui/oshi_growth/oshi_growth_views.dart';
 export 'ui/ui_kit/teach_mascot.dart';
 export 'ui/ui_kit/coin_breakdown.dart';
 export 'ui/ui_kit/readiness_progress.dart';
+export 'ui/ui_kit/solve_coverage_view.dart';
 export 'ui/ui_kit/ml_lab.dart';
 export 'ui/ui_kit/conv_lab.dart';
 export 'ui/ui_kit/nn_builder.dart';
