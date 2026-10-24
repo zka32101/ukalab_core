@@ -9,6 +9,7 @@ export 'content/attention_viz_validator.dart';
 export 'content/boundary_validator.dart';
 export 'content/chapter_reading_validator.dart';
 export 'content/company_mode_validator.dart';
+export 'content/content_coverage_report.dart';
 export 'content/confusion_matrix_lab_validator.dart';
 export 'content/conv_lab_validator.dart';
 export 'content/ethics_case_validator.dart';

@@ -9,6 +9,8 @@ import 'package:ukalab_core/ukalab_core.dart';
 /// `--subtopic-scope=subject` で、細目IDの衝突検査（subtopic-conflict）の単位を章（topicId、既定）から科目（subjectId）に変える。
 /// `--angle-report=md|json` で観点（conceptId / angle）のカバレッジを標準出力に出す（`--angle-report-out=PATH` でファイルへ）。
 /// `--strict-angles` で `concept-single-angle`（概念あたりの異なる観点が2未満）の警告をエラーにする。
+/// `--coverage` で分野別・難易度別・形式別の件数と倍率（件数÷試験1回の出題枠）を GitHub Actions の `::group::` 形式で出力する。
+/// `--coverage-min-multiplier=N`（既定5）・`--coverage-max-difficulty-share=R`（既定0.7）で閾値を変えられる。警告のみで終了コードには影響しない。
 /// 観点の警告（angle-unknown / concept-without-angle / concept-single-angle）は終了コードに影響しない。
 /// エラーの問題が1件でもあれば終了コード1（CI で配信を止める）。
 Future<void> main(List<String> args) async {
@@ -31,6 +33,7 @@ Future<void> main(List<String> args) async {
       '[--checklist checklist.jsonl]... '
       '[--subtopic-scope=topic|subject] '
       '[--angle-report=md|json] [--angle-report-out=PATH] [--strict-angles] '
+      '[--coverage] [--coverage-min-multiplier=N] [--coverage-max-difficulty-share=R] '
       '<questions.jsonl>...',
     );
     exit(64);
@@ -68,6 +71,9 @@ Future<void> main(List<String> args) async {
   String? angleReportFormat;
   String? angleReportOut;
   var strictAngles = false;
+  var coverage = false;
+  var coverageMin = kDefaultMinCoverageMultiplier;
+  var coverageMaxShare = kDefaultMaxDifficultyShare;
   final rest = args.skip(1).toList();
   for (var i = 0; i < rest.length; i++) {
     if (rest[i].startsWith('--subtopic-scope=')) {
@@ -89,6 +95,22 @@ Future<void> main(List<String> args) async {
       angleReportFormat = v;
     } else if (rest[i].startsWith('--angle-report-out=')) {
       angleReportOut = rest[i].substring('--angle-report-out='.length);
+    } else if (rest[i] == '--coverage') {
+      coverage = true;
+    } else if (rest[i].startsWith('--coverage-min-multiplier=')) {
+      final v = double.tryParse(rest[i].substring('--coverage-min-multiplier='.length));
+      if (v == null || v < 0) {
+        stderr.writeln('--coverage-min-multiplier は0以上の数を指定してください: ${rest[i]}');
+        exit(64);
+      }
+      coverageMin = v;
+    } else if (rest[i].startsWith('--coverage-max-difficulty-share=')) {
+      final v = double.tryParse(rest[i].substring('--coverage-max-difficulty-share='.length));
+      if (v == null || v <= 0 || v > 1) {
+        stderr.writeln('--coverage-max-difficulty-share は0より大きく1以下の数を指定してください: ${rest[i]}');
+        exit(64);
+      }
+      coverageMaxShare = v;
     } else if (rest[i] == '--strict-angles') {
       strictAngles = true;
     } else if (rest[i] == '--terms') {
@@ -502,6 +524,18 @@ Future<void> main(List<String> args) async {
     } else {
       stdout.write(text);
     }
+  }
+  if (coverage) {
+    // 警告のみ。終了コードには影響させない。
+    stdout.write(formatContentCoverageReport(
+      buildContentCoverageReport(
+        exam,
+        questions,
+        minMultiplier: coverageMin,
+        maxDifficultyShare: coverageMaxShare,
+      ),
+      github: true,
+    ));
   }
   exit(errorCount == 0 ? 0 : 1);
 }
