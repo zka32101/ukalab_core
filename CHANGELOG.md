@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Added
+- `buildContentCoverageReport(exam, questions, {levelId, minMultiplier = 5, maxDifficultyShare = 0.7})` / `ContentCoverageReport` / `SubjectCoverage` / `formatContentCoverageReport(report, {github})`（`ukalab_core.dart`、純Dart、`lib/content/content_coverage_report.dart`）: 分野別・難易度別・形式別の件数と、倍率（件数 ÷ 試験1回の出題枠＝級の `subjectQuestionCounts`）を集計する。`disabled` は数えない
+- `CoverageWarning`: 倍率が閾値未満の分野（`coverage-low-multiplier`）、最大の難易度が全体の70%超（`coverage-difficulty-skew`）を警告として返す。警告のみで検証失敗にはならない。`experienceCountWarning({label, actual, free, premium})`: 体験型の本数が「無料N+プレミアムM」に満たない場合の警告（件数を渡す形）
+- `validate_content` に `--coverage`（`::group::` 形式で出力）・`--coverage-min-multiplier=N`・`--coverage-max-difficulty-share=R` を追加。指定しなければ従来と出力・終了コードは同一で、指定しても終了コードは変わらない
+- テスト: `test/content_coverage_report_test.dart`
+
 ## [0.85.0] - 2026-10-24
 
 ### Added
