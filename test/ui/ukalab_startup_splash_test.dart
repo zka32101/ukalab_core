@@ -51,7 +51,7 @@ void main() {
       ),
       b: Brightness.dark,
     ));
-    await tester.pump();
+    await tester.pump(const Duration(seconds: 1)); // テーマ切替のアニメーションを終える
     expect(tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor, UkalabCert.boki3.dark);
   });
 
