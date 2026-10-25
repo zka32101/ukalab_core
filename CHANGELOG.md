@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.86.0] - 2026-10-25
+
 ### Added
 - `UkalabStartupSplash`（`ui.dart`、`lib/ui/ukalab_startup_splash.dart`）: うかラボ共通の起動画面。引数は `backgroundColor`・`iconAsset`（透過の foreground 画像、角丸クリップなし）・`iconSize`（既定160）・`iconPackage`・`showProgress`・`footer`（既定は kit の組織ロゴ）。`UkalabStartupSplash.cert(cert:, ...)` は背景色を `UkalabCert` から導出（ライト/ダーク）。内部で app_common_kit v4.0.0 の `StartupSplash` / `OrgBrandingFooter` を再利用する。追加のみ
 - `kUkalabAppIds` / `isUkalabAppId`（`ukalab_core.dart`、純Dart。`cross_promo.dart` からも export）: うかラボ8アプリの正規 applicationId（公開済みの不統一ID `ukalab_otsu` / `ukarulab.kanji` を含め変更しない）
