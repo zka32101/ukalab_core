@@ -94,3 +94,4 @@ export 'progress/weak_topics.dart';
 export 'progress/weak_trend.dart';
 export 'question/question.dart';
 export 'term/term.dart';
+export 'ukalab_app_ids.dart';

@@ -5,8 +5,8 @@ import 'package:ukalab_core/src/cross_promo_test_support.dart';
 
 const _list = '''
 [
-  {"id":"com.example.gkentei","name":"G検定コレ","tagline":"AIを学ぶ","iconUrl":"","storeUrl":"https://play.google.com/store/apps/details?id=com.example.gkentei","category":"うかラボ"},
-  {"id":"com.example.boki","name":"簿記コレ","tagline":"簿記を学ぶ","iconUrl":"","storeUrl":"https://play.google.com/store/apps/details?id=com.example.boki","category":"うかラボ"},
+  {"id":"com.yourwish.ukalab.g_kentei","name":"G検定コレ","tagline":"AIを学ぶ","iconUrl":"","storeUrl":"https://play.google.com/store/apps/details?id=com.example.gkentei","category":"うかラボ"},
+  {"id":"com.yourwish.ukalab.boki3","name":"簿記コレ","tagline":"簿記を学ぶ","iconUrl":"","storeUrl":"https://play.google.com/store/apps/details?id=com.example.boki","category":"うかラボ"},
   {"id":"com.example.sansu","name":"算数コレ","tagline":"小学生向け","iconUrl":"","storeUrl":"https://play.google.com/store/apps/details?id=com.example.sansu","category":"小学コレ"}
 ]
 ''';
@@ -16,13 +16,18 @@ Widget _host(Widget child) => MaterialApp(home: Scaffold(body: child));
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  testWidgets('kUkalabAppIds に無い currentAppId は debug で assert', (tester) async {
+    await tester.pumpWidget(_host(const UkalabCrossPromoSection(currentAppId: 'com.example.unknown')));
+    expect(tester.takeException(), isA<AssertionError>());
+  });
+
   test('カテゴリ定数', () {
     expect(kUkalabCrossPromoCategory, 'うかラボ');
   });
 
   testWidgets('掲載0件では何も描画せず例外も出ない', (tester) async {
     await tester.pumpWidget(
-      _host(const UkalabCrossPromoSection(currentAppId: 'com.example.gkentei')),
+      _host(const UkalabCrossPromoSection(currentAppId: 'com.yourwish.ukalab.g_kentei')),
     );
     expect(tester.takeException(), isNull);
     expect(find.text('他のアプリもチェック！'), findsNothing);
@@ -31,7 +36,7 @@ void main() {
 
   testWidgets('自アプリを除外し、うかラボだけを表示する', (tester) async {
     await tester.pumpWidget(_host(ukalabCrossPromoSectionForTest(
-      currentAppId: 'com.example.gkentei',
+      currentAppId: 'com.yourwish.ukalab.g_kentei',
       rawJson: _list,
     )));
     expect(tester.takeException(), isNull);
@@ -43,8 +48,8 @@ void main() {
 
   testWidgets('自アプリ以外にうかラボが無ければ何も出さない', (tester) async {
     await tester.pumpWidget(_host(ukalabCrossPromoSectionForTest(
-      currentAppId: 'com.example.boki',
-      rawJson: _list.replaceFirst('"id":"com.example.gkentei"', '"id":"com.example.other"').replaceFirst(
+      currentAppId: 'com.yourwish.ukalab.boki3',
+      rawJson: _list.replaceFirst('"id":"com.yourwish.ukalab.g_kentei"', '"id":"com.example.other"').replaceFirst(
           '"category":"うかラボ"', '"category":"小学コレ"'),
     )));
     expect(tester.takeException(), isNull);
@@ -55,7 +60,7 @@ void main() {
     var gateCalls = 0;
     var opened = 0;
     await tester.pumpWidget(_host(ukalabCrossPromoSectionForTest(
-      currentAppId: 'com.example.gkentei',
+      currentAppId: 'com.yourwish.ukalab.g_kentei',
       rawJson: _list,
       isChildDirected: true,
       beforeOpenStore: (_) async {
@@ -76,7 +81,7 @@ void main() {
     final childDirected = true;
     expect(
       () => UkalabCrossPromoSection(
-        currentAppId: 'com.example.gkentei',
+        currentAppId: 'com.yourwish.ukalab.g_kentei',
         isChildDirected: childDirected,
       ),
       throwsAssertionError,
