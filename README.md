@@ -240,9 +240,14 @@ if (canShowWeakSummary(isPremium: isPremium)) WeakSummaryCard(records: history, 
 例（問題の1行）: `{"qid":"q-012","topicId":"ch2","subtopicId":"ch2-a","compareWith":["term-recall"], ...}`
 （答えの用語 `term-precision` 側に `"relatedQuestionIds":["q-012"]`）
 
+### 起動画面（`UkalabStartupSplash`）と正規 applicationId（`kUkalabAppIds`）
+
+- `UkalabStartupSplash(backgroundColor:, iconAsset:, iconSize: 160)`（`ui.dart`）: 起動中の読み込み画面。見た目は app_common_kit の `StartupSplash` と同等（中央に進行表示、下部に組織ロゴ）で、アイコンは角丸クリップしない透過画像を渡す。`UkalabStartupSplash.cert(cert: UkalabCert.boki3, ...)` で背景色を資格色から導出できる
+- `kUkalabAppIds` / `isUkalabAppId`（`ukalab_core.dart`・`cross_promo.dart`）: うかラボ8アプリの正規 applicationId（公開済みの不統一ID含め変更しない）。`UkalabCrossPromoSection` は `currentAppId` を照合し、debug ビルドで一覧に無ければ assert する
+
 ### 相互紹介（`cross_promo.dart`）
 
-うかラボ5アプリの「他のアプリもチェック！」。`cross_promo_kit` を `うかラボ` カテゴリに固定した薄いラッパー。
+うかラボ8アプリの「他のアプリもチェック！」。`cross_promo_kit` を `うかラボ` カテゴリに固定した薄いラッパー。
 `ui.dart` には含めない（Firebase 依存を持ち込まないため。使うアプリが明示的に import する）。
 
 各アプリの作業:

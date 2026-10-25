@@ -1,4 +1,4 @@
-// うかラボ7アプリ（g_kentei / it_passport / infosecmanage / seisei_ai_passport / boki / otsu4 / kanken）の相互紹介。
+// うかラボ8アプリ（g_kentei / it_passport / infosecmanage / seisei_ai_passport / boki3 / otsu / kanji / bike_license）の相互紹介。
 //
 // `cross_promo_kit` の薄いラッパー。紹介カテゴリを「うかラボ」に固定し、
 // Firebase の初期化と Remote Config の取得を1回の呼び出しにまとめる。
@@ -8,6 +8,10 @@
 import 'package:cross_promo_kit/cross_promo_kit.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
+
+import 'ukalab_app_ids.dart';
+
+export 'ukalab_app_ids.dart';
 
 /// 相互紹介の対象カテゴリ（Remote Config の掲載リストの `category`）。
 const kUkalabCrossPromoCategory = 'うかラボ';
@@ -46,6 +50,7 @@ class UkalabCrossPromo {
 /// 掲載が0件（未配信・取得失敗・自アプリのみ）のときは何も表示しない。
 /// うかラボは大人向けなので `isChildDirected` は付けない。
 /// [currentAppId] には本番の applicationId を渡す（自アプリの除外に使う）。
+/// [kUkalabAppIds] に無い値を渡すと、debug ビルドでは assert で気づける（release では何もしない）。
 class UkalabCrossPromoSection extends StatelessWidget {
   const UkalabCrossPromoSection({
     super.key,
@@ -71,11 +76,18 @@ class UkalabCrossPromoSection extends StatelessWidget {
   final void Function(PromotedApp app)? onOpenStore;
 
   @override
-  Widget build(BuildContext context) => CrossPromoSection(
+  Widget build(BuildContext context) {
+    assert(
+      isUkalabAppId(currentAppId),
+      'currentAppId "$currentAppId" は kUkalabAppIds にありません。'
+      '本番の applicationId を渡してください（新しいアプリは ukalab_app_ids.dart に追記）。',
+    );
+    return CrossPromoSection(
         currentAppId: currentAppId,
         currentCategory: kUkalabCrossPromoCategory,
         isChildDirected: isChildDirected,
         beforeOpenStore: beforeOpenStore,
         onOpenStore: onOpenStore,
       );
+  }
 }

@@ -39,6 +39,7 @@ export 'ui/transfer/firebase_transfer_remote.dart';
 export 'ui/transfer/learning_transfer.dart';
 export 'ui/theme/ukalab_palette.dart';
 export 'ui/theme/ukalab_theme.dart';
+export 'ui/ukalab_startup_splash.dart';
 export 'ui/ui_kit/lab_strings.dart';
 export 'ui/ui_kit/term_card.dart';
 export 'ui/ui_kit/term_map.dart';

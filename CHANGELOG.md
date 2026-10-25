@@ -5,6 +5,14 @@
 ## [Unreleased]
 
 ### Added
+- `UkalabStartupSplash`（`ui.dart`、`lib/ui/ukalab_startup_splash.dart`）: うかラボ共通の起動画面。引数は `backgroundColor`・`iconAsset`（透過の foreground 画像、角丸クリップなし）・`iconSize`（既定160）・`iconPackage`・`showProgress`・`footer`（既定は kit の組織ロゴ）。`UkalabStartupSplash.cert(cert:, ...)` は背景色を `UkalabCert` から導出（ライト/ダーク）。内部で app_common_kit v4.0.0 の `StartupSplash` / `OrgBrandingFooter` を再利用する。追加のみ
+- `kUkalabAppIds` / `isUkalabAppId`（`ukalab_core.dart`、純Dart。`cross_promo.dart` からも export）: うかラボ8アプリの正規 applicationId（公開済みの不統一ID `ukalab_otsu` / `ukarulab.kanji` を含め変更しない）
+- `UkalabCrossPromoSection` が `currentAppId` を `kUkalabAppIds` と照合し、debug ビルドで一覧に無ければ assert する（release では何もしない）。既存の `com.example.*` を渡しているテストは正規IDへの更新が必要
+- テスト: `test/ui/ukalab_startup_splash_test.dart`、`test/ukalab_app_ids_test.dart`、`test/cross_promo_test.dart`（assert の確認を追加）
+
+### Changed
+- 相互紹介の説明（README / CHANGELOG / `cross_promo.dart` のコメント）の「5アプリ/7アプリ」を8アプリに更新
+
 - `buildContentCoverageReport(exam, questions, {levelId, minMultiplier = 5, maxDifficultyShare = 0.7})` / `ContentCoverageReport` / `SubjectCoverage` / `formatContentCoverageReport(report, {github})`（`ukalab_core.dart`、純Dart、`lib/content/content_coverage_report.dart`）: 分野別・難易度別・形式別の件数と、倍率（件数 ÷ 試験1回の出題枠＝級の `subjectQuestionCounts`）を集計する。`disabled` は数えない
 - `CoverageWarning`: 倍率が閾値未満の分野（`coverage-low-multiplier`）、最大の難易度が全体の70%超（`coverage-difficulty-skew`）を警告として返す。警告のみで検証失敗にはならない。`experienceCountWarning({label, actual, free, premium})`: 体験型の本数が「無料N+プレミアムM」に満たない場合の警告（件数を渡す形）
 - `validate_content` に `--coverage`（`::group::` 形式で出力）・`--coverage-min-multiplier=N`・`--coverage-max-difficulty-share=R` を追加。指定しなければ従来と出力・終了コードは同一で、指定しても終了コードは変わらない
@@ -533,7 +541,7 @@ app_common_kit を v3.1.0 に追従（PR #135 のながらセッション）。�
 
 ## [0.54.0] - 2026-10-13
 
-うかラボ5アプリの相互紹介を共通化する `package:ukalab_core/cross_promo.dart` を追加（`cross_promo_kit` v0.3.0）。追加のみ。
+うかラボ5アプリ（当時。現在は8アプリ）の相互紹介を共通化する `package:ukalab_core/cross_promo.dart` を追加（`cross_promo_kit` v0.3.0）。追加のみ。
 
 - `UkalabCrossPromo.init()`: Firebase 初期化（失敗は握りつぶす）→ `CrossPromoService.init()`。二重呼び出し安全。`unawaited` で呼べる
 - `UkalabCrossPromoSection(currentAppId: ...)`: `currentCategory: 'うかラボ'` 固定の薄いラッパー。成人向けのため `isChildDirected` は付けない
