@@ -8,6 +8,7 @@ import '../../question/question.dart';
 import '../../term/term.dart';
 import 'answer_feedback_strings.dart';
 import 'comparison_card.dart';
+import 'related_readings_card.dart';
 import 'wrong_cause_selector.dart';
 
 /// 解答後に置く統合ウィジェット。不正解のときだけ、次を出す（正解のときは何も出さない）。
@@ -163,43 +164,10 @@ class _AnswerFeedbackPanelState extends State<AnswerFeedbackPanel> {
     if (onOpen == null || readings.isEmpty) return const [];
     return [
       const SizedBox(height: 12),
-      Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Semantics(
-                header: true,
-                child: Row(
-                  children: [
-                    const Icon(Icons.menu_book_outlined, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        s.relatedReadingsTitle,
-                        style: theme.textTheme.titleSmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              for (final r in readings)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: OutlinedButton(
-                    onPressed: () => onOpen(r),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(r.title),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+      RelatedReadingsCard(
+        readings: readings,
+        onOpenReading: onOpen,
+        strings: s,
       ),
     ];
   }

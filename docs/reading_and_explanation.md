@@ -68,3 +68,66 @@ AnswerFeedbackPanel(
 
 不正解のときだけ「読み物でおさらい」を出す。`disabled` の読み物は出さない。`onOpenReading` が null なら欄ごと出さない。
 文言は `AnswerFeedbackStrings` の `explConclusion` `explReason` `explPitfall` `explOtherScene` `relatedReadingsTitle` `readingBackToQuestion` `readingQuestionLabel`（ja / en。zh / ko は機械翻訳の下書きで、公開前に母語話者の確認が要る）。独自の `AnswerFeedbackStrings` を作っているアプリは、追加項目を省略すれば日本語になる。
+
+## 5. 出題範囲の絞り込み（levelId）
+
+`ChapterReading` に任意の `levelId` を持てる（例: 簿記の `level3_from_2027_04`）。省略した読み物は全範囲向け。
+
+```json
+{"readingId":"r1","examId":"boki","subjectId":"s1","title":"仕訳の基本","levelId":"level3_from_2027_04","sections":[{"heading":"導入","body":"..."}],"source":"original","sourceRef":"自作","contentVer":"1"}
+```
+
+```dart
+// 簿記: 今の出題範囲の読み物だけを一覧・誤答導線に使う
+final visible = readingsForLevel(allReadings, currentLevelId);
+```
+
+`levelId` が null の読み物は常に含まれ、指定のある読み物は一致するものだけ。`currentLevelId` が null なら全件。`validateChapterReadings` は空文字の `levelId` を `empty-level-id` で指摘する。
+
+## 6. 他コンテンツへの参照（relatedLinks）
+
+```json
+"relatedLinks":[{"kind":"hazard","id":"h12"},{"kind":"story","id":"s3"}]
+```
+
+`kind` は文字列（例: `hazard` / `story` / `term` / `question`）で、コアは意味を解釈しない。遷移先の解決はアプリ側。
+
+```dart
+for (final l in linksOfKind(reading, 'hazard')) {
+  openHazard(l.id); // バイク: 危険予測へ
+}
+```
+
+validator は `kind` / `id` が空なら `empty-link-kind` / `empty-link-id`。`relatedTermIds` / `relatedQuestionIds` は従来どおり。
+
+## 7. 誤答導線だけ出す: RelatedReadingsCard
+
+`AnswerFeedbackPanel` は原因選択欄とセットなので、独自の結果表示を持つアプリはこのカードだけを置く。
+
+```dart
+// バイク: AnswerResultOverlay の中
+RelatedReadingsCard(
+  readings: readingsForQuestion(allReadings, q.qid),
+  isCorrect: correct,           // 正解なら何も出ない
+  onOpenReading: (r) => openReading(r),
+)
+```
+
+読み物が空・全て `disabled`・`onOpenReading` が null のときも何も出さない。文言は `AnswerFeedbackStrings.relatedReadingsTitle`（`strings:` で差し替え可）。
+
+## 8. import の入口: reading.dart
+
+```dart
+import 'package:ukalab_core/reading.dart';
+```
+
+読み物/説明ページ関連（`ChapterReading` `ContentLink` `ReadingSection` `ReadingTable` `ReadingFigure` `ReadingSectionContent` `ExplanationCard` `ExplanationParts` `RelatedReadingsCard` `ReadingQuestionLinks` `readingsForQuestion` `readingsForLevel` `linksOfKind` `validateChapterReadings`、`kReadingSection*` 定数）をまとめて使える。Flutter が要る。純Dartだけで使うなら従来どおり `ukalab_core.dart`。既存の入口の公開名は変わらず、同じ宣言を再エクスポートするだけなので併用しても曖昧にならない（別名の型をアプリが持つ場合は `show` / `as` で選ぶ）。
+
+## 9. 設計メモ: 問題の変換アダプタ（今回は実装しない）
+
+アプリ側の `Question`（独自スキーマ）を core の `Question` に変換するアダプタの実現可能性:
+
+- 可能。core 側に変換関数を置くとアプリ固有の型に依存してしまうため、**アプリ側に `Question toCoreQuestion(AppQuestion q)` を置く**のを推奨（core は変更しない）。
+- 必須の対応: `qid`・`prompt`・`choices`・`answerIndex`・`explanation`・`examId`・`subjectId`・`topicId`・`source`・`sourceRef`・`contentVer`。選択肢を並べ替えて表示するアプリは、`AnswerFeedbackPanel.selectedIndex` に元の番号を渡す。
+- 変換結果は表示用に毎回作らず、一覧読み込み時に1度作ってキャッシュする。変換できない問題（記述式など）は `isCorrect` を渡して `selectedIndex: null` で使う。
+- 将来共通化するなら、core に `abstract interface class` ではなく変換用の関数型 typedef だけを足す案を先に検討する（既存アプリへの影響が最小）。

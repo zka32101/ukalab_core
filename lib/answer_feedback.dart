@@ -19,6 +19,7 @@ export 'experience/explanation_parts.dart'
     show ExplanationParts, kExplanationOtherSceneMarker, readingsForQuestion;
 export 'ui/answer_feedback/comparison_card.dart';
 export 'ui/answer_feedback/explanation_card.dart';
+export 'ui/answer_feedback/related_readings_card.dart';
 export 'ui/reading/reading_question_links.dart';
 export 'ui/answer_feedback/weak_summary_card.dart';
 export 'ui/answer_feedback/wrong_cause_selector.dart';

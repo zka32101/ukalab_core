@@ -59,6 +59,19 @@ List<ContentIssue> validateChapterReadings(
     if (r.contentVer.trim().isEmpty)
       add(r, 'no-content-ver', 'contentVer がありません');
 
+    if (r.levelId != null && r.levelId!.trim().isEmpty) {
+      add(r, 'empty-level-id', 'levelId が空文字です（省略するか値を入れてください）');
+    }
+    for (var i = 0; i < r.relatedLinks.length; i++) {
+      final l = r.relatedLinks[i];
+      if (l.kind.trim().isEmpty) {
+        add(r, 'empty-link-kind', 'relatedLinks[$i]のkindが空です');
+      }
+      if (l.id.trim().isEmpty) {
+        add(r, 'empty-link-id', 'relatedLinks[$i]のidが空です');
+      }
+    }
+
     for (var i = 0; i < r.sections.length; i++) {
       final s = r.sections[i];
       if (s.heading.trim().isEmpty) {

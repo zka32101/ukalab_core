@@ -12,6 +12,13 @@
 - `AnswerFeedbackPanel` に任意引数 `relatedReadings`・`onOpenReading`（誤答時だけ「読み物でおさらい」を表示。未指定なら従来と同一表示）、`readingsForQuestion(readings, qid)`、読み物側の `ReadingQuestionLinks`（`relatedQuestionIds` から確認問題へ戻る）
 - `AnswerFeedbackStrings` に文言を追加（ja / en と、zh・ko の機械翻訳の下書き）。追加項目は省略可で、独自に `AnswerFeedbackStrings` を作っているアプリは変更不要
 - 使い方: `docs/reading_and_explanation.md`。テスト: `test/reading_section_kinds_test.dart`、`test/ui/reading_and_explanation_ui_test.dart`
+- 読み物の追加改善（すべて任意・追加のみ。既存 JSON・既存の公開名は変更なし）
+  - `ChapterReading.levelId`（出題範囲。省略可、未指定は `toJson` に出さず往復一致）と、純Dartの `readingsForLevel(readings, currentLevelId)`（levelId が null の読み物は常に含め、指定があれば一致のみ）。`validateChapterReadings` は空文字の levelId を `empty-level-id` で指摘
+  - `ChapterReading.relatedLinks`（`List<ContentLink>`、`ContentLink` は `kind` と `id`）と `linksOfKind(reading, kind)`。validator は kind/id が空なら `empty-link-kind` / `empty-link-id`。`relatedTermIds` / `relatedQuestionIds` は変更なし
+  - `RelatedReadingsCard`（`ui.dart` / `answer_feedback.dart`）: 誤答後の「読み物でおさらい」だけを出す単体カード。正解・読み物なし・`onOpenReading` なしは非表示。`AnswerFeedbackPanel` も内部で再利用（表示・引数は従来どおり）
+  - 新しい入口 `package:ukalab_core/reading.dart`: 読み物/説明ページ関連（ChapterReading・ContentLink・ReadingSection・ReadingTable・ReadingFigure・ReadingSectionContent・ExplanationCard・ExplanationParts・RelatedReadingsCard・ReadingQuestionLinks・readingsForQuestion・readingsForLevel・linksOfKind・validateChapterReadings と kReadingSection* 定数）を `show` で再エクスポート。既存の `ukalab_core.dart` / `ui.dart` / `answer_feedback.dart` の公開名は削除・変更なし
+  - docs: `docs/reading_and_explanation.md` に使用例・移行例・問題の変換アダプタの設計メモ（コード追加なし）
+  - テスト: `test/reading_level_links_test.dart`、`test/ui/related_readings_card_test.dart`、`test/reading_entrypoint_test.dart`
 
 ## [0.86.0] - 2026-10-25
 

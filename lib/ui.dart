@@ -47,6 +47,7 @@ export 'ui/ui_kit/chapter_reading.dart';
 export 'ui/reading/reading_section_content.dart';
 export 'ui/reading/reading_question_links.dart';
 export 'ui/answer_feedback/explanation_card.dart';
+export 'ui/answer_feedback/related_readings_card.dart';
 export 'ui/ui_kit/tappable_term_text.dart';
 export 'ui/ui_kit/stats_compare.dart';
 export 'ui/stats/exam_stats_models.dart';
