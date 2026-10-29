@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.87.0] - 2026-10-29
+
+読み物の表現拡張（#161）、levelId・relatedLinks・`reading.dart` 入口（#162）、表の列幅・数字の折り返し・確認問題リンクの表示（#163）をまとめたリリース。
+
+### アプリ側への影響・移行メモ
+- 後方互換: 破壊的変更なし。既存の公開名・JSON は変更なしで、従来形式のデータは同じ結果で通る。新規公開APIは `package:ukalab_core/reading.dart` 入口、`ChapterReading.levelId`、`ChapterReading.relatedLinks`（`ContentLink`）、`ReadingSection` の kind/table/steps/figure、`ExplanationCard`、`RelatedReadingsCard` など（すべて任意・追加のみ）
+- 要対応（#163）: 4文字以上の数字語（`300,000円` `¥1,350,000` など）を含む表示は `Text.data` に WORD JOINER（U+2060）が入る。`find.text('300,000円')` のように完全一致で探しているアプリ側テストは、U+2060 を除いた文字列での比較に直す必要がある（例: `find.byWidgetPredicate((w) => w is Text && w.data?.replaceAll('\u2060', '') == '300,000円')`）。読み上げ（semanticsLabel）と JSON は元の文字列のまま
+- 未確認: U+2060 が実機フォントで幅ゼロに表示されるかは未確認。実機で数字語の周囲に空白や豆腐が出ないかを確認してほしい
+
 ### Added
 - `ReadingSection` に任意フィールド `kind`（`text`｜`table`｜`steps`｜`figure`、省略は `text`）・`table`（`ReadingTable`）・`steps`・`figure`（`ReadingFigure`、`alt` 必須）を追加。未指定のキーは `toJson` に出さず、既存 JSON と往復で一致する。`body` は kind が `text` のときだけ必須（それ以外は補足として任意）。定数 `kReadingSectionKinds` / `kReadingTableMaxColumns`(6) / `kReadingTableMaxRows`(20) / `kReadingFigureAltMaxLength`(200)
 - `validateChapterReadings` の検査を拡張（table の列・行の整合と上限、steps が空でない、figure の alt と asset の相対パス、kind の許容値）。従来形式のデータは同じ結果で通る
