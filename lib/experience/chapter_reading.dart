@@ -147,6 +147,32 @@ class ReadingSection {
   };
 }
 
+/// 読み物から他のコンテンツ（危険予測・物語・用語・問題など）への参照。
+///
+/// [kind] は文字列（例: `hazard` / `story` / `term` / `question`）。コアは意味を解釈せず、
+/// 遷移先の解決はアプリ側で行う。
+class ContentLink {
+  const ContentLink({required this.kind, required this.id});
+
+  final String kind;
+  final String id;
+
+  factory ContentLink.fromJson(Map<String, dynamic> j, String where) =>
+      ContentLink(
+        kind: reqString(j, 'kind', where),
+        id: reqString(j, 'id', where),
+      );
+
+  Map<String, dynamic> toJson() => {'kind': kind, 'id': id};
+
+  @override
+  bool operator ==(Object other) =>
+      other is ContentLink && other.kind == kind && other.id == id;
+
+  @override
+  int get hashCode => Object.hash(kind, id);
+}
+
 /// 章ごとの解説読み物（教科書的なまとめページ）。
 ///
 /// 用語の暗記だけでなく、章の学習項目を体系的に読める記事を提供する。
@@ -165,6 +191,8 @@ class ChapterReading {
     this.relatedTermIds = const [],
     this.relatedQuestionIds = const [],
     this.disabled = false,
+    this.levelId,
+    this.relatedLinks = const [],
   });
 
   final String readingId;
@@ -187,6 +215,14 @@ class ChapterReading {
   final String contentVer;
   final bool disabled;
 
+  /// 出題範囲（級・年度版など。例: 簿記の `level3_from_2027_04`）。省略（null）は全範囲向け。
+  /// 絞り込みは [readingsForLevel]。
+  final String? levelId;
+
+  /// 他コンテンツへの参照（任意）。[relatedTermIds]・[relatedQuestionIds] とは独立。
+  /// 種類で取り出すには [linksOfKind]。
+  final List<ContentLink> relatedLinks;
+
   factory ChapterReading.fromJson(Map<String, dynamic> j) {
     final readingId = reqString(j, 'readingId', 'chapterReading');
     final where = 'chapterReading[$readingId]';
@@ -205,6 +241,16 @@ class ChapterReading {
         .map((s) => ReadingSection.fromJson(s as Map<String, dynamic>, where))
         .toList();
 
+    final linksJson = j['relatedLinks'];
+    if (linksJson != null &&
+        (linksJson is! List ||
+            linksJson.any((e) => e is! Map<String, dynamic>))) {
+      fail(where, '"relatedLinks" はオブジェクトの配列が必要です');
+    }
+    final levelRaw = j['levelId'];
+    if (levelRaw != null && levelRaw is! String) {
+      fail(where, '"levelId" は文字列が必要です');
+    }
     return ChapterReading(
       readingId: readingId,
       examId: reqString(j, 'examId', where),
@@ -217,6 +263,11 @@ class ChapterReading {
       sourceRef: reqString(j, 'sourceRef', where),
       contentVer: reqString(j, 'contentVer', where),
       disabled: j['disabled'] == true,
+      levelId: levelRaw as String?,
+      relatedLinks: [
+        for (final e in (linksJson as List? ?? const []))
+          ContentLink.fromJson(e as Map<String, dynamic>, where),
+      ],
     );
   }
 
@@ -232,6 +283,9 @@ class ChapterReading {
     'sourceRef': sourceRef,
     'contentVer': contentVer,
     if (disabled) 'disabled': true,
+    if (levelId != null) 'levelId': levelId,
+    if (relatedLinks.isNotEmpty)
+      'relatedLinks': relatedLinks.map((l) => l.toJson()).toList(),
   };
 
   static List<String> _stringList(
@@ -247,3 +301,23 @@ class ChapterReading {
     return v.cast<String>();
   }
 }
+
+/// [reading] の参照のうち [kind] のものを順序を保って返す。
+List<ContentLink> linksOfKind(ChapterReading reading, String kind) => [
+  for (final l in reading.relatedLinks)
+    if (l.kind == kind) l,
+];
+
+/// 出題範囲 [currentLevelId] で表示する読み物。`levelId` が null の読み物は常に含め、
+/// 指定のある読み物は一致するものだけ。[currentLevelId] が null なら全件。
+/// `disabled` はここでは除かない（従来どおり呼び出し側で扱う）。
+List<ChapterReading> readingsForLevel(
+  Iterable<ChapterReading> readings,
+  String? currentLevelId,
+) => [
+  for (final r in readings)
+    if (currentLevelId == null ||
+        r.levelId == null ||
+        r.levelId == currentLevelId)
+      r,
+];
