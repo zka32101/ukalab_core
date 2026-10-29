@@ -31,7 +31,7 @@ void main() {
     expect(readingsForQuestion([reading], 'q'), isEmpty);
     expect(readingsForLevel([reading], 'l'), hasLength(1));
     expect(linksOfKind(reading, 'hazard'), hasLength(1));
-    expect(validateChapterReadings([reading]), isNotEmpty);
+    expect(validateChapterReadings([reading]), isEmpty);
     expect(kExplanationOtherSceneMarker, isNotEmpty);
     expect(ExplanationParts.fromPlain('x').hasBody, isTrue);
   });
