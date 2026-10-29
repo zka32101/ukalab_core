@@ -285,7 +285,7 @@ void main() {
       expect(_lineCount(p), 3);
       expect(p.didExceedMaxLines, isTrue);
       final display = keepReadingNumbersTogether(label);
-      final start = display.indexOf('1,350');
+      final start = display.indexOf('1$kReadingWordJoiner,');
       final end = display.indexOf('円') + 1;
       for (final s in _lineStarts(p)) {
         expect(s > start && s < end, isFalse, reason: '行頭=$s');
