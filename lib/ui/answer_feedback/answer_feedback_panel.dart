@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../experience/chapter_reading.dart';
 import '../../experience/comparison_view.dart';
 import '../../progress/progress_record.dart';
 import '../../progress/weak_topics.dart';
@@ -27,6 +28,8 @@ class AnswerFeedbackPanel extends StatefulWidget {
     this.isCorrect,
     this.includeCalculation = true,
     this.strings,
+    this.relatedReadings = const [],
+    this.onOpenReading,
   });
 
   /// 解答した問題。
@@ -49,6 +52,13 @@ class AnswerFeedbackPanel extends StatefulWidget {
   final bool includeCalculation;
 
   final AnswerFeedbackStrings? strings;
+
+  /// 誤答のときに「読み物でおさらい」として出す読み物（`disabled` は出さない）。
+  /// 問題から探すには `readingsForQuestion` が使える。空なら従来と同じ表示。
+  final List<ChapterReading> relatedReadings;
+
+  /// 読み物がタップされたときに呼ぶ。null なら読み物の欄は出さない。
+  final ValueChanged<ChapterReading>? onOpenReading;
 
   @override
   State<AnswerFeedbackPanel> createState() => _AnswerFeedbackPanelState();
@@ -79,7 +89,8 @@ class _AnswerFeedbackPanelState extends State<AnswerFeedbackPanel> {
     final s = widget.strings ?? AnswerFeedbackStrings.of(context);
     final theme = Theme.of(context);
     final comparison = buildComparison(widget.question, widget.terms);
-    final cause = (!widget.includeCalculation && _cause == WrongCause.calculation)
+    final cause =
+        (!widget.includeCalculation && _cause == WrongCause.calculation)
         ? null
         : _cause;
     final prescription = prescriptionFor(cause);
@@ -119,7 +130,10 @@ class _AnswerFeedbackPanelState extends State<AnswerFeedbackPanel> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(s.prescriptionTitle, style: theme.textTheme.titleSmall),
+                          Text(
+                            s.prescriptionTitle,
+                            style: theme.textTheme.titleSmall,
+                          ),
                           const SizedBox(height: 2),
                           Text(s.prescriptionText(prescription)),
                         ],
@@ -131,7 +145,62 @@ class _AnswerFeedbackPanelState extends State<AnswerFeedbackPanel> {
             ),
           ),
         ],
+        ..._readingLinks(context, s, theme),
       ],
     );
+  }
+
+  List<Widget> _readingLinks(
+    BuildContext context,
+    AnswerFeedbackStrings s,
+    ThemeData theme,
+  ) {
+    final onOpen = widget.onOpenReading;
+    final readings = [
+      for (final r in widget.relatedReadings)
+        if (!r.disabled) r,
+    ];
+    if (onOpen == null || readings.isEmpty) return const [];
+    return [
+      const SizedBox(height: 12),
+      Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Semantics(
+                header: true,
+                child: Row(
+                  children: [
+                    const Icon(Icons.menu_book_outlined, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        s.relatedReadingsTitle,
+                        style: theme.textTheme.titleSmall,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              for (final r in readings)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: OutlinedButton(
+                    onPressed: () => onOpen(r),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(r.title),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    ];
   }
 }

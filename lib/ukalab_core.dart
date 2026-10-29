@@ -51,6 +51,7 @@ export 'experience/comparison_view.dart';
 export 'experience/conv_lab.dart';
 export 'experience/ethics_case.dart';
 export 'experience/exam_day_checklist.dart';
+export 'experience/explanation_parts.dart';
 export 'experience/failure_gallery.dart';
 export 'experience/method_choice.dart';
 export 'experience/ml_lab.dart';
