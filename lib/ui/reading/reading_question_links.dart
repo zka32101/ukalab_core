@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../experience/chapter_reading.dart';
 import '../answer_feedback/answer_feedback_strings.dart';
+import 'reading_number_wrap.dart';
+
+/// ボタンのラベルを折り返す最大行数。
+const int _kLinkMaxLines = 3;
 
 /// 読み物から確認問題へ戻る導線。`ChapterReading.relatedQuestionIds` の問題ごとにボタンを出し、
 /// タップで [onOpenQuestion]（qid）を呼ぶ。問題が無ければ何も出さない。
@@ -58,8 +62,11 @@ class ReadingQuestionLinks extends StatelessWidget {
               onPressed: () => onOpenQuestion(questionIds[i]),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
+                // 最大3行まで折り返し、それでも長いときだけ末尾を省略（数字の途中では切らない）。
+                child: readingNumberSafeText(
                   labels[questionIds[i]] ?? s.readingQuestionLabel(i + 1),
+                  maxLines: _kLinkMaxLines,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
