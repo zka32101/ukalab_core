@@ -37,6 +37,13 @@ class AnswerFeedbackStrings {
     required this.trendWorse,
     required this.trendSame,
     required this.weakAttempts,
+    this.explConclusion = '結論',
+    this.explReason = '理由',
+    this.explPitfall = '間違えやすい点',
+    this.explOtherScene = '別の場面',
+    this.relatedReadingsTitle = '読み物でおさらい',
+    this.readingBackToQuestion = '確認問題にもどる',
+    this.readingQuestionLabel = _jaQuestionLabel,
   });
 
   final String causeKnowledge;
@@ -69,19 +76,34 @@ class AnswerFeedbackStrings {
   /// 「N問中M問ミス」。
   final String Function(int attempts, int misses) weakAttempts;
 
+  // 解説カード（ExplanationCard）・誤答→読み物導線。後から追加した項目なので省略可（既定は日本語）。
+  final String explConclusion;
+  final String explReason;
+  final String explPitfall;
+  final String explOtherScene;
+
+  /// 誤答後に出す読み物リンクの見出し。
+  final String relatedReadingsTitle;
+
+  /// 読み物側の「確認問題へ戻る」見出し。
+  final String readingBackToQuestion;
+
+  /// 確認問題ボタンの既定名（1始まりの番号）。
+  final String Function(int n) readingQuestionLabel;
+
   String causeLabel(WrongCause cause) => switch (cause) {
-        WrongCause.knowledge => causeKnowledge,
-        WrongCause.trap => causeTrap,
-        WrongCause.calculation => causeCalculation,
-        WrongCause.misread => causeMisread,
-      };
+    WrongCause.knowledge => causeKnowledge,
+    WrongCause.trap => causeTrap,
+    WrongCause.calculation => causeCalculation,
+    WrongCause.misread => causeMisread,
+  };
 
   String prescriptionText(WeakPrescription p) => switch (p) {
-        WeakPrescription.studyExplanation => prescriptionStudy,
-        WeakPrescription.compareFirst => prescriptionCompare,
-        WeakPrescription.calculationSteps => prescriptionCalculation,
-        WeakPrescription.markKeyPoints => prescriptionMisread,
-      };
+    WeakPrescription.studyExplanation => prescriptionStudy,
+    WeakPrescription.compareFirst => prescriptionCompare,
+    WeakPrescription.calculationSteps => prescriptionCalculation,
+    WeakPrescription.markKeyPoints => prescriptionMisread,
+  };
 
   static const ja = AnswerFeedbackStrings(
     causeKnowledge: '知識不足',
@@ -109,6 +131,13 @@ class AnswerFeedbackStrings {
     trendWorse: '先週より悪化',
     trendSame: '先週と同程度',
     weakAttempts: _jaAttempts,
+    explConclusion: '結論',
+    explReason: '理由',
+    explPitfall: '間違えやすい点',
+    explOtherScene: '別の場面',
+    relatedReadingsTitle: '読み物でおさらい',
+    readingBackToQuestion: '確認問題にもどる',
+    readingQuestionLabel: _jaQuestionLabel,
   );
 
   static const en = AnswerFeedbackStrings(
@@ -119,7 +148,8 @@ class AnswerFeedbackStrings {
     selectorTitle: 'Why did you miss it?',
     selectorHint: 'Optional. Tap again to undo.',
     prescriptionTitle: 'Suggested next step',
-    prescriptionStudy: 'Read the explanation and term card to get the meaning down first.',
+    prescriptionStudy:
+        'Read the explanation and term card to get the meaning down first.',
     prescriptionCompare: 'Compare the look-alike terms, then try again.',
     prescriptionCalculation: 'Write out the calculation one step at a time.',
     prescriptionMisread: 'Mark the key points in the question before choosing.',
@@ -137,6 +167,13 @@ class AnswerFeedbackStrings {
     trendWorse: 'Worse than last week',
     trendSame: 'About the same as last week',
     weakAttempts: _enAttempts,
+    explConclusion: 'Takeaway',
+    explReason: 'Why',
+    explPitfall: 'Common slip',
+    explOtherScene: 'Another situation',
+    relatedReadingsTitle: 'Read to review',
+    readingBackToQuestion: 'Back to practice questions',
+    readingQuestionLabel: _enQuestionLabel,
   );
 
   // 簡体字・繁体字・韓国語は機械翻訳の下書き。公開前に母語話者の確認が要る。
@@ -166,6 +203,13 @@ class AnswerFeedbackStrings {
     trendWorse: '比上周退步',
     trendSame: '与上周持平',
     weakAttempts: _zhAttempts,
+    explConclusion: '结论',
+    explReason: '理由',
+    explPitfall: '容易出错的地方',
+    explOtherScene: '其他场景',
+    relatedReadingsTitle: '阅读复习',
+    readingBackToQuestion: '返回练习题',
+    readingQuestionLabel: _zhQuestionLabel,
   );
 
   static const zhHant = AnswerFeedbackStrings(
@@ -194,6 +238,13 @@ class AnswerFeedbackStrings {
     trendWorse: '比上週退步',
     trendSame: '與上週持平',
     weakAttempts: _zhHantAttempts,
+    explConclusion: '結論',
+    explReason: '理由',
+    explPitfall: '容易出錯的地方',
+    explOtherScene: '其他情境',
+    relatedReadingsTitle: '閱讀複習',
+    readingBackToQuestion: '返回練習題',
+    readingQuestionLabel: _zhHantQuestionLabel,
   );
 
   static const ko = AnswerFeedbackStrings(
@@ -222,16 +273,23 @@ class AnswerFeedbackStrings {
     trendWorse: '지난주보다 나빠짐',
     trendSame: '지난주와 비슷함',
     weakAttempts: _koAttempts,
+    explConclusion: '결론',
+    explReason: '이유',
+    explPitfall: '헷갈리기 쉬운 점',
+    explOtherScene: '다른 상황',
+    relatedReadingsTitle: '읽을거리로 복습',
+    readingBackToQuestion: '확인 문제로 돌아가기',
+    readingQuestionLabel: _koQuestionLabel,
   );
 
   /// [KitStrings.languageCode] に対応する文言。無い言語は日本語。
   static AnswerFeedbackStrings forLanguageCode(String code) => switch (code) {
-        'en' => en,
-        'ko' => ko,
-        'zh' => zhHans,
-        'zh-Hant' => zhHant,
-        _ => ja,
-      };
+    'en' => en,
+    'ko' => ko,
+    'zh' => zhHans,
+    'zh-Hant' => zhHant,
+    _ => ja,
+  };
 
   /// 最も近い `KitStringsScope` の言語に合う文言。無ければ日本語。
   static AnswerFeedbackStrings of(BuildContext context) =>
@@ -248,3 +306,8 @@ String _enAttempts(int a, int m) => '$m of $a missed';
 String _zhAttempts(int a, int m) => '$a题中错$m题';
 String _zhHantAttempts(int a, int m) => '$a題中錯$m題';
 String _koAttempts(int a, int m) => '$a문제 중 $m문제 오답';
+String _jaQuestionLabel(int n) => '確認問題 $n';
+String _enQuestionLabel(int n) => 'Practice question $n';
+String _zhQuestionLabel(int n) => '练习题 $n';
+String _zhHantQuestionLabel(int n) => '練習題 $n';
+String _koQuestionLabel(int n) => '확인 문제 $n';

@@ -5,14 +5,20 @@
 /// `ui.dart` とは別の単機能エントリ。
 library;
 
-export 'experience/comparison_view.dart' show ComparisonRow, ComparisonView, buildComparison;
+export 'experience/comparison_view.dart'
+    show ComparisonRow, ComparisonView, buildComparison;
 export 'policy/premium_features.dart' show PremiumFeature, canUsePremiumFeature;
 export 'progress/history_log.dart' show attachCauseToLatest, historyRecordFor;
 export 'progress/progress_record.dart' show ProgressRecord, WrongCause;
 export 'progress/weak_summary.dart' show WeakSummary, buildWeakSummary;
-export 'progress/weak_topics.dart' show WeakPrescription, WeakTopic, prescriptionFor;
+export 'progress/weak_topics.dart'
+    show WeakPrescription, WeakTopic, prescriptionFor;
 export 'ui/answer_feedback/answer_feedback_panel.dart';
 export 'ui/answer_feedback/answer_feedback_strings.dart';
+export 'experience/explanation_parts.dart'
+    show ExplanationParts, kExplanationOtherSceneMarker, readingsForQuestion;
 export 'ui/answer_feedback/comparison_card.dart';
+export 'ui/answer_feedback/explanation_card.dart';
+export 'ui/reading/reading_question_links.dart';
 export 'ui/answer_feedback/weak_summary_card.dart';
 export 'ui/answer_feedback/wrong_cause_selector.dart';

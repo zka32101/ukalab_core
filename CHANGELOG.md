@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+### Added
+- `ReadingSection` に任意フィールド `kind`（`text`｜`table`｜`steps`｜`figure`、省略は `text`）・`table`（`ReadingTable`）・`steps`・`figure`（`ReadingFigure`、`alt` 必須）を追加。未指定のキーは `toJson` に出さず、既存 JSON と往復で一致する。`body` は kind が `text` のときだけ必須（それ以外は補足として任意）。定数 `kReadingSectionKinds` / `kReadingTableMaxColumns`(6) / `kReadingTableMaxRows`(20) / `kReadingFigureAltMaxLength`(200)
+- `validateChapterReadings` の検査を拡張（table の列・行の整合と上限、steps が空でない、figure の alt と asset の相対パス、kind の許容値）。従来形式のデータは同じ結果で通る
+- `ReadingSectionContent`（`ui.dart`）: `ReadingSection` を kind に応じて描画（テーマ・ダーク・文字拡大対応、alt 読み上げ）。既存の `ReadingSectionView`（データ型）とは別名
+- `ExplanationCard` / `ExplanationCard.fromPlain`（`ui.dart` / `answer_feedback.dart`）と、純Dartの `ExplanationParts`・`kExplanationOtherSceneMarker`: 解説を「結論／理由／間違えやすい点／別の場面」で出す。`【別の場面】` を含む1本文は「別の場面」欄に分け、分けられなければ全文を表示
+- `AnswerFeedbackPanel` に任意引数 `relatedReadings`・`onOpenReading`（誤答時だけ「読み物でおさらい」を表示。未指定なら従来と同一表示）、`readingsForQuestion(readings, qid)`、読み物側の `ReadingQuestionLinks`（`relatedQuestionIds` から確認問題へ戻る）
+- `AnswerFeedbackStrings` に文言を追加（ja / en と、zh・ko の機械翻訳の下書き）。追加項目は省略可で、独自に `AnswerFeedbackStrings` を作っているアプリは変更不要
+- 使い方: `docs/reading_and_explanation.md`。テスト: `test/reading_section_kinds_test.dart`、`test/ui/reading_and_explanation_ui_test.dart`
+
 ## [0.86.0] - 2026-10-25
 
 ### Added
