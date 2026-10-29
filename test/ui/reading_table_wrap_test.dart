@@ -32,11 +32,26 @@ RenderParagraph _paragraph(WidgetTester tester, Finder text) =>
       find.descendant(of: text, matching: find.byType(RichText)).first,
     );
 
-/// 各行の開始位置（文字オフセット）。
-Set<int> _lineStarts(RenderParagraph p, int length) => {
-  for (var i = 0; i < length; i++)
-    p.getLineBoundary(TextPosition(offset: i)).start,
-};
+/// 各行の開始位置（文字オフセット）。文字の箱の上端が変わった位置を行頭とする。
+List<int> _lineStarts(RenderParagraph p) {
+  final length = p.text.toPlainText().length;
+  final starts = <int>[];
+  double? lastTop;
+  for (var i = 0; i < length; i++) {
+    final boxes = p.getBoxesForSelection(
+      TextSelection(baseOffset: i, extentOffset: i + 1),
+    );
+    if (boxes.isEmpty) continue;
+    final top = boxes.first.top;
+    if (lastTop == null || top > lastTop + 1) {
+      starts.add(i);
+      lastTop = top;
+    }
+  }
+  return starts;
+}
+
+int _lineCount(RenderParagraph p) => _lineStarts(p).length;
 
 Finder get _hScroll => find.byWidgetPredicate(
   (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal,
@@ -100,7 +115,7 @@ void main() {
       final display = keepReadingNumbersTogether(raw);
       final p = _paragraph(tester, find.byType(Text));
       final start = display.indexOf('3');
-      final starts = _lineStarts(p, display.length);
+      final starts = _lineStarts(p);
       expect(starts.length, 2);
       for (final s in starts) {
         expect(s > start && s < display.length, isFalse, reason: '行頭=$s');
@@ -123,7 +138,7 @@ void main() {
       await _settle(tester);
       expect(tester.takeException(), isNull);
       for (final n in ['300,000円', '240,000円', '1,350,000円', '2,400,000円']) {
-        expect(_paragraph(tester, _textOf(n)).computeLineMetrics().length, 1);
+        expect(_lineCount(_paragraph(tester, _textOf(n))), 1);
       }
     });
   });
@@ -180,7 +195,7 @@ void main() {
       expect(_hScroll, findsNothing);
       expect(tester.getSize(find.byType(Table)).width, 390);
       expect(
-        _paragraph(tester, _textOf('減価償却累計額')).computeLineMetrics().length,
+        _lineCount(_paragraph(tester, _textOf('減価償却累計額'))),
         1,
       );
     });
@@ -203,7 +218,7 @@ void main() {
       expect(tester.getSize(find.byType(Table)).width, greaterThan(390));
       // 見出しは語の途中で折れない
       for (final h in ['減価償却累計額', '借方・貸方', '金額の求め方']) {
-        expect(_paragraph(tester, _textOf(h)).computeLineMetrics().length, 1);
+        expect(_lineCount(_paragraph(tester, _textOf(h))), 1);
       }
       final table = tester.widget<Table>(find.byType(Table));
       expect(table.children.length, 2);
@@ -267,12 +282,12 @@ void main() {
       final label = '営業用の車両運搬具(取得原価1,350,000円)の減価償却${'あ' * 150}';
       await pumpLink(tester, label);
       final p = _paragraph(tester, _textOf(label));
-      expect(p.computeLineMetrics().length, 3);
+      expect(_lineCount(p), 3);
       expect(p.didExceedMaxLines, isTrue);
       final display = keepReadingNumbersTogether(label);
       final start = display.indexOf('1,350');
       final end = display.indexOf('円') + 1;
-      for (final s in _lineStarts(p, display.length)) {
+      for (final s in _lineStarts(p)) {
         expect(s > start && s < end, isFalse, reason: '行頭=$s');
       }
     });
@@ -281,7 +296,7 @@ void main() {
       final label = 'あ' * 40;
       await pumpLink(tester, label);
       final p = _paragraph(tester, _textOf(label));
-      expect(p.computeLineMetrics().length, lessThanOrEqualTo(3));
+      expect(_lineCount(p), lessThanOrEqualTo(3));
       expect(p.didExceedMaxLines, isFalse);
     });
 
