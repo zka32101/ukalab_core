@@ -20,6 +20,14 @@
   - docs: `docs/reading_and_explanation.md` に使用例・移行例・問題の変換アダプタの設計メモ（コード追加なし）
   - テスト: `test/reading_level_links_test.dart`、`test/ui/related_readings_card_test.dart`、`test/reading_entrypoint_test.dart`
 
+### Fixed
+- 読み物の表（`ReadingSectionContent` の kind: table）と `ReadingQuestionLinks` の表示を改善（公開API・JSON・2〜3列の表の見た目は変更なし）
+  - 数字・金額（`300,000円` `¥1,350,000` など4文字以上の語）は、文字の間に折り返し禁止の WORD JOINER（U+2060、幅ゼロ）を入れて描画し、数字の途中や数字と単位の間で折れないようにした。読み上げ（semanticsLabel）は元の文字列で、データ（JSON）は変更しない
+  - 4列以上の表の列幅を内容に応じて配分。従来の均等幅で各列の下限（短い語は1行の幅、長い文は全角6文字分か最長の語）を満たすときは従来と同じ見た目。足りないときは全幅のまま列幅を配分し、全列の下限の合計が画面幅を超えるときは表全体を横スクロールにする（行→列の順序は同じ `Table`）。列数の上限6は変更なし
+  - `ReadingQuestionLinks` のラベルは最大3行まで折り返し、3行を超えるときだけ末尾を省略（タップ領域・並びは従来どおり）
+  - 注意: 4文字以上の数字語を含む文字列は `Text.data` に U+2060 が入るため、テストで `find.text('300,000円')` のように完全一致で探しているアプリは、連結文字を除いた比較に変える必要がある
+  - テスト: `test/ui/reading_table_wrap_test.dart`
+
 ## [0.86.0] - 2026-10-25
 
 ### Added
