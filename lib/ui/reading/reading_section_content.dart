@@ -88,6 +88,15 @@ class _TableBlock extends StatefulWidget {
 class _TableBlockState extends State<_TableBlock> {
   final ScrollController _scroll = ScrollController();
 
+  /// 右にまだスクロールできる（右端に達していない）とき true。ヒントの表示に使う。
+  bool _moreToRight = false;
+
+  bool _onMetrics(ScrollMetrics m) {
+    final more = m.axis == Axis.horizontal && m.extentAfter > 1;
+    if (more != _moreToRight && mounted) setState(() => _moreToRight = more);
+    return false;
+  }
+
   @override
   void dispose() {
     _scroll.dispose();
@@ -240,7 +249,8 @@ class _TableBlockState extends State<_TableBlock> {
         // 収まらない: 表全体を横スクロール（行→列の順序は Table のまま）。
         final widths = [for (final c in m) c.scroll.ceilToDouble()];
         final total = widths.fold<double>(0, (a, w) => a + w);
-        return Scrollbar(
+        final surface = Theme.of(context).colorScheme.surface;
+        final scrollView = Scrollbar(
           controller: _scroll,
           thumbVisibility: true,
           child: SingleChildScrollView(
@@ -254,6 +264,43 @@ class _TableBlockState extends State<_TableBlock> {
               }),
             ),
           ),
+        );
+        // 右端に「まだ横にスクロールできる」控えめな手がかり（フェード＋シェブロン）。
+        // 右端に達したら消える。装飾なので読み上げ対象にしない。
+        return Stack(
+          children: [
+            NotificationListener<ScrollMetricsNotification>(
+              onNotification: (n) => _onMetrics(n.metrics),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (n) => _onMetrics(n.metrics),
+                child: scrollView,
+              ),
+            ),
+            if (_moreToRight)
+              Positioned(
+                top: 0,
+                bottom: 12,
+                right: 0,
+                child: ExcludeSemantics(
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 28,
+                      alignment: Alignment.centerRight,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [surface.withValues(alpha: 0), surface],
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.chevron_right,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );
