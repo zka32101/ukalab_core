@@ -292,6 +292,17 @@ void main() {
       }
     });
 
+    testWidgets('ラベル文字列は事前に切り詰めない（省略は Text の ellipsis に任せる）', (tester) async {
+      final label = '営業用の車両運搬具(取得原価1,350,000円)の減価償却${'あ' * 150}';
+      await pumpLink(tester, label);
+      final text = tester.widget<Text>(_textOf(label));
+      expect(text.data!.replaceAll(kReadingWordJoiner, ''), label);
+      expect(text.data!, isNot(contains('…')));
+      expect(text.maxLines, 3);
+      expect(text.overflow, TextOverflow.ellipsis);
+      expect(text.semanticsLabel, label);
+    });
+
     testWidgets('3行に収まるラベルは省略しない', (tester) async {
       final label = 'あ' * 40;
       await pumpLink(tester, label);
@@ -316,6 +327,52 @@ void main() {
       await _settle(tester);
       await tester.tap(find.byType(OutlinedButton));
       expect(opened, ['q1']);
+    });
+  });
+
+  group('(D) 横スクロールのヒント', () {
+    final hint = find.byIcon(Icons.chevron_right);
+    final wide = _table(
+      ['減価償却累計額', '借方・貸方', '金額', '金額の求め方'],
+      [
+        ['車両運搬具', '300,000円', '240,000円', '取得原価'],
+      ],
+    );
+
+    testWidgets('横スクロールのとき表示し、右端に達したら消える', (tester) async {
+      _phone(tester);
+      await tester.pumpWidget(_app(wide));
+      await _settle(tester);
+      expect(_hScroll, findsOneWidget);
+      expect(hint, findsOneWidget);
+      // 装飾なので読み上げ対象にしない
+      expect(
+        find.ancestor(of: hint, matching: find.byType(ExcludeSemantics)),
+        findsWidgets,
+      );
+      await tester.drag(_hScroll, const Offset(-2000, 0));
+      await _settle(tester);
+      expect(hint, findsNothing);
+      await tester.drag(_hScroll, const Offset(2000, 0));
+      await _settle(tester);
+      expect(hint, findsOneWidget);
+    });
+
+    testWidgets('スクロール不要の表（均等幅・全幅配分）では出さない', (tester) async {
+      _phone(tester);
+      await tester.pumpWidget(
+        _app(
+          _table(
+            ['A', 'B', 'C', 'D'],
+            [
+              ['1', '2', '3', '4'],
+            ],
+          ),
+        ),
+      );
+      await _settle(tester);
+      expect(_hScroll, findsNothing);
+      expect(hint, findsNothing);
     });
   });
 }
